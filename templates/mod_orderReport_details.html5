@@ -1,0 +1,50 @@
+<!-- indexer::stop -->
+<div
+	class="<?php echo $this->class; ?> block orderDetails"<?php echo $this->cssID; ?><?php if ($this->style): ?> style="<?php echo $this->style; ?>"<?php endif; ?>>
+	<?php if($this->id): ?>
+		<a class="span10" href="javascript:history.go(-1);"><?php echo $GLOBALS['TL_LANG']['tl_reports']['orderReport']['backLink']; ?></a>
+		<br><br>
+		<div class="dataBlock">
+			<?php echo $GLOBALS['TL_LANG']['tl_reports']['orderReport']['orderId']; ?>: <?php echo $this->order->id; ?><br/>
+			<?php echo $GLOBALS['TL_LANG']['tl_reports']['orderReport']['orderDate']; ?>: <?php echo $this->order->date; ?><br/>
+			<?php echo $GLOBALS['TL_LANG']['tl_reports']['orderReport']['email']; ?>: <?php echo $this->order->billing['email'] ?>
+		</div>
+		<hr class="span10"/>
+		<div class="dataBlock">
+			<div class="billingAddress span5">
+				<b><?php echo $GLOBALS['TL_LANG']['tl_reports']['orderReport']['billingTitle']; ?> </b><br/>
+				<?php if(strlen($this->order->billing['company']) > 0): ?>
+					<?php echo $this->order->billing['company'] ?><br/>
+				<?php endif; ?>
+				<?php echo sprintf("%s %s %s", $this->order->billing['gender'], ($this->order->billing['salutation'] ? $this->order->billing['salutation'] . ' ' : '') . $this->order->billing['firstname'], $this->order->billing['lastname']); ?><br/>
+				<?php echo $this->order->billing['street1']; ($this->order->billing['street2'] ? '<br>' . $this->order->billing['street2'] : ''); ($this->order->billing['street3'] ? '<br>' . $this->order->billing['street3'] : '') ?><br/>
+				<?php echo sprintf("%s %s", ($this->order->billing['country'] ? utf8_strtoupper(strtoupper($this->order->billing['country'])) . ' - ' : '') . $this->order->billing['postal'], $this->order->billing['city']); ?>
+				<?php if(strlen($this->order->billing['phone']) > 0): ?>
+					<br/><?php echo $this->order->billing['phone'] ?>
+				<?php endif; ?>
+			</div>
+		</div>
+		<hr class="span10"/>
+
+		<div class="dataBlock orderItems">
+			<table width="100%" cellpadding="0" cellspacing="0" class="table table-striped span10">
+				<tr>
+					<th><?php echo $GLOBALS['TL_LANG']['tl_reports']['orderReport']['thead']['product']; ?></th>
+					<th><?php echo $GLOBALS['TL_LANG']['tl_reports']['orderReport']['thead']['qty']; ?></th>
+				</tr>
+				<?php foreach($this->order->items as $item): ?>
+					<tr>
+						<td class="productName" title="<?php echo $item->name; ?>"><?php echo $item->name; ?></td>
+						<td class="productQTY"><?php echo $item->quantity; ?></td>
+					</tr>
+				<?php endforeach; ?>
+			</table>
+		</div>
+
+		<hr class="span10"/>
+	<?php else: ?>
+		<p><?php echo $GLOBALS['TL_LANG']['tl_reports']['orderReport']['notFound']; ?></p>
+	<?php endif; ?>
+	<a class="span10" href="javascript:history.go(-1);"><?php echo $GLOBALS['TL_LANG']['tl_reports']['orderReport']['backLink']; ?></a>
+</div>
+<!-- indexer::continue -->

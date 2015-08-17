@@ -1,0 +1,1 @@
+<a class="<?php echo $this->class; ?>" href="<?php echo $this->href; ?>" title="<?php echo $this->title; ?>"><span><?php echo $this->link; ?> <span class="size">(<?php echo $this->filesize; ?>)</span></span></a>
