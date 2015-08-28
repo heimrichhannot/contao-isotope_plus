@@ -27,13 +27,14 @@ use Isotope\RequestCache\Sort;
 
 
 /**
- * Class ProductFilter
+ * Class ProductFilterPlus
  *
- * Front end module Isotope "product filter".
- * @copyright  Isotope eCommerce Workgroup 2009-2012
- * @author     Andreas Schempp <andreas.schempp@terminal42.ch>
- * @author     Fred Bliss <fred.bliss@intelligentspark.com>
+ * Copyright (c) 2015 Heimrich & Hannot GmbH
+ * @package isotope_plus
+ * @author Oliver Janke <o.janke@heimrich-hannot.de>
+ * @license http://www.gnu.org/licences/lgpl-3.0.html LGPL
  */
+
 class ProductFilterPlus extends ProductFilter
 {
     /**

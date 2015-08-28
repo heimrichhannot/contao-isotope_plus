@@ -10,8 +10,7 @@
 
 $GLOBALS['ISO_HOOKS']['generateProduct'][] = array('HeimrichHannot\Isotope\Hooks', 'generateProductHook');
 $GLOBALS['ISO_HOOKS']['addProductToCollection'][] = array('HeimrichHannot\Isotope\Hooks', 'addProductToCollectionHook');
-$GLOBALS['ISO_HOOKS']['postAddProductToCollection'][] = array('HeimrichHannot\Isotope\Hooks', 'postAddProductToCollectionHook');
-$GLOBALS['ISO_HOOKS']['preCheckout'][] = array('HeimrichHannot\Isotope\Hooks', 'preCheckoutHook');
+$GLOBALS['ISO_HOOKS']['preCheckout']['isotope_plus_preCheckoutHook'] = array('HeimrichHannot\Isotope\Hooks', 'preCheckoutHook');
 $GLOBALS['ISO_HOOKS']['updateItemInCollection'][] = array('HeimrichHannot\Isotope\Hooks', 'updateItemInCollectionHook');
 
 /**
@@ -29,8 +28,3 @@ $GLOBALS['FE_MOD']['isotopeplus'] = array
  * Attributes
  */
 \Isotope\Model\Attribute::registerModelType('youtube', 'Isotope\Model\Attribute\Youtube');
-
-/**
- * Models
- */
-$GLOBALS['TL_MODELS']['tl_belegungsplan_data'] = '\HeimrichHannot\Isotope\BookingDataModel';

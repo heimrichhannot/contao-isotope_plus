@@ -25,13 +25,14 @@ use Isotope\RequestCache\Sort;
 
 
 /**
- * Class ProductList
+ * Class ProductListPlus
  *
- * The mother of all product lists.
- * @copyright  Isotope eCommerce Workgroup 2009-2012
- * @author     Fred Bliss <fred.bliss@intelligentspark.com>
- * @author     Andreas Schempp <andreas.schempp@terminal42.ch>
+ * Copyright (c) 2015 Heimrich & Hannot GmbH
+ * @package isotope_plus
+ * @author Oliver Janke <o.janke@heimrich-hannot.de>
+ * @license http://www.gnu.org/licences/lgpl-3.0.html LGPL
  */
+
 class ProductListPlus extends ProductList
 {
 
