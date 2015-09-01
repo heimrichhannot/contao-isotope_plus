@@ -1,6 +1,45 @@
 <?php
 
+$arrDca = &$GLOBALS['TL_DCA']['tl_iso_product'];
+
 /**
- * Table tl_iso_product
+ * Fields
  */
-$GLOBALS['TL_DCA']['tl_iso_product']['fields']['shipping_exempt']['attributes']['fe_filter'] = true;
+$arrDca['fields']['shipping_exempt']['attributes']['fe_filter'] = true;
+
+$arrDca['fields']['initialStock'] = array
+(
+	'label'                 => &$GLOBALS['TL_LANG']['tl_iso_product']['initialStock'],
+	'inputType'             => 'text',
+	'eval'                  => array('mandatory'=>true, 'tl_class'=>'w50', 'rgxp' => 'digit'),
+	'attributes'            => array('legend'=>'inventory_legend'),
+	'sql'                   => "varchar(255) NOT NULL default ''",
+);
+
+$arrDca['fields']['stock'] = array
+(
+	'label'                 => &$GLOBALS['TL_LANG']['tl_iso_product']['stock'],
+	'inputType'             => 'text',
+	'eval'                  => array('mandatory'=>true, 'tl_class'=>'w50', 'rgxp' => 'digit'),
+	'attributes'            => array('legend'=>'inventory_legend', 'fe_sorting'=>true),
+	'sql'                   => "varchar(255) NOT NULL default ''",
+);
+
+$arrDca['fields']['releaseDate'] = array
+(
+	'label'                 => &$GLOBALS['TL_LANG']['tl_iso_product']['releaseDate'],
+	'exclude'               => true,
+	'inputType'             => 'text',
+	'eval'                  => array('rgxp'=>'date', 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
+	'attributes'            => array('legend'=>'publish_legend'),
+	'sql'                   => "varchar(10) NOT NULL default ''",
+);
+
+$arrDca['fields']['maxOrderSize'] = array
+(
+	'label'                 => &$GLOBALS['TL_LANG']['tl_iso_product']['maxOrderSize'],
+	'inputType'             => 'text',
+	'eval'                  => array('tl_class'=>'w50', 'rgxp' => 'digit'),
+	'attributes'            => array('legend'=>'inventory_legend'),
+	'sql'                   => "varchar(255) NOT NULL default ''",
+);
