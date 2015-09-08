@@ -31,7 +31,7 @@ $arrDca['fields']['releaseDate'] = array
 	'exclude'               => true,
 	'inputType'             => 'text',
 	'eval'                  => array('rgxp'=>'date', 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
-	'attributes'            => array('legend'=>'publish_legend'),
+	'attributes'            => array('legend'=>'publish_legend', 'fe_sorting'=>true),
 	'sql'                   => "varchar(10) NOT NULL default ''",
 );
 

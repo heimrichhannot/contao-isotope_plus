@@ -11,21 +11,21 @@
  */
 
 
-$dc = &$GLOBALS['TL_DCA']['tl_module'];
+$arrDca = &$GLOBALS['TL_DCA']['tl_module'];
 
 
 /**
  * Add palettes to tl_module
  */
 
-$dc['palettes']['iso_productfilterplus'] = '{title_legend},name,headline,type;{config_legend},iso_category_scope,iso_list_where,iso_enableLimit,iso_filterFields,iso_filterHideSingle,iso_searchFields,iso_searchAutocomplete,iso_sortingFields,iso_listingSortField,iso_listingSortDirection;{template_legend},customTpl,iso_filterTpl,iso_includeMessages,iso_hide_list;{redirect_legend},jumpTo;{reference_legend:hide},defineRoot;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
-$dc['palettes']['iso_productlistplus']       = '{title_legend},name,headline,type;{config_legend},numberOfItems,perPage,iso_category_scope,iso_list_where,iso_filterModules,iso_newFilter,iso_listingSortField,iso_listingSortDirection;{redirect_legend},iso_addProductJumpTo,iso_jump_first;{reference_legend:hide},defineRoot;{template_legend:hide},customTpl,iso_list_layout,iso_gallery,iso_cols,iso_use_quantity,iso_hide_list,iso_includeMessages,iso_emptyMessage,iso_emptyFilter,iso_buttons;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
+$arrDca['palettes']['iso_productfilterplus'] = '{title_legend},name,headline,type;{config_legend},iso_category_scope,iso_list_where,iso_enableLimit,iso_filterFields,iso_filterHideSingle,iso_searchFields,iso_searchAutocomplete,iso_sortingFields,iso_listingSortField,iso_listingSortDirection;{template_legend},customTpl,iso_filterTpl,iso_includeMessages,iso_hide_list;{redirect_legend},jumpTo;{reference_legend:hide},defineRoot;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
+$arrDca['palettes']['iso_productlistplus']       = '{title_legend},name,headline,type;{config_legend},numberOfItems,perPage,iso_category_scope,iso_list_where,iso_filterModules,iso_newFilter,iso_listingSortField,iso_listingSortDirection;{redirect_legend},iso_addProductJumpTo,iso_jump_first;{reference_legend:hide},defineRoot;{template_legend:hide},customTpl,iso_list_layout,iso_gallery,iso_cols,iso_use_quantity,iso_hide_list,iso_includeMessages,iso_emptyMessage,iso_emptyFilter,iso_buttons;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
 
 
 /**
  * Add fields to tl_module
  */
-$GLOBALS['TL_DCA']['tl_module']['fields']['iso_filterTpl'] = array
+$arrDca['fields']['iso_filterTpl'] = array
 (
     'label'                     => &$GLOBALS['TL_LANG']['tl_module']['iso_filterTpl'],
     'exclude'                   => true,
@@ -36,7 +36,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['iso_filterTpl'] = array
     'sql'                       => "varchar(64) NOT NULL default ''",
 );
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['iso_hide_list'] = array
+$arrDca['fields']['iso_hide_list'] = array
 (
     'label'                     => &$GLOBALS['TL_LANG']['tl_module']['iso_hide_list'],
     'exclude'                   => true,
@@ -45,7 +45,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['iso_hide_list'] = array
     'sql'                       => "char(1) NOT NULL default ''",
 );
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['iso_category_scope'] = array
+$arrDca['fields']['iso_category_scope'] = array
 (
     'label'                     => &$GLOBALS['TL_LANG']['tl_module']['iso_category_scope'],
     'exclude'                   => true,
@@ -57,7 +57,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['iso_category_scope'] = array
     'sql'                       => "varchar(64) NOT NULL default ''",
 );
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['iso_list_where'] = array
+$arrDca['fields']['iso_list_where'] = array
 (
     'label'                     => &$GLOBALS['TL_LANG']['tl_module']['iso_list_where'],
     'exclude'                   => true,
@@ -66,7 +66,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['iso_list_where'] = array
     'sql'                       => "varchar(255) NOT NULL default ''",
 );
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['iso_filterFields'] = array
+$arrDca['fields']['iso_filterFields'] = array
 (
     'label'                     => &$GLOBALS['TL_LANG']['tl_module']['iso_filterFields'],
     'exclude'                   => true,
@@ -76,7 +76,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['iso_filterFields'] = array
     'sql'                       => "blob NULL",
 );
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['iso_filterHideSingle'] = array
+$arrDca['fields']['iso_filterHideSingle'] = array
 (
     'label'                     => &$GLOBALS['TL_LANG']['tl_module']['iso_filterHideSingle'],
     'exclude'                   => true,
@@ -85,7 +85,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['iso_filterHideSingle'] = array
     'sql'                       => "char(1) NOT NULL default ''",
 );
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['iso_searchFields'] = array
+$arrDca['fields']['iso_searchFields'] = array
 (
     'label'                     => &$GLOBALS['TL_LANG']['tl_module']['iso_searchFields'],
     'exclude'                   => true,
@@ -95,7 +95,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['iso_searchFields'] = array
     'sql'                       => "blob NULL",
 );
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['iso_searchAutocomplete'] = array
+$arrDca['fields']['iso_searchAutocomplete'] = array
 (
     'label'                     => &$GLOBALS['TL_LANG']['tl_module']['iso_searchAutocomplete'],
     'exclude'                   => true,
@@ -105,7 +105,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['iso_searchAutocomplete'] = array
     'sql'                       => "varchar(255) NOT NULL default ''",
 );
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['iso_sortingFields'] = array
+$arrDca['fields']['iso_sortingFields'] = array
 (
     'label'                     => &$GLOBALS['TL_LANG']['tl_module']['iso_sortingFields'],
     'exclude'                   => true,
@@ -115,7 +115,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['iso_sortingFields'] = array
     'sql'                       => "blob NULL",
 );
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['iso_enableLimit'] = array
+$arrDca['fields']['iso_enableLimit'] = array
 (
     'label'                     => &$GLOBALS['TL_LANG']['tl_module']['iso_enableLimit'],
     'exclude'                   => true,
@@ -124,7 +124,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['iso_enableLimit'] = array
     'sql'                       => "char(1) NOT NULL default ''",
 );
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['iso_listingSortField'] = array
+$arrDca['fields']['iso_listingSortField'] = array
 (
     'label'                     => &$GLOBALS['TL_LANG']['tl_module']['iso_listingSortField'],
     'exclude'                   => true,
@@ -138,7 +138,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['iso_listingSortField'] = array
     ),
 );
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['iso_listingSortDirection'] = array
+$arrDca['fields']['iso_listingSortDirection'] = array
 (
     'label'                     => &$GLOBALS['TL_LANG']['tl_module']['iso_listingSortDirection'],
     'exclude'                   => true,
@@ -150,7 +150,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['iso_listingSortDirection'] = array
     'sql'                       => "varchar(8) NOT NULL default ''",
 );
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['iso_includeMessages'] = array
+$arrDca['fields']['iso_includeMessages'] = array
 (
     'label'                     => &$GLOBALS['TL_LANG']['tl_module']['iso_includeMessages'],
     'exclude'                   => true,
@@ -159,7 +159,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['iso_includeMessages'] = array
     'sql'                       => "char(1) NOT NULL default ''",
 );
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['iso_perPage'] = array
+$arrDca['fields']['iso_perPage'] = array
 (
 	'label'                     => &$GLOBALS['TL_LANG']['tl_module']['iso_perPage'],
 	'exclude'                   => true,
@@ -169,7 +169,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['iso_perPage'] = array
 	'sql'                       => "varchar(64) NOT NULL default ''",
 );
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['iso_filterModules'] = array
+$arrDca['fields']['iso_filterModules'] = array
 (
 	'label'                     => &$GLOBALS['TL_LANG']['tl_module']['iso_filterModules'],
 	'exclude'                   => true,
@@ -181,7 +181,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['iso_filterModules'] = array
 	'relation'                  => array('type'=>'hasMany', 'load'=>'lazy'),
 );
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['iso_newFilter'] = array
+$arrDca['fields']['iso_newFilter'] = array
 (
 	'label'                     => &$GLOBALS['TL_LANG']['tl_module']['iso_newFilter'],
 	'exclude'                   => true,
@@ -193,7 +193,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['iso_newFilter'] = array
 	'sql'                       => "varchar(8) NOT NULL default ''"
 );
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['iso_addProductJumpTo'] = array
+$arrDca['fields']['iso_addProductJumpTo'] = array
 (
 	'label'                     => &$GLOBALS['TL_LANG']['tl_module']['iso_addProductJumpTo'],
 	'exclude'                   => true,
@@ -205,7 +205,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['iso_addProductJumpTo'] = array
 	'relation'                  => array('type'=>'hasOne', 'load'=>'lazy'),
 );
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['iso_jump_first'] = array
+$arrDca['fields']['iso_jump_first'] = array
 (
 	'label'                     => &$GLOBALS['TL_LANG']['tl_module']['iso_jump_first'],
 	'exclude'                   => true,
@@ -214,19 +214,19 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['iso_jump_first'] = array
 	'sql'                       => "char(1) NOT NULL default ''",
 );
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['iso_list_layout'] = array
+$arrDca['fields']['iso_list_layout'] = array
 (
 	'label'                     => &$GLOBALS['TL_LANG']['tl_module']['iso_list_layout'],
 	'exclude'                   => true,
 	'inputType'                 => 'select',
-	'options_callback'          => function(\DataContainer $dc) {
+	'options_callback'          => function(\DataContainer $arrDca) {
 		return \Isotope\Backend::getTemplates('iso_list_');
 	},
 	'eval'                      => array('includeBlankOption'=>true, 'tl_class'=>'w50', 'chosen'=>true),
 	'sql'                       => "varchar(64) NOT NULL default ''",
 );
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['iso_gallery'] = array
+$arrDca['fields']['iso_gallery'] = array
 (
 	'label'                     => &$GLOBALS['TL_LANG']['tl_module']['iso_gallery'],
 	'exclude'                   => true,
@@ -236,7 +236,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['iso_gallery'] = array
 	'sql'                       => "int(10) unsigned NOT NULL default '0'",
 );
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['iso_cols'] = array
+$arrDca['fields']['iso_cols'] = array
 (
 	'label'                     => &$GLOBALS['TL_LANG']['tl_module']['iso_cols'],
 	'exclude'                   => true,
@@ -246,7 +246,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['iso_cols'] = array
 	'sql'                       => "int(1) unsigned NOT NULL default '1'",
 );
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['iso_use_quantity'] = array
+$arrDca['fields']['iso_use_quantity'] = array
 (
 	'label'                     => &$GLOBALS['TL_LANG']['tl_module']['iso_use_quantity'],
 	'exclude'                   => true,
@@ -255,7 +255,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['iso_use_quantity'] = array
 	'sql'                       => "char(1) NOT NULL default ''",
 );
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['iso_emptyMessage'] = array
+$arrDca['fields']['iso_emptyMessage'] = array
 (
 	'label'                     => &$GLOBALS['TL_LANG']['tl_module']['iso_emptyMessage'],
 	'exclude'                   => true,
@@ -264,7 +264,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['iso_emptyMessage'] = array
 	'sql'                       => "char(1) NOT NULL default ''"
 );
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['iso_emptyFilter'] = array
+$arrDca['fields']['iso_emptyFilter'] = array
 (
 	'label'                     => &$GLOBALS['TL_LANG']['tl_module']['iso_emptyFilter'],
 	'exclude'                   => true,
@@ -273,7 +273,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['iso_emptyFilter'] = array
 	'sql'                       => "char(1) NOT NULL default ''",
 );
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['iso_buttons'] = array
+$arrDca['fields']['iso_buttons'] = array
 (
 	'label'                     => &$GLOBALS['TL_LANG']['tl_module']['iso_buttons'],
 	'exclude'                   => true,
@@ -284,5 +284,5 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['iso_buttons'] = array
 	'sql'                       => "blob NULL",
 );
 
-$dc['palettes']['iso_productreader'] = str_replace('iso_buttons;', 'iso_buttons;{bookings_legend},bp_months;', $dc['palettes']['iso_productreader']);
+$arrDca['palettes']['iso_productreader'] = str_replace('iso_buttons;', 'iso_buttons;{bookings_legend},bp_months;', $arrDca['palettes']['iso_productreader']);
 
