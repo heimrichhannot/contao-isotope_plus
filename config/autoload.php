@@ -33,8 +33,8 @@ ClassLoader::addClasses(array
 	'Isotope\Model\RequestCacheOrFilter'    => 'system/modules/isotope_plus/library/Isotope/Model/RequestCacheOrFilter.php',
 
 	// Classes
-	'HeimrichHannot\Isotope\DownloadHelper' => 'system/modules/isotope_plus/classes/helper/DownloadHelper.php',
-	'HeimrichHannot\Isotope\Hooks'          => 'system/modules/isotope_plus/classes/Hooks.php',
+	'HeimrichHannot\IsotopePlus\DownloadHelper' => 'system/modules/isotope_plus/classes/helper/DownloadHelper.php',
+	'HeimrichHannot\IsotopePlus\IsotopePlus'          => 'system/modules/isotope_plus/classes/IsotopePlus.php',
 ));
 
 

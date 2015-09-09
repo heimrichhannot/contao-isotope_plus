@@ -8,7 +8,7 @@
  * @license http://www.gnu.org/licences/lgpl-3.0.html LGPL
  */
 
-namespace HeimrichHannot\Isotope;
+namespace HeimrichHannot\IsotopePlus;
 
 
 class DownloadHelper extends \Isotope\Isotope

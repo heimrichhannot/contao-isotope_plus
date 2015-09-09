@@ -8,10 +8,11 @@
  * @license http://www.gnu.org/licences/lgpl-3.0.html LGPL
  */
 
-$GLOBALS['ISO_HOOKS']['generateProduct'][] = array('HeimrichHannot\Isotope\Hooks', 'generateProductHook');
-$GLOBALS['ISO_HOOKS']['addProductToCollection'][] = array('HeimrichHannot\Isotope\Hooks', 'addProductToCollectionHook');
-$GLOBALS['ISO_HOOKS']['preCheckout']['isotope_plus_preCheckoutHook'] = array('HeimrichHannot\Isotope\Hooks', 'preCheckoutHook');
-$GLOBALS['ISO_HOOKS']['updateItemInCollection'][] = array('HeimrichHannot\Isotope\Hooks', 'updateItemInCollectionHook');
+$GLOBALS['ISO_HOOKS']['generateProduct'][] = array('HeimrichHannot\IsotopePlus\IsotopePlus', 'generateProductHook');
+$GLOBALS['ISO_HOOKS']['addProductToCollection'][] = array('HeimrichHannot\IsotopePlus\IsotopePlus', 'addProductToCollectionHook');
+$GLOBALS['ISO_HOOKS']['preCheckout']['isotope_plus_preCheckoutHook'] = array('HeimrichHannot\IsotopePlus\IsotopePlus', 'preCheckoutHook');
+$GLOBALS['ISO_HOOKS']['updateItemInCollection'][] = array('HeimrichHannot\IsotopePlus\IsotopePlus', 'updateItemInCollectionHook');
+$GLOBALS['ISO_HOOKS']['buttons'][] = array('HeimrichHannot\IsotopePlus\IsotopePlus', 'addDownloadSingleProductButton');
 
 /**
  * Frontend modules
