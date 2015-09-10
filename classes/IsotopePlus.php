@@ -115,7 +115,7 @@ class IsotopePlus extends \Isotope\Isotope
 			'label' => $GLOBALS['TL_LANG']['MSC']['buttonLabel']['update']
 		);
 
-		$arrButtons['downloadProduct'] = array(
+		$arrButtons['downloadSingleProduct'] = array(
 			'label' => $GLOBALS['TL_LANG']['MSC']['buttonLabel']['downloadSingleProduct'],
 			'callback' => array('\HeimrichHannot\IsotopePlus\IsotopePlus', 'downloadSingleProduct')
 		);

@@ -25,6 +25,11 @@ $GLOBALS['FE_MOD']['isotopeplus'] = array
 	'iso_orderreport'       => 'Isotope\Module\ModuleOrderReport',
 );
 
+if (in_array('slick', \ModuleLoader::getActive()))
+{
+	$GLOBALS['FE_MOD']['isotopeplus']['iso_productlistslick']  = 'Isotope\Module\ProductListSlick';
+}
+
 /**
  * Attributes
  */

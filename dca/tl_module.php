@@ -15,19 +15,28 @@ $arrDca = &$GLOBALS['TL_DCA']['tl_module'];
 
 
 /**
- * Add palettes to tl_module
+ * Palettes
  */
 
 $arrDca['palettes']['iso_productfilterplus']
 	= '{title_legend},name,headline,type;{config_legend},iso_category_scope,iso_list_where,iso_enableLimit,iso_filterFields,iso_filterHideSingle,iso_searchFields,iso_searchAutocomplete,iso_sortingFields,iso_listingSortField,iso_listingSortDirection;{template_legend},customTpl,iso_filterTpl,iso_includeMessages,iso_hide_list;{redirect_legend},jumpTo;{reference_legend:hide},defineRoot;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
+
 $arrDca['palettes']['iso_productlistplus']
 	= '{title_legend},name,headline,type;{config_legend},numberOfItems,perPage,iso_category_scope,iso_list_where,iso_filterModules,iso_newFilter,iso_listingSortField,iso_listingSortDirection;{redirect_legend},iso_addProductJumpTo,iso_jump_first;{reference_legend:hide},defineRoot;{template_legend:hide},customTpl,iso_list_layout,iso_gallery,iso_cols,iso_use_quantity,iso_hide_list,iso_includeMessages,iso_emptyMessage,iso_emptyFilter,iso_buttons;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
 
 $arrDca['palettes']['iso_productlist'] = str_replace('{config_legend}', '{config_legend},description', $arrDca['palettes']['iso_productlist']);
 
+$arrDca['palettes']['iso_productreader'] = str_replace(
+	'iso_buttons;', 'iso_buttons;{bookings_legend},bp_months;', $arrDca['palettes']['iso_productreader']
+);
+
+if (in_array('slick', \ModuleLoader::getActive()))
+{
+	$arrDca['palettes']['iso_productlistslick'] = str_replace('description', 'slickConfig,description', $arrDca['palettes']['iso_productlist']);
+}
 
 /**
- * Add fields to tl_module
+ * Fields
  */
 $arrDca['fields']['iso_filterTpl'] = array
 (
@@ -298,8 +307,3 @@ $arrDca['fields']['description'] = array
 	'eval'      => array('rte' => 'tinyMCE', 'tl_class' => 'clr'),
 	'sql'       => "text NULL"
 );
-
-$arrDca['palettes']['iso_productreader'] = str_replace(
-	'iso_buttons;', 'iso_buttons;{bookings_legend},bp_months;', $arrDca['palettes']['iso_productreader']
-);
-
