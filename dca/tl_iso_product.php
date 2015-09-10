@@ -30,6 +30,7 @@ $arrDca['fields']['releaseDate'] = array
 	'label'                 => &$GLOBALS['TL_LANG']['tl_iso_product']['releaseDate'],
 	'exclude'               => true,
 	'inputType'             => 'text',
+	'default'               => time(),
 	'eval'                  => array('rgxp'=>'date', 'datepicker'=>true, 'tl_class'=>'w50 wizard'),
 	'attributes'            => array('legend'=>'publish_legend', 'fe_sorting'=>true),
 	'sql'                   => "varchar(10) NOT NULL default ''",

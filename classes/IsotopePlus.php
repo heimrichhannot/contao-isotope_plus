@@ -111,10 +111,6 @@ class IsotopePlus extends \Isotope\Isotope
 
 	public static function addDownloadSingleProductButton($arrButtons)
 	{
-		$arrButtons['update'] = array(
-			'label' => $GLOBALS['TL_LANG']['MSC']['buttonLabel']['update']
-		);
-
 		$arrButtons['downloadSingleProduct'] = array(
 			'label' => $GLOBALS['TL_LANG']['MSC']['buttonLabel']['downloadSingleProduct'],
 			'callback' => array('\HeimrichHannot\IsotopePlus\IsotopePlus', 'downloadSingleProduct')
