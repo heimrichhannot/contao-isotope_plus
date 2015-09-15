@@ -31,6 +31,19 @@ if (in_array('slick', \ModuleLoader::getActive()))
 }
 
 /**
+ * Notification Center Notification Types
+ */
+if (in_array('notification_center_plus', \ModuleLoader::getActive()))
+{
+	$GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['isotope']['iso_order_status_change']['email_text'][] = 'salutation_user';
+	$GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['isotope']['iso_order_status_change']['email_text'][] = 'salutation_form';
+}
+
+//echo '<pre>';
+//var_dump($GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['isotope']);
+//echo '</pre>';
+
+	/**
  * Attributes
  */
 \Isotope\Model\Attribute::registerModelType('youtube', 'Isotope\Model\Attribute\Youtube');
