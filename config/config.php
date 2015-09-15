@@ -10,7 +10,7 @@
 
 $GLOBALS['ISO_HOOKS']['generateProduct'][] = array('HeimrichHannot\IsotopePlus\IsotopePlus', 'generateProductHook');
 $GLOBALS['ISO_HOOKS']['addProductToCollection'][] = array('HeimrichHannot\IsotopePlus\IsotopePlus', 'addProductToCollectionHook');
-$GLOBALS['ISO_HOOKS']['preCheckout']['isotope_plus_preCheckoutHook'] = array('HeimrichHannot\IsotopePlus\IsotopePlus', 'preCheckoutHook');
+$GLOBALS['ISO_HOOKS']['preCheckout']['checkOrderForStock'] = array('HeimrichHannot\IsotopePlus\IsotopePlus', 'checkOrderForStock');
 $GLOBALS['ISO_HOOKS']['updateItemInCollection'][] = array('HeimrichHannot\IsotopePlus\IsotopePlus', 'updateItemInCollectionHook');
 $GLOBALS['ISO_HOOKS']['buttons'][] = array('HeimrichHannot\IsotopePlus\IsotopePlus', 'addDownloadSingleProductButton');
 

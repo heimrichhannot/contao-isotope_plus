@@ -47,7 +47,7 @@ class IsotopePlus extends \Isotope\Isotope
 	 *
 	 * @return boolean
 	 */
-	public function preCheckoutHook($objOrder)
+	public static function checkOrderForStock($objOrder)
 	{
 		$arrItems = $objOrder->getItems();
 		$arrOrders = array();
