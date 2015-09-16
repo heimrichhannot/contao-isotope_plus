@@ -12,10 +12,17 @@
 namespace HeimrichHannot\IsotopePlus;
 
 
+use Haste\Generator\RowClass;
+use Haste\Haste;
 use HeimrichHannot\HastePlus\Environment;
 use HeimrichHannot\HastePlus\Files;
+use Isotope\Interfaces\IsotopeAttribute;
 use Isotope\Interfaces\IsotopeProduct;
+use Isotope\Isotope;
 use Isotope\Model\Download;
+use Isotope\Model\Product;
+use Isotope\Model\ProductCollection\Order;
+use Isotope\Model\ProductCollectionItem;
 use Isotope\Model\ProductType;
 use NotificationCenter\Model\Notification;
 
@@ -151,11 +158,192 @@ class IsotopePlus extends \Isotope\Isotope
 		{
 			if (($objProductType = ProductType::findByPk($intProductType)) !== null)
 			{
-				if ($objProductType->orderNotification &&
+				if ($objProductType->sendOrderNotification &&
 					($objNotification = Notification::findByPk($objProductType->orderNotification)) !== null) {
-					$objNotification->send($arrTokens, $GLOBALS['TL_LANGUAGE']);
+
+					if ($objProductType->removeOtherProducts)
+						$objNotification->send(
+							static::getCleanTokens($intProductType, $objOrder, $objNotification),
+							$GLOBALS['TL_LANGUAGE']
+						);
+					else
+						$objNotification->send($arrTokens, $GLOBALS['TL_LANGUAGE']);
 				}
 			}
 		}
 	}
+
+	// copy of code in Order->getNotificationTokens
+	public static function getCleanTokens($intProductType, Order $objOrder, $objNotification)
+	{
+		$objTemplate                 = new \Isotope\Template($objNotification->iso_collectionTpl);
+		$objTemplate->isNotification = true;
+
+		// FIX - call to custom function since addToTemplate isn't static
+		static::addToTemplate(
+			$intProductType,
+			$objOrder,
+			$objTemplate,
+			array(
+				'gallery'   => $objNotification->iso_gallery,
+				'sorting'   => $objOrder->getItemsSortingCallable($objNotification->iso_orderCollectionBy),
+			)
+		);
+
+		$arrTokens['cart_html'] = Haste::getInstance()->call('replaceInsertTags', array($objTemplate->parse(), false));
+		$objTemplate->textOnly  = true;
+		$arrTokens['cart_text'] = strip_tags(Haste::getInstance()->call('replaceInsertTags', array($objTemplate->parse(), true)));
+
+		return $arrTokens;
+	}
+
+	// copy of code in ProductCollection->addToTemplate
+	public function addToTemplate($intProductType, Order $objOrder, \Template $objTemplate, array $arrConfig = array())
+	{
+		$arrGalleries = array();
+		// FIX - call to custom function since addItemsToTemplate isn't static
+		$arrItems     = static::addItemsToTemplate($intProductType, $objOrder, $objTemplate, $arrConfig['sorting']);
+
+		$objTemplate->id                = $objOrder->id;
+		$objTemplate->collection        = $objOrder;
+		$objTemplate->config            = ($objOrder->getRelated('config_id') || Isotope::getConfig());
+		$objTemplate->surcharges        = \Isotope\Frontend::formatSurcharges($objOrder->getSurcharges());
+		$objTemplate->subtotal          = Isotope::formatPriceWithCurrency($objOrder->getSubtotal());
+		$objTemplate->total             = Isotope::formatPriceWithCurrency($objOrder->getTotal());
+		$objTemplate->tax_free_subtotal = Isotope::formatPriceWithCurrency($objOrder->getTaxFreeSubtotal());
+		$objTemplate->tax_free_total    = Isotope::formatPriceWithCurrency($objOrder->getTaxFreeTotal());
+
+		$objTemplate->hasAttribute = function ($strAttribute, ProductCollectionItem $objItem) {
+			if (!$objItem->hasProduct()) {
+				return false;
+			}
+
+			$objProduct = $objItem->getProduct();
+
+			return in_array($strAttribute, $objProduct->getAttributes())
+			|| in_array($strAttribute, $objProduct->getVariantAttributes());
+		};
+
+		$objTemplate->generateAttribute = function (
+			$strAttribute,
+			ProductCollectionItem $objItem,
+			array $arrOptions = array()
+		) {
+			if (!$objItem->hasProduct()) {
+				return '';
+			}
+
+			$objAttribute = $GLOBALS['TL_DCA']['tl_iso_product']['attributes'][$strAttribute];
+
+			if (!($objAttribute instanceof IsotopeAttribute)) {
+				throw new \InvalidArgumentException($strAttribute . ' is not a valid attribute');
+			}
+
+			return $objAttribute->generate($objItem->getProduct(), $arrOptions);
+		};
+
+		$objTemplate->getGallery = function (
+			$strAttribute,
+			ProductCollectionItem $objItem
+		) use (
+			$arrConfig,
+			&$arrGalleries
+		) {
+			if (!$objItem->hasProduct()) {
+				return new \Isotope\Model\Gallery\Standard();
+			}
+
+			$strCacheKey         = 'product' . $objItem->product_id . '_' . $strAttribute;
+			$arrConfig['jumpTo'] = $objItem->getRelated('jumpTo');
+
+			if (!isset($arrGalleries[$strCacheKey])) {
+				$arrGalleries[$strCacheKey] = Gallery::createForProductAttribute(
+					$objItem->getProduct(),
+					$strAttribute,
+					$arrConfig
+				);
+			}
+
+			return $arrGalleries[$strCacheKey];
+		};
+
+		// !HOOK: allow overriding of the template
+		if (isset($GLOBALS['ISO_HOOKS']['addCollectionToTemplate'])
+			&& is_array($GLOBALS['ISO_HOOKS']['addCollectionToTemplate'])
+		) {
+			foreach ($GLOBALS['ISO_HOOKS']['addCollectionToTemplate'] as $callback) {
+				$objCallback = \System::importStatic($callback[0]);
+				$objCallback->$callback[1]($objTemplate, $arrItems, $objOrder);
+			}
+		}
+	}
+
+	// copy of code in ProductCollection->generateItem
+	protected static function generateItem(ProductCollectionItem $objItem)
+	{
+		$blnHasProduct = $objItem->hasProduct();
+		$objProduct    = $objItem->getProduct();
+
+		// Set the active product for insert tags replacement
+		if ($blnHasProduct) {
+			Product::setActive($objProduct);
+		}
+
+		$arrCSS = ($blnHasProduct ? deserialize($objProduct->cssID, true) : array());
+
+		$arrItem = array(
+			'id'                => $objItem->id,
+			'sku'               => $objItem->getSku(),
+			'name'              => $objItem->getName(),
+			'options'           => Isotope::formatOptions($objItem->getOptions()),
+			'configuration'     => $objItem->getConfiguration(),
+			'quantity'          => $objItem->quantity,
+			'price'             => Isotope::formatPriceWithCurrency($objItem->getPrice()),
+			'tax_free_price'    => Isotope::formatPriceWithCurrency($objItem->getTaxFreePrice()),
+			'total'             => Isotope::formatPriceWithCurrency($objItem->getTotalPrice()),
+			'tax_free_total'    => Isotope::formatPriceWithCurrency($objItem->getTaxFreeTotalPrice()),
+			'tax_id'            => $objItem->tax_id,
+			'href'              => false,
+			'hasProduct'        => $blnHasProduct,
+			'product'           => $objProduct,
+			'item'              => $objItem,
+			'raw'               => $objItem->row(),
+			'rowClass'          => trim('product ' . (($blnHasProduct && $objProduct->isNew()) ? 'new ' : '') . $arrCSS[1]),
+		);
+
+		if (null !== $objItem->getRelated('jumpTo') && $blnHasProduct && $objProduct->isAvailableInFrontend()) {
+			$arrItem['href'] = $objProduct->generateUrl($objItem->getRelated('jumpTo'));
+		}
+
+		Product::unsetActive();
+
+		return $arrItem;
+	}
+
+	// copy of code in ProductCollection->addItemsToTemplate
+	protected function addItemsToTemplate($intProductType, $objOrder, \Template $objTemplate, $varCallable = null)
+	{
+		$taxIds   = array();
+		$arrItems = array();
+
+		foreach ($objOrder->getItems($varCallable) as $objItem) {
+			// FIX - check for product type id
+			if ($objItem->getProduct()->type != $intProductType)
+				continue;
+			// ENDFIX
+
+			$item = static::generateItem($objItem);
+
+			$taxIds[]   = $item['tax_id'];
+			$arrItems[] = $item;
+		}
+
+		RowClass::withKey('rowClass')->addCount('row_')->addFirstLast('row_')->addEvenOdd('row_')->applyTo($arrItems);
+
+		$objTemplate->items         = $arrItems;
+		$objTemplate->total_tax_ids = count(array_unique($taxIds));
+
+		return $arrItems;
+	}
+
 }
