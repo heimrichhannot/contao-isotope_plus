@@ -16,6 +16,8 @@ use HeimrichHannot\HastePlus\Environment;
 use HeimrichHannot\HastePlus\Files;
 use Isotope\Interfaces\IsotopeProduct;
 use Isotope\Model\Download;
+use Isotope\Model\ProductType;
+use NotificationCenter\Model\Notification;
 
 class IsotopePlus extends \Isotope\Isotope
 {
@@ -132,6 +134,28 @@ class IsotopePlus extends \Isotope\Isotope
 			// TODO count downloads
 			// start downloading the file (protected folders also supported)
 			\Controller::redirect(Environment::getUrl() . '?file=' . $strPath);
+		}
+	}
+
+	public static function sendOrderNotification($objOrder, $arrTokens)
+	{
+		$arrItems = $objOrder->getItems();
+
+		// only send one one notification per product type and order
+		$arrProductTypes = array();
+		foreach ($arrItems as $objItem) {
+			$arrProductTypes[] = $objItem->getProduct()->type;
+		}
+
+		foreach (array_unique($arrProductTypes) as $intProductType)
+		{
+			if (($objProductType = ProductType::findByPk($intProductType)) !== null)
+			{
+				if ($objProductType->orderNotification &&
+					($objNotification = Notification::findByPk($objProductType->orderNotification)) !== null) {
+					$objNotification->send($arrTokens, $GLOBALS['TL_LANGUAGE']);
+				}
+			}
 		}
 	}
 }

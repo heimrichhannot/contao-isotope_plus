@@ -17,6 +17,8 @@ use HeimrichHannot\Slick\SlickConfigModel;
 class ProductListSlick extends ProductList
 {
 
+	protected $blnCacheProducts = true;
+
 	public function generate()
 	{
 		if (TL_MODE == 'BE') {

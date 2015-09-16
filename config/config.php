@@ -11,6 +11,7 @@
 $GLOBALS['ISO_HOOKS']['generateProduct'][] = array('HeimrichHannot\IsotopePlus\IsotopePlus', 'generateProductHook');
 $GLOBALS['ISO_HOOKS']['addProductToCollection'][] = array('HeimrichHannot\IsotopePlus\IsotopePlus', 'addProductToCollectionHook');
 $GLOBALS['ISO_HOOKS']['preCheckout']['checkOrderForStock'] = array('HeimrichHannot\IsotopePlus\IsotopePlus', 'checkOrderForStock');
+$GLOBALS['ISO_HOOKS']['postCheckout']['sendOrderNotification'] = array('HeimrichHannot\IsotopePlus\IsotopePlus', 'sendOrderNotification');
 $GLOBALS['ISO_HOOKS']['updateItemInCollection'][] = array('HeimrichHannot\IsotopePlus\IsotopePlus', 'updateItemInCollectionHook');
 $GLOBALS['ISO_HOOKS']['buttons'][] = array('HeimrichHannot\IsotopePlus\IsotopePlus', 'addDownloadSingleProductButton');
 
@@ -38,10 +39,6 @@ if (in_array('notification_center_plus', \ModuleLoader::getActive()))
 	$GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['isotope']['iso_order_status_change']['email_text'][] = 'salutation_user';
 	$GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['isotope']['iso_order_status_change']['email_text'][] = 'salutation_form';
 }
-
-//echo '<pre>';
-//var_dump($GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['isotope']);
-//echo '</pre>';
 
 	/**
  * Attributes

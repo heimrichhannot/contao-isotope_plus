@@ -44,22 +44,3 @@ $arrDca['fields']['maxOrderSize'] = array
 	'attributes'            => array('legend'=>'inventory_legend'),
 	'sql'                   => "varchar(255) NOT NULL default ''",
 );
-
-$arrDca['fields']['sendEmailAfterOrder'] = array
-(
-	'label'                 => &$GLOBALS['TL_LANG']['tl_iso_product']['sendEmailAfterOrder'],
-	'exclude'               => true,
-	'inputType'             => 'checkbox',
-	'eval'                  => array('doNotCopy'=>true, 'tl_class'=>'w50'),
-	'attributes'            => array('legend'=>'email_legend'),
-	'sql'                   => "char(1) NOT NULL default ''"
-);
-
-$arrDca['fields']['emailAfterOrderRecipients'] = array
-(
-	'label'                 => &$GLOBALS['TL_LANG']['tl_iso_product']['emailAfterOrderRecipients'],
-	'inputType'             => 'text',
-	'eval'                  => array('tl_class'=>'w50'),
-	'attributes'            => array('legend'=>'email_legend'),
-	'sql'                   => "varchar(255) NOT NULL default ''",
-);
