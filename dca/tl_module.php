@@ -30,6 +30,9 @@ $arrDca['palettes']['iso_productreader'] = str_replace(
 	'iso_buttons;', 'iso_buttons;{bookings_legend},bp_months;', $arrDca['palettes']['iso_productreader']
 );
 
+$arrDca['palettes']['iso_cart_link']
+	= '{title_legend},name,headline,type;{config_legend},jumpTo;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
+
 if (in_array('slick', \ModuleLoader::getActive()))
 {
 	$arrDca['palettes']['iso_productlistslick'] = str_replace('description', 'slickConfig,description', $arrDca['palettes']['iso_productlist']);

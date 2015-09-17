@@ -9,6 +9,7 @@ A module that brings some new features to the isotope shopsystem
 - adds a new attribute (youtube)
 - uses isotope hooks (generateProduct, addProductToCollection, preCheckout, updateItemInCollection)
 - adds 2 new front end modules (order report, stock report) and extends 2 isotope modules (product filter, product list)
+- adds new modules
 
 ### Order report & Stock report
 
@@ -23,3 +24,7 @@ A module that brings some new features to the isotope shopsystem
 ### ProductListPlus
 
 - modifies the list, that it can show the filter and sorting results
+
+### CartLink
+
+- a link to the current cart containing a badge showig the current quantity
