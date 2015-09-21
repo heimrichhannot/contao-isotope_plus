@@ -14,7 +14,7 @@ use HeimrichHannot\Slick\SlickConfigModel;
  * @license http://www.gnu.org/licences/lgpl-3.0.html LGPL
  */
 
-class ProductListSlick extends ProductList
+class ProductListSlick extends ProductListPlus
 {
 
 	protected $blnCacheProducts = true;
@@ -45,6 +45,11 @@ class ProductListSlick extends ProductList
 		}
 
 		return $this->Template->parse();
+	}
+
+	protected function compile()
+	{
+		parent::compile();
 	}
 
 }

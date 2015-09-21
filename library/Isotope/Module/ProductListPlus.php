@@ -15,6 +15,7 @@ namespace Isotope\Module;
 use Haste\Haste;
 use Haste\Generator\RowClass;
 use Haste\Http\Response\HtmlResponse;
+use HeimrichHannot\IsotopePlus\IsotopePlus;
 use Isotope\Isotope;
 use Isotope\Model\Attribute;
 use Isotope\Model\Product;
@@ -199,7 +200,18 @@ class ProductListPlus extends ProductList
 			);
 
 			if (\Environment::get('isAjaxRequest') && \Input::post('AJAX_MODULE') == $this->id && \Input::post('AJAX_PRODUCT') == $objProduct->getProductId()) {
-				$objResponse = new HtmlResponse($objProduct->generate($arrConfig));
+				$arrCheck = IsotopePlus::validateQuantity($objProduct, \Input::post('quantity_requested'), Isotope::getCart()->getItemForProduct($objProduct), true);
+				if (!$arrCheck[0])
+				{
+					// remove synchronous error messages in case of ajax
+					unset($_SESSION['ISO_ERROR']);
+					$objResponse = new HtmlResponse($arrCheck[1], 400);
+				}
+				else
+				{
+					$objResponse = new HtmlResponse($objProduct->generate($arrConfig));
+				}
+
 				$objResponse->send();
 			}
 

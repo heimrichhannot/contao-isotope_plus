@@ -25,6 +25,15 @@ $arrDca['fields']['stock'] = array
 	'sql'                   => "varchar(255) NOT NULL default ''",
 );
 
+$arrDca['fields']['set'] = array
+(
+	'label'                 => &$GLOBALS['TL_LANG']['tl_iso_product']['set'],
+	'inputType'             => 'text',
+	'eval'                  => array('mandatory'=>true, 'tl_class'=>'w50', 'rgxp' => 'digit'),
+	'attributes'            => array('legend'=>'inventory_legend', 'fe_sorting'=>true),
+	'sql'                   => "varchar(255) NOT NULL default ''",
+);
+
 $arrDca['fields']['releaseDate'] = array
 (
 	'label'                 => &$GLOBALS['TL_LANG']['tl_iso_product']['releaseDate'],

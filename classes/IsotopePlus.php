@@ -16,14 +16,19 @@ use Haste\Generator\RowClass;
 use Haste\Haste;
 use HeimrichHannot\HastePlus\Environment;
 use HeimrichHannot\HastePlus\Files;
+use Isotope\Frontend;
 use Isotope\Interfaces\IsotopeAttribute;
 use Isotope\Interfaces\IsotopeProduct;
 use Isotope\Isotope;
 use Isotope\Model\Download;
+use Isotope\Model\Gallery;
+use Isotope\Model\Gallery\Standard;
 use Isotope\Model\Product;
+use Isotope\Model\ProductCollection;
 use Isotope\Model\ProductCollection\Order;
 use Isotope\Model\ProductCollectionItem;
 use Isotope\Model\ProductType;
+use Isotope\Template;
 use NotificationCenter\Model\Notification;
 
 class IsotopePlus extends \Isotope\Isotope
@@ -33,13 +38,45 @@ class IsotopePlus extends \Isotope\Isotope
 		DownloadHelper::addDownloadsFromProductDownloadsToTemplate($objTemplate);
 	}
 
-
-	/**
-	 * Validierung im Warenkorb
-	 */
-	public function addProductToCollectionHook($objProduct, $intQuantity)
+	public static function validateStockCheckout($objOrder)
 	{
-		if (!$this->isOrderSizeValid($objProduct, $intQuantity)) {
+		$arrItems = $objOrder->getItems();
+		$arrOrders = array();
+
+		foreach ($arrItems as $objItem) {
+			$objProduct = $objItem->getProduct();
+
+			if ($objProduct->stock != '' && $objProduct->stock !== null) {
+				// override the quantity!
+				if (!static::validateQuantity($objProduct, $objItem->quantity)) {
+					return false;
+				}
+
+				$arrOrders[] = $objItem;
+			}
+		}
+
+		// save new stock
+		foreach ($arrOrders as $objItem) {
+			$objProduct = $objItem->getProduct();
+			$intQuantity = $objProduct->set ? $objProduct->set * $objItem->quantity : $objItem->quantity;
+
+			$objProduct->stock -= $intQuantity;
+
+			if ($objProduct->stock <= 0) {
+				$objProduct->shipping_exempt = true;
+			}
+
+			$objProduct->save();
+		}
+
+		return true;
+	}
+
+	public function validateStockCollectionAdd($objProduct, $intQuantity, ProductCollection $objProductCollection)
+	{
+		if (!$this->validateQuantity($objProduct, $intQuantity, $objProductCollection->getItemForProduct($objProduct))
+		) {
 			return 0;
 		} else {
 			unset($_SESSION['ISO_ERROR']);
@@ -49,14 +86,88 @@ class IsotopePlus extends \Isotope\Isotope
 	}
 
 
-	/**
-	 * Check for stocks and block shipping if there is not enough
-	 *
-	 * @param $objOrder
-	 *
-	 * @return boolean
-	 */
-	public static function checkOrderForStock($objOrder)
+	public function validateStockCollectionUpdate($objItem, $arrSet)
+	{
+		$objProduct = Product::findPublishedByPk($objItem->product_id);
+
+		if (!static::validateQuantity($objProduct, $arrSet['quantity'])) {
+			\Controller::reload();
+		}
+		return $arrSet;
+	}
+
+	public static function getQuantityForValidation($intQuantity, $objProduct, $objCartItem = null)
+	{
+		$intTotalQuantity = $objProduct->set ? $objProduct->set * $intQuantity : $intQuantity;
+
+		if ($objCartItem !== null)
+		{
+			$intTotalQuantity += $objCartItem->quantity;
+		}
+
+		return $intTotalQuantity;
+	}
+
+	public static function validateQuantity($objProduct, $intQuantity, $objCartItem = null, $blnIncludeError = false)
+	{
+		// no quantity at all
+		if ($intQuantity === null)
+			return true;
+		elseif ($intQuantity == '')
+			$intQuantity = 1;
+
+		$intQuantityTotal = static::getQuantityForValidation($intQuantity, $objProduct, $objCartItem);
+
+		// stock
+		if ($objProduct->stock != '' && $objProduct->stock !== null)
+		{
+			if ($objProduct->stock <= 0)
+			{
+				$strErrorMessage = sprintf($GLOBALS['TL_LANG']['MSC']['stockEmpty'], $objProduct->name);
+
+				$_SESSION['ISO_ERROR'][] = $strErrorMessage;
+
+				if ($blnIncludeError)
+					return array(false, $strErrorMessage);
+				else
+					return false;
+			}
+			elseif ($intQuantityTotal > $objProduct->stock) {
+				$strErrorMessage = sprintf($GLOBALS['TL_LANG']['MSC']['stockExceeded'], $objProduct->name, $objProduct->stock);
+
+				$_SESSION['ISO_ERROR'][] = $strErrorMessage;
+
+				if ($blnIncludeError)
+					return array(false, $strErrorMessage);
+				else
+					return false;
+			}
+		}
+
+		// maxOrderSize
+		if ($objProduct->maxOrderSize != '' && $objProduct->maxOrderSize !== null) {
+			if ($intQuantityTotal <= $objProduct->maxOrderSize)
+			{
+				$strErrorMessage = sprintf($GLOBALS['TL_LANG']['MSC']['maxOrderSizeExceeded'],
+					$objProduct->name, $objProduct->maxOrderSize);
+
+				$_SESSION['ISO_ERROR'][] = $strErrorMessage;
+
+
+				if ($blnIncludeError)
+					return array(false, $strErrorMessage);
+				else
+					return false;
+			}
+		}
+
+		if ($blnIncludeError)
+			return array(true, null);
+		else
+			return true;
+	}
+
+	public static function setSetQuantity($objOrder, $arrTokens)
 	{
 		$arrItems = $objOrder->getItems();
 		$arrOrders = array();
@@ -64,58 +175,12 @@ class IsotopePlus extends \Isotope\Isotope
 		foreach ($arrItems as $objItem) {
 			$objProduct = $objItem->getProduct();
 
-			if ($objProduct->stock) {
-				if (!static::isOrderSizeValid($objProduct, $objItem->quantity)) {
-					return false;
-				}
-				$arrOrders[] = $objItem;
+			if ($objProduct->set)
+			{
+				$objItem->setQuantity = $objProduct->set;
+				$objItem->save();
 			}
 		}
-
-		// save new stock and if stock empty block shipping
-		foreach ($arrOrders as $objItem) {
-			$objProduct = $objItem->getProduct();
-			$objProduct->stock -= $objItem->quantity;
-			if ($objProduct->stock <= 0) {
-				$objProduct->shipping_exempt = '1';
-			}
-			$objProduct->save();
-		}
-
-		return true;
-	}
-
-	/**
-	 * Check for updated quantity
-	 *
-	 * @param $objItem
-	 * @param $arrSet
-	 * @param $objCollection
-	 *
-	 * @return $arrSet
-	 */
-	public function updateItemInCollectionHook($objItem, $arrSet, $objCollection)
-	{
-		$objProduct = \Isotope\Model\Product::findPublishedByPk($objItem->product_id);
-		if (!static::isOrderSizeValid($objProduct, $arrSet['quantity'])) {
-			\Controller::reload();
-		}
-		return $arrSet;
-	}
-
-
-	public static function isOrderSizeValid($objProduct, $intQuantity)
-	{
-		if ($objProduct->stock <= 0 || $objProduct->stock == '' || $objProduct->stock == null
-			|| $intQuantity > $objProduct->stock
-		) {
-			$_SESSION['ISO_ERROR'][] = 'Ihre Bestellmenge liegt über der noch vorhandenen Menge.';
-		} elseif ($intQuantity <= $objProduct->max_order_size || $objProduct->max_order_size == '') {
-			return true;
-		} else {
-			$_SESSION['ISO_ERROR'][] = 'Ihre Bestellmenge liegt über der maximal zulässigen Menge.';
-		}
-		return false;
 	}
 
 	public static function addDownloadSingleProductButton($arrButtons)
@@ -176,7 +241,7 @@ class IsotopePlus extends \Isotope\Isotope
 	// copy of code in Order->getNotificationTokens
 	public static function getCleanTokens($intProductType, Order $objOrder, $objNotification)
 	{
-		$objTemplate                 = new \Isotope\Template($objNotification->iso_collectionTpl);
+		$objTemplate                 = new Template($objNotification->iso_collectionTpl);
 		$objTemplate->isNotification = true;
 
 		// FIX - call to custom function since addToTemplate isn't static
@@ -207,7 +272,7 @@ class IsotopePlus extends \Isotope\Isotope
 		$objTemplate->id                = $objOrder->id;
 		$objTemplate->collection        = $objOrder;
 		$objTemplate->config            = ($objOrder->getRelated('config_id') || Isotope::getConfig());
-		$objTemplate->surcharges        = \Isotope\Frontend::formatSurcharges($objOrder->getSurcharges());
+		$objTemplate->surcharges        = Frontend::formatSurcharges($objOrder->getSurcharges());
 		$objTemplate->subtotal          = Isotope::formatPriceWithCurrency($objOrder->getSubtotal());
 		$objTemplate->total             = Isotope::formatPriceWithCurrency($objOrder->getTotal());
 		$objTemplate->tax_free_subtotal = Isotope::formatPriceWithCurrency($objOrder->getTaxFreeSubtotal());
@@ -250,7 +315,7 @@ class IsotopePlus extends \Isotope\Isotope
 			&$arrGalleries
 		) {
 			if (!$objItem->hasProduct()) {
-				return new \Isotope\Model\Gallery\Standard();
+				return new Standard();
 			}
 
 			$strCacheKey         = 'product' . $objItem->product_id . '_' . $strAttribute;

@@ -5,11 +5,13 @@ A module that brings some new features to the isotope shopsystem
 
 ## Features
 
-- adds fields to tl_module
-- adds a new attribute (youtube)
-- uses isotope hooks (generateProduct, addProductToCollection, preCheckout, updateItemInCollection)
-- adds 2 new front end modules (order report, stock report) and extends 2 isotope modules (product filter, product list)
-- adds new modules
+- adds new possible attributes to products: stock, initialStock, set, maxOrderSize, releaseDate
+- adds a new attribute type: youtube
+- adds new frontend modules
+
+### set and stock
+
+- if these attributes have values, adding products to the cart or checking out is constrained by stock left (depending on "set" if set)
 
 ### Order report & Stock report
 
