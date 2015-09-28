@@ -27,8 +27,9 @@ ClassLoader::addClasses(array
 	// Library
 	'Isotope\Module\ProductListSlick'            => 'system/modules/isotope_plus/library/Isotope/Module/ProductListSlick.php',
 	'Isotope\Module\ProductListPlus'             => 'system/modules/isotope_plus/library/Isotope/Module/ProductListPlus.php',
+	'Isotope\Module\OrderHistoryPlus'            => 'system/modules/isotope_plus/library/Isotope/Module/OrderHistoryPlus.php',
 	'HeimrichHannot\IsotopePlus\Module\CartLink' => 'system/modules/isotope_plus/library/Isotope/Module/CartLink.php',
-	'Isotope\Module\ModuleOrderReport'           => 'system/modules/isotope_plus/library/Isotope/Module/ModuleOrderReport.php',
+	'Isotope\Module\OrderDetailsPlus'            => 'system/modules/isotope_plus/library/Isotope/Module/OrderDetailsPlus.php',
 	'Isotope\Module\ProductFilterPlus'           => 'system/modules/isotope_plus/library/Isotope/Module/ProductFilterPlus.php',
 	'Isotope\Module\ModuleStockReport'           => 'system/modules/isotope_plus/library/Isotope/Module/ModuleStockReport.php',
 	'Isotope\Model\RequestCacheOrFilter'         => 'system/modules/isotope_plus/library/Isotope/Model/RequestCacheOrFilter.php',
@@ -45,10 +46,9 @@ ClassLoader::addClasses(array
  */
 TemplateLoader::addFiles(array
 (
+	'mod_iso_orderhistoryplus'        => 'system/modules/isotope_plus/templates',
 	'mod_iso_productlist_slider'      => 'system/modules/isotope_plus/templates',
 	'mod_stockReport'                 => 'system/modules/isotope_plus/templates',
-	'mod_orderReport_details'         => 'system/modules/isotope_plus/templates',
 	'mod_iso_cart_link'               => 'system/modules/isotope_plus/templates',
-	'mod_orderReport'                 => 'system/modules/isotope_plus/templates',
 	'isotope_download_from_attribute' => 'system/modules/isotope_plus/templates/downloads',
 ));

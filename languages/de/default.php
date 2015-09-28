@@ -32,3 +32,4 @@ $GLOBALS['TL_LANG']['MSC']['new_to_old'] = 'Neuste';
 $GLOBALS['TL_LANG']['MSC']['stockEmpty'] = 'Der Artikel "%s" ist nicht mehr verfügbar.';
 $GLOBALS['TL_LANG']['MSC']['stockExceeded'] = 'Vom Artikel "%s" sind nur noch %s Stück verfügbar. Bitte bedenken Sie, dass es manche Artikel nur im Set gibt.';
 $GLOBALS['TL_LANG']['MSC']['maxOrderSizeExceeded'] = 'Sie können den Artikel "%s" pro Bestellung nur maximal %s-mal anfordern.';
+$GLOBALS['TL_LANG']['MSC']['customer'] = 'Kunde';

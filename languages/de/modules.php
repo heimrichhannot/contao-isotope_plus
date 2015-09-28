@@ -6,3 +6,5 @@ $GLOBALS['TL_LANG']['FMD']['iso_productlistslick']	= array('Produktliste Slick',
 $GLOBALS['TL_LANG']['FMD']['iso_stockreport']		= array('Bericht - Bestandsauswertung', 'Zeigt noch vorhandene Bestände an');
 $GLOBALS['TL_LANG']['FMD']['iso_orderreport']		= array('Bericht - Bestellungen', 'Zeigt eingegangene Bestellungen an');
 $GLOBALS['TL_LANG']['FMD']['iso_cart_link']			= array('Warenkorbverknüpfung', 'Fügt eine Verknüpfung zum Warenkorb hinzu, die in einer Badge anzeigt, wie viele Artikel aktuell im Warenkorb sind.');
+$GLOBALS['TL_LANG']['FMD']['iso_orderhistory_plus']	= array('Vergangene Bestellungen Plus', '');
+$GLOBALS['TL_LANG']['FMD']['iso_orderdetails_plus']	= array('Bestellungsdetails Plus', '');

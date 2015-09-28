@@ -35,11 +35,12 @@ class ModuleStockReport extends Module
 	protected function compile()
 	{
 		$arrProducts = array();
-		$objProducts = $this->Database->prepare("SELECT p.*, t.name as category FROM tl_iso_product p INNER JOIN tl_iso_producttype t ON t.id = p.type WHERE p.published=1 AND p.shipping_exempt='' AND p.initial_stock!='' ORDER BY category")->execute();
+		$objProducts = \Database::getInstance()->prepare("SELECT p.*, t.name as category FROM tl_iso_product p INNER JOIN tl_iso_producttype t ON t.id = p.type WHERE p.published=1 AND p.shipping_exempt='' AND p.initialStock!='' AND stock IS NOT NULL ORDER BY category ASC")->execute();
 
-		$this->loadLanguageFile('tl_reports');
+		\System::loadLanguageFile('tl_reports');
 
-		if ($objProducts->numRows < 1) return false;
+		if ($objProducts->numRows < 1)
+			return false;
 
 		while ($objProducts->next()) {
 			$category = 'category_' . $objProducts->category;
@@ -52,8 +53,8 @@ class ModuleStockReport extends Module
 			$arrProducts[$objProducts->id] = $objProducts->row();
 			$arrProducts[$objProducts->id]['stockPercent'] = '-';
 
-			if ($objProducts->initial_stock > 0 && $objProducts->initial_stock !== '') {
-				$percent = floor($objProducts->stock * 100 / $objProducts->initial_stock);
+			if ($objProducts->initialStock > 0 && $objProducts->initialStock !== '') {
+				$percent = floor($objProducts->stock * 100 / $objProducts->initialStock);
 
 				$arrProducts[$objProducts->id]['stockPercent'] = $percent;
 

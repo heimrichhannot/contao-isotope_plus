@@ -33,6 +33,10 @@ $arrDca['palettes']['iso_productreader'] = str_replace(
 $arrDca['palettes']['iso_cart_link']
 	= '{title_legend},name,headline,type;{config_legend},jumpTo;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
 
+$arrDca['palettes']['iso_orderhistory_plus'] = str_replace('iso_config_ids', 'iso_config_ids,iso_show_all_orders', $arrDca['palettes']['iso_orderhistory']);
+$arrDca['palettes']['iso_orderdetails_plus'] = str_replace('iso_loginRequired', 'iso_loginRequired,iso_show_all_orders', $arrDca['palettes']['iso_orderdetails']);
+
+
 if (in_array('slick', \ModuleLoader::getActive()))
 {
 	$arrDca['palettes']['iso_productlistslick'] = str_replace('description', 'slickConfig,description', $arrDca['palettes']['iso_productlist']);
@@ -55,6 +59,15 @@ $arrDca['fields']['iso_filterTpl'] = array
 $arrDca['fields']['iso_hide_list'] = array
 (
 	'label'     => &$GLOBALS['TL_LANG']['tl_module']['iso_hide_list'],
+	'exclude'   => true,
+	'inputType' => 'checkbox',
+	'eval'      => array('tl_class' => 'w50'),
+	'sql'       => "char(1) NOT NULL default ''",
+);
+
+$arrDca['fields']['iso_show_all_orders'] = array
+(
+	'label'     => &$GLOBALS['TL_LANG']['tl_module']['iso_show_all_orders'],
 	'exclude'   => true,
 	'inputType' => 'checkbox',
 	'eval'      => array('tl_class' => 'w50'),

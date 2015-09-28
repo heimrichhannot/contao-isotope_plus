@@ -26,6 +26,8 @@ $GLOBALS['FE_MOD']['isotopeplus'] = array
 	'iso_stockreport'       => 'Isotope\Module\ModuleStockReport',
 	'iso_orderreport'       => 'Isotope\Module\ModuleOrderReport',
 	'iso_cart_link'         => 'HeimrichHannot\IsotopePlus\Module\CartLink',
+	'iso_orderhistory_plus' => 'Isotope\Module\OrderHistoryPlus',
+	'iso_orderdetails_plus' => 'Isotope\Module\OrderDetailsPlus'
 );
 
 if (in_array('slick', \ModuleLoader::getActive()))
