@@ -27,7 +27,8 @@ $GLOBALS['FE_MOD']['isotopeplus'] = array
 	'iso_orderreport'       => 'Isotope\Module\ModuleOrderReport',
 	'iso_cart_link'         => 'HeimrichHannot\IsotopePlus\Module\CartLink',
 	'iso_orderhistory_plus' => 'Isotope\Module\OrderHistoryPlus',
-	'iso_orderdetails_plus' => 'Isotope\Module\OrderDetailsPlus'
+	'iso_orderdetails_plus' => 'Isotope\Module\OrderDetailsPlus',
+	'iso_direct_checkout'   => 'Isotope\Module\DirectCheckout',
 );
 
 if (in_array('slick', \ModuleLoader::getActive()))
@@ -42,6 +43,7 @@ if (in_array('notification_center_plus', \ModuleLoader::getActive()))
 {
 	$GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['isotope']['iso_order_status_change']['email_text'][] = 'salutation_user';
 	$GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['isotope']['iso_order_status_change']['email_text'][] = 'salutation_form';
+	$GLOBALS['NOTIFICATION_CENTER']['NOTIFICATION_TYPE']['isotope']['iso_order_status_change']['email_text'][] = 'salutation_billing_address';
 }
 
 	/**

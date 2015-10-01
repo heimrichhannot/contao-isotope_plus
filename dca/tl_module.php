@@ -22,9 +22,9 @@ $arrDca['palettes']['iso_productfilterplus']
 	= '{title_legend},name,headline,type;{config_legend},iso_category_scope,iso_list_where,iso_enableLimit,iso_filterFields,iso_filterHideSingle,iso_searchFields,iso_searchAutocomplete,iso_sortingFields,iso_listingSortField,iso_listingSortDirection;{template_legend},customTpl,iso_filterTpl,iso_includeMessages,iso_hide_list;{redirect_legend},jumpTo;{reference_legend:hide},defineRoot;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
 
 $arrDca['palettes']['iso_productlistplus']
-	= '{title_legend},name,headline,type;{config_legend},description,numberOfItems,perPage,iso_category_scope,iso_list_where,iso_filterModules,iso_newFilter,iso_listingSortField,iso_listingSortDirection;{redirect_legend},iso_addProductJumpTo,iso_jump_first;{reference_legend:hide},defineRoot;{template_legend:hide},customTpl,iso_list_layout,iso_gallery,iso_cols,iso_use_quantity,iso_hide_list,iso_includeMessages,iso_emptyMessage,iso_emptyFilter,iso_buttons;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
+	= '{title_legend},name,headline,type;{config_legend},iso_description,numberOfItems,perPage,iso_category_scope,iso_list_where,iso_filterModules,iso_newFilter,iso_listingSortField,iso_listingSortDirection;{redirect_legend},iso_addProductJumpTo,iso_jump_first;{reference_legend:hide},defineRoot;{template_legend:hide},customTpl,iso_list_layout,iso_gallery,iso_cols,iso_use_quantity,iso_hide_list,iso_includeMessages,iso_emptyMessage,iso_emptyFilter,iso_buttons;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
 
-$arrDca['palettes']['iso_productlist'] = str_replace('{config_legend}', '{config_legend},description', $arrDca['palettes']['iso_productlist']);
+$arrDca['palettes']['iso_productlist'] = str_replace('{config_legend}', '{config_legend},iso_description', $arrDca['palettes']['iso_productlist']);
 
 $arrDca['palettes']['iso_productreader'] = str_replace(
 	'iso_buttons;', 'iso_buttons;{bookings_legend},bp_months;', $arrDca['palettes']['iso_productreader']
@@ -33,14 +33,22 @@ $arrDca['palettes']['iso_productreader'] = str_replace(
 $arrDca['palettes']['iso_cart_link']
 	= '{title_legend},name,headline,type;{config_legend},jumpTo;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
 
+$arrDca['palettes']['iso_direct_checkout']
+	= '{title_legend},name,headline,type;{config_legend},jumpTo,iso_config_id,iso_use_quantity,iso_direct_checkout_product_mode,iso_direct_checkout_product,nc_notification,iso_shipping_modules;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
+
 $arrDca['palettes']['iso_orderhistory_plus'] = str_replace('iso_config_ids', 'iso_config_ids,iso_show_all_orders', $arrDca['palettes']['iso_orderhistory']);
 $arrDca['palettes']['iso_orderdetails_plus'] = str_replace('iso_loginRequired', 'iso_loginRequired,iso_show_all_orders', $arrDca['palettes']['iso_orderdetails']);
 
 
 if (in_array('slick', \ModuleLoader::getActive()))
 {
-	$arrDca['palettes']['iso_productlistslick'] = str_replace('description', 'slickConfig,description', $arrDca['palettes']['iso_productlist']);
+	$arrDca['palettes']['iso_productlistslick'] = str_replace('iso_description', 'slickConfig,iso_description', $arrDca['palettes']['iso_productlist']);
 }
+
+/**
+ * Callbacks
+ */
+$arrDca['config']['onload_callback'][] = array('tl_module_isotope_plus', 'modifyPalette');
 
 /**
  * Fields
@@ -314,12 +322,104 @@ $arrDca['fields']['iso_buttons'] = array
 	'sql'              => "blob NULL",
 );
 
-$arrDca['fields']['description'] = array
+$arrDca['fields']['iso_description'] = array
 (
-	'label'     => &$GLOBALS['TL_LANG']['tl_module']['description'],
+	'label'     => &$GLOBALS['TL_LANG']['tl_module']['iso_description'],
 	'exclude'   => true,
 	'search'    => true,
 	'inputType' => 'textarea',
 	'eval'      => array('rte' => 'tinyMCE', 'tl_class' => 'clr'),
 	'sql'       => "text NULL"
 );
+
+$arrDca['fields']['iso_direct_checkout_product_mode'] = array
+(
+	'label'            => &$GLOBALS['TL_LANG']['tl_module']['iso_direct_checkout_product_mode'],
+	'exclude'          => true,
+	'inputType'        => 'select',
+	'options'          => array('product', 'product_type'),
+	'default'          => 'product',
+	'reference'        => &$GLOBALS['TL_LANG']['tl_module']['iso_direct_checkout_product_mode'],
+	'eval'             => array('mandatory' => true, 'tl_class' => 'w50 clr', 'submitOnChange' => true),
+	'sql'              => "varchar(64) NOT NULL default ''",
+);
+
+$arrDca['fields']['iso_direct_checkout_product'] = array
+(
+	'label'            => &$GLOBALS['TL_LANG']['tl_module']['iso_direct_checkout_product'],
+	'exclude'          => true,
+	'inputType'        => 'select',
+	'options_callback' => array('tl_module_isotope_plus', 'getProducts'),
+	'eval'             => array('mandatory' => true, 'tl_class' => 'w50', 'chosen' => true, 'includeBlankOption' => true),
+	'sql'              => "int(10) unsigned NOT NULL default '0'",
+);
+
+$arrDca['fields']['iso_direct_checkout_product_type'] = array
+(
+	'label'            => &$GLOBALS['TL_LANG']['tl_module']['iso_direct_checkout_product_type'],
+	'exclude'          => true,
+	'inputType'        => 'select',
+	'foreignKey'       => 'tl_iso_producttype.name',
+	'eval'             => array('mandatory' => true, 'tl_class' => 'w50', 'chosen' => true, 'includeBlankOption' => true),
+	'sql'              => "int(10) unsigned NOT NULL default '0'",
+);
+
+class tl_module_isotope_plus {
+
+	public function modifyPalette($objDc)
+	{
+		$objModule = \ModuleModel::findByPk(\Input::get('id'));
+		$arrDca = &$GLOBALS['TL_DCA']['tl_module'];
+
+		if ($objModule->type = 'iso_direct_checkout')
+		{
+			if ($objModule->iso_direct_checkout_product_mode == 'product_type')
+			{
+				$arrDca['palettes']['iso_direct_checkout'] = str_replace(
+					'iso_direct_checkout_product,', 'iso_direct_checkout_product_type,iso_listingSortField,iso_listingSortDirection,',
+					$arrDca['palettes']['iso_direct_checkout']);
+
+				// fix field labels
+				$arrDca['fields']['iso_listingSortField']['label'] = &$GLOBALS['TL_LANG']['tl_module']['iso_direct_checkout_listingSortField'];
+				$arrDca['fields']['iso_listingSortDirection']['label'] = &$GLOBALS['TL_LANG']['tl_module']['iso_direct_checkout_listingSortDirection'];
+			}
+
+			$arrDca['fields']['iso_shipping_modules']['inputType'] = 'select';
+			$arrDca['fields']['iso_shipping_modules']['eval']['includeBlankOption'] = true;
+			$arrDca['fields']['iso_shipping_modules']['eval']['multiple'] = false;
+			$arrDca['fields']['iso_shipping_modules']['eval']['tl_class'] = 'w50';
+		}
+	}
+
+	public static function getProducts()
+	{
+		$objProducts = \Isotope\Model\Product::findPublished();
+
+		$arrProductTypeLabels = array();
+		$arrProducts = array();
+
+		while ($objProducts->next())
+		{
+			// check for label cache
+			if (isset($arrProductTypeLabels[$objProducts->type]))
+			{
+				$strProductTypeLabel = $arrProductTypeLabels[$objProducts->type];
+			}
+			else
+			{
+				if (($objProductType = \Isotope\Model\ProductType::findByPk($objProducts->type)) !== null)
+				{
+					$strProductTypeLabel = $objProductType->name;
+					$arrProductTypeLabels[$objProductType->id] = $objProductType->name;
+				}
+			}
+
+			$arrProducts[$objProducts->id] = $strProductTypeLabel . ' - ' . $objProducts->name;
+		}
+
+		asort($arrProducts);
+
+		return $arrProducts;
+	}
+
+}

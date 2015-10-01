@@ -1,11 +1,10 @@
 <?php
 
-namespace HeimrichHannot\IsotopePlus\Module;
-
-use Isotope\Module\Module;
+namespace Isotope\Module;
+use Isotope\Form\DirectCheckoutForm;
 
 /**
- * Class CartLink
+ * Class DirectCheckout
  *
  * Copyright (c) 2015 Heimrich & Hannot GmbH
  *
@@ -13,17 +12,17 @@ use Isotope\Module\Module;
  * @author  Dennis Patzer <d.patzer@heimrich-hannot.de>
  * @license http://www.gnu.org/licences/lgpl-3.0.html LGPL
  */
-class CartLink extends Module
+class DirectCheckout extends Checkout
 {
 
-	protected $strTemplate = 'mod_iso_cart_link';
+	protected $strTemplate = 'mod_iso_direct_checkout';
 
 	public function generate()
 	{
 		if (TL_MODE == 'BE') {
 			$objTemplate = new \BackendTemplate('be_wildcard');
 
-			$objTemplate->wildcard = '### ISOTOPE ECOMMERCE: CART LINK ###';
+			$objTemplate->wildcard = '### ISOTOPE ECOMMERCE: DIRECT CHECKOUT ###';
 
 			$objTemplate->title = $this->headline;
 			$objTemplate->id = $this->id;
@@ -33,17 +32,15 @@ class CartLink extends Module
 			return $objTemplate->parse();
 		}
 
-		return parent::generate();
+		return Module::generate();
 	}
 
 	protected function compile()
 	{
-		global $objPage;
+		$this->objModel->formHybridDataContainer = 'tl_iso_product_collection';
 
-		$this->Template->href = \Controller::generateFrontendUrl(\PageModel::findByPk($this->jumpTo)->row());
-		if ($objPage->id == $this->jumpTo) {
-			$this->Template->active = true;
-		}
+		$objForm = new DirectCheckoutForm($this, $this->objModel);
+		$this->Template->checkoutForm = $objForm->generate();
 	}
 
 }
