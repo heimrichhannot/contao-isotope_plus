@@ -21,6 +21,14 @@ $GLOBALS['TL_LANG']['ATTR']['youtube']                = array('Youtube', 'Generi
 $GLOBALS['TL_LANG']['MSC']['buttonLabel']['downloadSingleProduct'] = 'Download';
 
 /**
+ * Messages
+ */
+$GLOBALS['TL_LANG']['MSC']['productNotFound'] = 'Das Produkt der Direktbestellung wurde nicht gefunden.';
+$GLOBALS['TL_LANG']['MSC']['stockEmpty'] = 'Der Artikel "%s" ist nicht mehr verfügbar.';
+$GLOBALS['TL_LANG']['MSC']['stockExceeded'] = 'Vom Artikel "%s" sind nur noch %s Stück verfügbar. Bitte bedenken Sie, dass es manche Artikel nur im Set gibt.';
+$GLOBALS['TL_LANG']['MSC']['maxOrderSizeExceeded'] = 'Sie können den Artikel "%s" pro Bestellung nur maximal %s-mal anfordern.';
+
+/**
  * Misc
  */
 $GLOBALS['TL_LANG']['MSC']['low_to_high'] = '0 - 9';
@@ -29,7 +37,4 @@ $GLOBALS['TL_LANG']['MSC']['a_to_z'] = 'A - Z';
 $GLOBALS['TL_LANG']['MSC']['z_to_a'] = 'Z - A';
 $GLOBALS['TL_LANG']['MSC']['old_to_new'] = 'Älteste';
 $GLOBALS['TL_LANG']['MSC']['new_to_old'] = 'Neuste';
-$GLOBALS['TL_LANG']['MSC']['stockEmpty'] = 'Der Artikel "%s" ist nicht mehr verfügbar.';
-$GLOBALS['TL_LANG']['MSC']['stockExceeded'] = 'Vom Artikel "%s" sind nur noch %s Stück verfügbar. Bitte bedenken Sie, dass es manche Artikel nur im Set gibt.';
-$GLOBALS['TL_LANG']['MSC']['maxOrderSizeExceeded'] = 'Sie können den Artikel "%s" pro Bestellung nur maximal %s-mal anfordern.';
 $GLOBALS['TL_LANG']['MSC']['customer'] = 'Kunde';

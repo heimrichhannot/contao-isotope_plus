@@ -53,6 +53,6 @@ TemplateLoader::addFiles(array
 	'mod_stockReport'                 => 'system/modules/isotope_plus/templates',
 	'mod_iso_cart_link'               => 'system/modules/isotope_plus/templates',
 	'isotope_download_from_attribute' => 'system/modules/isotope_plus/templates/downloads',
-	'mod_iso_direct_checkout2'        => 'system/modules/isotope_plus/templates',
+	'formhybrid_direct_checkout'      => 'system/modules/isotope_plus/templates',
 	'mod_iso_direct_checkout'         => 'system/modules/isotope_plus/templates',
 ));

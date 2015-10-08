@@ -5,13 +5,20 @@ $arrDca = &$GLOBALS['TL_DCA']['tl_iso_producttype'];
 /**
  * Palettes
  */
-$arrDca['palettes']['standard'] = str_replace('{description_legend:hide}', '{email_legend},sendOrderNotification;{description_legend:hide}', $arrDca['palettes']['standard']);
+$arrDca['palettes']['standard'] = str_replace(
+	array('{description_legend:hide}', 'shipping_exempt'),
+	array('{email_legend},sendOrderNotification;{description_legend:hide}', 'shipping_exempt,overrideStockShopConfig'),
+	$arrDca['palettes']['standard']
+);
+
 $arrDca['palettes']['__selector__'][] = 'sendOrderNotification';
+$arrDca['palettes']['__selector__'][] = 'overrideStockShopConfig';
 
 /**
  * Subpalettes
  */
 $arrDca['subpalettes']['sendOrderNotification'] = 'orderNotification,removeOtherProducts';
+$arrDca['subpalettes']['overrideStockShopConfig'] = 'skipStockValidation,skipExemptionFromShippingWhenStockEmpty';
 
 /**
  * Fields
@@ -43,3 +50,18 @@ $arrDca['fields']['removeOtherProducts'] = array
 	'eval'      => array('tl_class' => 'w50'),
 	'sql'       => "char(1) NOT NULL default ''",
 );
+
+$arrDca['fields']['overrideStockShopConfig'] = array
+(
+	'label'     => &$GLOBALS['TL_LANG']['tl_iso_producttype']['overrideStockShopConfig'],
+	'exclude'   => true,
+	'inputType' => 'checkbox',
+	'eval'      => array('tl_class' => 'w50', 'submitOnChange' => true),
+	'sql'       => "char(1) NOT NULL default ''",
+);
+
+\Controller::loadDataContainer('tl_iso_config');
+\System::loadLanguageFile('tl_iso_config');
+
+$arrDca['fields']['skipStockValidation'] = $GLOBALS['TL_DCA']['tl_iso_config']['fields']['skipStockValidation'];
+$arrDca['fields']['skipExemptionFromShippingWhenStockEmpty'] = $GLOBALS['TL_DCA']['tl_iso_config']['fields']['skipExemptionFromShippingWhenStockEmpty'];

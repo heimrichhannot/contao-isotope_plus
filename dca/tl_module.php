@@ -34,7 +34,7 @@ $arrDca['palettes']['iso_cart_link']
 	= '{title_legend},name,headline,type;{config_legend},jumpTo;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
 
 $arrDca['palettes']['iso_direct_checkout']
-	= '{title_legend},name,headline,type;{config_legend},jumpTo,iso_config_id,iso_use_quantity,iso_direct_checkout_product_mode,iso_direct_checkout_product,nc_notification,iso_shipping_modules;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
+	= '{title_legend},name,headline,type;{config_legend},jumpTo,iso_use_quantity,iso_direct_checkout_product_mode,iso_direct_checkout_product,nc_notification,iso_shipping_modules;{template_legend},formHybridTemplate;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
 
 $arrDca['palettes']['iso_orderhistory_plus'] = str_replace('iso_config_ids', 'iso_config_ids,iso_show_all_orders', $arrDca['palettes']['iso_orderhistory']);
 $arrDca['palettes']['iso_orderdetails_plus'] = str_replace('iso_loginRequired', 'iso_loginRequired,iso_show_all_orders', $arrDca['palettes']['iso_orderdetails']);
@@ -371,23 +371,27 @@ class tl_module_isotope_plus {
 		$objModule = \ModuleModel::findByPk(\Input::get('id'));
 		$arrDca = &$GLOBALS['TL_DCA']['tl_module'];
 
-		if ($objModule->type = 'iso_direct_checkout')
+		switch ($objModule->type)
 		{
-			if ($objModule->iso_direct_checkout_product_mode == 'product_type')
-			{
-				$arrDca['palettes']['iso_direct_checkout'] = str_replace(
-					'iso_direct_checkout_product,', 'iso_direct_checkout_product_type,iso_listingSortField,iso_listingSortDirection,',
-					$arrDca['palettes']['iso_direct_checkout']);
+			case 'iso_direct_checkout':
+				if ($objModule->iso_direct_checkout_product_mode == 'product_type')
+				{
+					$arrDca['palettes']['iso_direct_checkout'] = str_replace(
+						'iso_direct_checkout_product,', 'iso_direct_checkout_product_type,iso_listingSortField,iso_listingSortDirection,',
+						$arrDca['palettes']['iso_direct_checkout']);
 
-				// fix field labels
-				$arrDca['fields']['iso_listingSortField']['label'] = &$GLOBALS['TL_LANG']['tl_module']['iso_direct_checkout_listingSortField'];
-				$arrDca['fields']['iso_listingSortDirection']['label'] = &$GLOBALS['TL_LANG']['tl_module']['iso_direct_checkout_listingSortDirection'];
-			}
+					// fix field labels
+					$arrDca['fields']['iso_listingSortField']['label'] = &$GLOBALS['TL_LANG']['tl_module']['iso_direct_checkout_listingSortField'];
+					$arrDca['fields']['iso_listingSortDirection']['label'] = &$GLOBALS['TL_LANG']['tl_module']['iso_direct_checkout_listingSortDirection'];
+				}
 
-			$arrDca['fields']['iso_shipping_modules']['inputType'] = 'select';
-			$arrDca['fields']['iso_shipping_modules']['eval']['includeBlankOption'] = true;
-			$arrDca['fields']['iso_shipping_modules']['eval']['multiple'] = false;
-			$arrDca['fields']['iso_shipping_modules']['eval']['tl_class'] = 'w50';
+				$arrDca['fields']['iso_shipping_modules']['inputType'] = 'select';
+				$arrDca['fields']['iso_shipping_modules']['eval']['includeBlankOption'] = true;
+				$arrDca['fields']['iso_shipping_modules']['eval']['multiple'] = false;
+				$arrDca['fields']['iso_shipping_modules']['eval']['tl_class'] = 'w50';
+
+				$arrDca['fields']['formHybridTemplate']['default'] = 'formhybrid_direct_checkout';
+				break;
 		}
 	}
 

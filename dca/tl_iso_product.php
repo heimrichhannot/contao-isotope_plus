@@ -53,3 +53,24 @@ $arrDca['fields']['maxOrderSize'] = array
 	'attributes'            => array('legend'=>'inventory_legend'),
 	'sql'                   => "varchar(255) NOT NULL default ''",
 );
+
+$arrDca['fields']['overrideStockShopConfig'] = array
+(
+	'label'     => &$GLOBALS['TL_LANG']['tl_iso_product']['overrideStockShopConfig'],
+	'exclude'   => true,
+	'inputType' => 'checkbox',
+	'eval'      => array('tl_class' => 'w50'),
+	'attributes' => array('legend'=>'shipping_legend'),
+	'sql'       => "char(1) NOT NULL default ''",
+);
+
+\Controller::loadDataContainer('tl_iso_config');
+\System::loadLanguageFile('tl_iso_config');
+\Controller::loadDataContainer('tl_iso_producttype');
+\System::loadLanguageFile('tl_iso_producttype');
+
+// arrays are always copied by value (not by reference) in php
+$arrDca['fields']['skipStockValidation'] = $GLOBALS['TL_DCA']['tl_iso_config']['fields']['skipStockValidation'];
+$arrDca['fields']['skipStockValidation']['attributes'] = array('legend'=>'shipping_legend');
+$arrDca['fields']['skipExemptionFromShippingWhenStockEmpty'] = $GLOBALS['TL_DCA']['tl_iso_config']['fields']['skipExemptionFromShippingWhenStockEmpty'];
+$arrDca['fields']['skipExemptionFromShippingWhenStockEmpty']['attributes'] = array('legend'=>'shipping_legend');

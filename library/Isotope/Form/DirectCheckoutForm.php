@@ -3,6 +3,7 @@
 namespace Isotope\Form;
 
 use HeimrichHannot\FormHybrid\Form;
+use HeimrichHannot\IsotopePlus\IsotopePlus;
 use Isotope\CheckoutStep\BillingAddress;
 use Isotope\CheckoutStep\ShippingAddress;
 use Isotope\CheckoutStep\ShippingMethod;
@@ -16,6 +17,7 @@ use Isotope\Model\ProductCollection\Order;
 use Isotope\Model\ProductCollectionItem;
 use Isotope\Model\ProductCollectionSurcharge\Shipping;
 use Isotope\Model\Shipping\Flat;
+use Isotope\RequestCache\Sort;
 
 class DirectCheckoutForm extends Form
 {
@@ -23,6 +25,7 @@ class DirectCheckoutForm extends Form
 	protected $arrBillingAddressFields = array();
 	protected $arrShippingAddressFields = array();
 	protected $objCheckoutModule;
+	protected $objProduct;
 
 	public function __construct($objCheckoutModule, \ModuleModel $objModule = null, $instanceId = 0)
 	{
@@ -30,9 +33,50 @@ class DirectCheckoutForm extends Form
 		parent::__construct($objModule, $instanceId);
 	}
 
-	protected function compile() {}
+	protected function compile() {
+		if (!$this->objProduct)
+		{
+			$this->Template->error = $GLOBALS['TL_LANG']['MSC']['productNotFound'];
+		}
+	}
 
 	protected function modifyDC() {
+		// get the product
+		switch ($this->iso_direct_checkout_product_mode) {
+			case 'product_type':
+				$arrColumns = array(
+					'type'
+				);
+
+				$arrValues = array(
+					$this->iso_direct_checkout_product_type
+				);
+
+				if ($this->iso_listingSortField)
+					$arrSorting = array(
+						$this->iso_listingSortField => ($this->iso_listingSortDirection == 'DESC' ? Sort::descending() : Sort::ascending())
+					);
+				else
+					$arrSorting = array();
+
+				$objProducts = Product::findPublishedBy(
+					$arrColumns,
+					$arrValues,
+					array(
+						'sorting' => $arrSorting,
+					)
+				);
+
+				if ($objProducts->count() > 0)
+				{
+					$this->objProduct = $objProducts->current();
+				}
+				break;
+			default:
+				$this->objProduct = Product::findByPk($this->iso_direct_checkout_product);
+				break;
+		}
+
 		// add quantity
 		$this->addEditableField('quantity', array(
 			'label'     => &$GLOBALS['TL_LANG']['MSC']['quantity'],
@@ -114,20 +158,10 @@ class DirectCheckoutForm extends Form
 
 		$objSubmission = $this->getSubmission();
 
-		switch ($this->iso_direct_checkout_product_mode) {
-			case 'product_type':
+		if (!$objCart->addProduct($this->objProduct, $objSubmission->quantity))
+			return;
 
-				break;
-			default:
-				if (($objProduct = Product::findByPk($this->iso_direct_checkout_product)) !== null)
-				{
-					if (!$objCart->addProduct($objProduct, $objSubmission->quantity))
-						return;
-
-					$objCart->save();
-				}
-				break;
-		}
+		$objCart->save();
 
 		$objOrder = $objCart->getDraftOrder();
 
