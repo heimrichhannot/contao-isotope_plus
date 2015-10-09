@@ -49,7 +49,7 @@ class IsotopePlus extends \Isotope\Isotope
 
 			if ($objProduct->stock != '' && $objProduct->stock !== null) {
 				// override the quantity!
-				if (!static::validateQuantity($objProduct, $objItem->quantity, null, false)) {
+				if (!static::validateQuantity($objProduct, $objItem->quantity)) {
 					return false;
 				}
 
@@ -61,14 +61,7 @@ class IsotopePlus extends \Isotope\Isotope
 		foreach ($arrOrders as $objItem) {
 			$objProduct = $objItem->getProduct();
 
-			global $objPage;
-			$objConfig = Isotope::getConfig();
-			if ($objPage->iso_config)
-			{
-				$objConfig = Config::findByPk($objPage->iso_config);
-			}
-
-			$intQuantity = static::getQuantityForValidation($objItem->quantity, $objProduct, null, $objConfig->skipSets);
+			$intQuantity = static::getTotalStockQuantity($objItem->quantity, $objProduct);
 
 			$objProduct->stock -= $intQuantity;
 
@@ -106,9 +99,15 @@ class IsotopePlus extends \Isotope\Isotope
 		return $arrSet;
 	}
 
-	public static function getQuantityForValidation($intQuantity, $objProduct, $objCartItem = null, $blnSkipSets = false)
+	// watch out: also in backend the current set quantity is used
+	public static function getTotalStockQuantity($intQuantity, $objProduct, $objCartItem = null, $intSetQuantity = null)
 	{
-		$intTotalQuantity = !$blnSkipSets && $objProduct->set ? $objProduct->set * $intQuantity : $intQuantity;
+		if ($intSetQuantity)
+			$intTotalQuantity = $intSetQuantity * $intQuantity;
+		elseif (!static::getOverridableShopConfigProperty('skipSets') && $objProduct->set)
+			$intTotalQuantity = $objProduct->set * $intQuantity;
+		else
+			$intTotalQuantity = $intQuantity;
 
 		if ($objCartItem !== null)
 		{
@@ -118,17 +117,19 @@ class IsotopePlus extends \Isotope\Isotope
 		return $intTotalQuantity;
 	}
 
-	public static function validateQuantity($objProduct, $intQuantity, $objCartItem = null, $blnIncludeError = false)
+	/**
+	 * @param            $objProduct
+	 * @param            $intQuantity
+	 * @param null       $objCartItem
+	 * @param bool|false $blnIncludeError
+	 * @param bool|false $skipSets override the normal handling of this property -> used for backend handling since this
+	 *                             uses the order item's setQuantity property
+	 *
+	 * @return array|bool
+	 */
+	public static function validateQuantity($objProduct, $intQuantity, $objCartItem = null, $blnIncludeError = false, $intSetQuantity = null)
 	{
-		global $objPage;
 		$blnSkipStockValidation = static::getOverridableStockProperty('skipStockValidation', $objProduct);
-
-		$objConfig = Isotope::getConfig();
-
-		if ($objPage->iso_config)
-		{
-			$objConfig = Config::findByPk($objPage->iso_config);
-		}
 
 		// no quantity at all
 		if ($intQuantity === null)
@@ -136,7 +137,7 @@ class IsotopePlus extends \Isotope\Isotope
 		elseif ($intQuantity == '')
 			$intQuantity = 1;
 
-		$intQuantityTotal = static::getQuantityForValidation($intQuantity, $objProduct, $objCartItem, $objConfig->skipSets);
+		$intQuantityTotal = static::getTotalStockQuantity($intQuantity, $objProduct, $objCartItem, $intSetQuantity);
 
 		// stock
 		if (!$blnSkipStockValidation && $objProduct->stock != '' && $objProduct->stock !== null)
@@ -145,7 +146,10 @@ class IsotopePlus extends \Isotope\Isotope
 			{
 				$strErrorMessage = sprintf($GLOBALS['TL_LANG']['MSC']['stockEmpty'], $objProduct->name);
 
-				$_SESSION['ISO_ERROR'][] = $strErrorMessage;
+				if (TL_MODE == 'FE')
+					$_SESSION['ISO_ERROR'][] = $strErrorMessage;
+				else
+					\Message::addError($strErrorMessage);
 
 				if ($blnIncludeError)
 					return array(false, $strErrorMessage);
@@ -155,7 +159,10 @@ class IsotopePlus extends \Isotope\Isotope
 			elseif ($intQuantityTotal > $objProduct->stock) {
 				$strErrorMessage = sprintf($GLOBALS['TL_LANG']['MSC']['stockExceeded'], $objProduct->name, $objProduct->stock);
 
-				$_SESSION['ISO_ERROR'][] = $strErrorMessage;
+				if (TL_MODE == 'FE')
+					$_SESSION['ISO_ERROR'][] = $strErrorMessage;
+				else
+					\Message::addError($strErrorMessage);
 
 				if ($blnIncludeError)
 					return array(false, $strErrorMessage);
@@ -171,7 +178,10 @@ class IsotopePlus extends \Isotope\Isotope
 				$strErrorMessage = sprintf($GLOBALS['TL_LANG']['MSC']['maxOrderSizeExceeded'],
 					$objProduct->name, $objProduct->maxOrderSize);
 
-				$_SESSION['ISO_ERROR'][] = $strErrorMessage;
+				if (TL_MODE == 'FE')
+					$_SESSION['ISO_ERROR'][] = $strErrorMessage;
+				else
+					\Message::addError($strErrorMessage);
 
 
 				if ($blnIncludeError)
@@ -189,8 +199,10 @@ class IsotopePlus extends \Isotope\Isotope
 
 	public static function setSetQuantity($objOrder, $arrTokens)
 	{
+		if (static::getOverridableShopConfigProperty('skipSets'))
+			return;
+
 		$arrItems = $objOrder->getItems();
-		$arrOrders = array();
 
 		foreach ($arrItems as $objItem) {
 			$objProduct = $objItem->getProduct();
@@ -466,6 +478,77 @@ class IsotopePlus extends \Isotope\Isotope
 
 		// defaultly return the value defined in the global config
 		return $objConfig->{$strProperty};
+	}
+
+	public static function getOverridableShopConfigProperty($strProperty)
+	{
+		$objConfig = Isotope::getConfig();
+		global $objPage;
+
+		if ($objPage->iso_config)
+		{
+			$objConfig = Config::findByPk($objPage->iso_config);
+		}
+
+		return $objConfig->{$strProperty};
+	}
+
+	public static function updateStock(Order $objOrder, $objNewStatus)
+	{
+		// atm only for backend
+		if (TL_MODE != 'BE')
+			return false;
+
+		// the order's config is used!
+		$objConfig = Isotope::getConfig();
+
+		$arrStockDecreaseOrderStates = deserialize($objConfig->stockDecreaseOrderStates, true);
+
+		// e.g. new -> cancelled => increase the stock based on the order item's setQuantity-values (no validation required, of course)
+		if (!in_array($objOrder->order_status, $arrStockDecreaseOrderStates) && in_array($objNewStatus->id, $arrStockDecreaseOrderStates))
+		{
+			foreach ($objOrder->getItems() as $objItem) {
+				$objProduct = $objItem->getProduct();
+
+				$intTotalQuantity = static::getTotalStockQuantity($objItem->quantity, $objProduct, null, $objItem->setQuantity);
+
+				$objProduct->stock += $intTotalQuantity;
+				$objProduct->save();
+			}
+		}
+		// e.g. cancelled -> new => decrease the stock after validation
+		elseif (in_array($objOrder->order_status, $arrStockDecreaseOrderStates) && !in_array($objNewStatus->id, $arrStockDecreaseOrderStates))
+		{
+			foreach ($objOrder->getItems() as $objItem) {
+				$objProduct = $objItem->getProduct();
+				$blnSkipValidation = static::getOverridableStockProperty('skipStockValidation', $objProduct);
+
+				// watch out: also in backend the current set quantity is used for validation!
+				if (!$blnSkipValidation && !static::validateQuantity($objProduct, $objItem->quantity))
+				{
+					// if the validation breaks for only one product collection item -> cancel the order status transition
+					return true;
+				}
+			}
+
+			foreach ($objOrder->getItems() as $objItem) {
+				$objProduct = $objItem->getProduct();
+
+				$intTotalQuantity = static::getTotalStockQuantity($objItem->quantity, $objProduct);
+
+				$objProduct->stock -= $intTotalQuantity;
+
+				if ($objProduct->stock <= 0 &&
+					!static::getOverridableStockProperty('skipExemptionFromShippingWhenStockEmpty', $objProduct)) {
+					$objProduct->shipping_exempt = true;
+				}
+
+				$objProduct->save();
+			}
+		}
+
+		// don't cancel
+		return false;
 	}
 
 }

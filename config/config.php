@@ -15,6 +15,7 @@ $GLOBALS['ISO_HOOKS']['postCheckout']['sendOrderNotification'] = array('Heimrich
 $GLOBALS['ISO_HOOKS']['postCheckout']['setSetQuantity'] = array('HeimrichHannot\IsotopePlus\IsotopePlus', 'setSetQuantity');
 $GLOBALS['ISO_HOOKS']['updateItemInCollection']['validateStockCollectionUpdate'] = array('HeimrichHannot\IsotopePlus\IsotopePlus', 'validateStockCollectionUpdate');
 $GLOBALS['ISO_HOOKS']['buttons'][] = array('HeimrichHannot\IsotopePlus\IsotopePlus', 'addDownloadSingleProductButton');
+$GLOBALS['ISO_HOOKS']['preOrderStatusUpdate']['updateStock'] = array('HeimrichHannot\IsotopePlus\IsotopePlus', 'updateStock');
 
 /**
  * Frontend modules
