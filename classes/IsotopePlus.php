@@ -100,11 +100,11 @@ class IsotopePlus extends \Isotope\Isotope
 	}
 
 	// watch out: also in backend the current set quantity is used
-	public static function getTotalStockQuantity($intQuantity, $objProduct, $objCartItem = null, $intSetQuantity = null)
+	public static function getTotalStockQuantity($intQuantity, $objProduct, $objCartItem = null, $intSetQuantity = null, $objConfig = null)
 	{
 		if ($intSetQuantity)
 			$intTotalQuantity = $intSetQuantity * $intQuantity;
-		elseif (!static::getOverridableShopConfigProperty('skipSets') && $objProduct->set)
+		elseif (!static::getOverridableShopConfigProperty('skipSets', $objConfig) && $objProduct->set)
 			$intTotalQuantity = $objProduct->set * $intQuantity;
 		else
 			$intTotalQuantity = $intQuantity;
@@ -444,7 +444,7 @@ class IsotopePlus extends \Isotope\Isotope
 	}
 
 	// priorities (first is the most important):
-	// product, product type, page shop config, global shop config
+	// product, product type, global shop config
 	public static function getOverridableStockProperty($strProperty, $objProduct)
 	{
 		// at first check for product and product type
@@ -467,28 +467,29 @@ class IsotopePlus extends \Isotope\Isotope
 			}
 		}
 
-		// nothing returned? -> check module shop config
+		// nothing returned?
 		$objConfig = Isotope::getConfig();
-		global $objPage;
-
-		if ($objPage->iso_config)
-		{
-			$objConfig = Config::findByPk($objPage->iso_config);
-		}
+//		global $objPage;
+//
+//		if ($objPage->iso_config)
+//		{
+//			$objConfig = Config::findByPk($objPage->iso_config);
+//		}
 
 		// defaultly return the value defined in the global config
 		return $objConfig->{$strProperty};
 	}
 
-	public static function getOverridableShopConfigProperty($strProperty)
+	public static function getOverridableShopConfigProperty($strProperty, $objConfig = null)
 	{
-		$objConfig = Isotope::getConfig();
-		global $objPage;
-
-		if ($objPage->iso_config)
-		{
-			$objConfig = Config::findByPk($objPage->iso_config);
-		}
+		if (!$objConfig)
+			$objConfig = Isotope::getConfig();
+//		global $objPage;
+//
+//		if ($objPage->iso_config)
+//		{
+//			$objConfig = Config::findByPk($objPage->iso_config);
+//		}
 
 		return $objConfig->{$strProperty};
 	}
@@ -502,48 +503,58 @@ class IsotopePlus extends \Isotope\Isotope
 		// the order's config is used!
 		$objConfig = Isotope::getConfig();
 
-		$arrStockDecreaseOrderStates = deserialize($objConfig->stockDecreaseOrderStates, true);
+		$arrStockIncreaseOrderStates = deserialize($objConfig->stockIncreaseOrderStates, true);
 
 		// e.g. new -> cancelled => increase the stock based on the order item's setQuantity-values (no validation required, of course)
-		if (!in_array($objOrder->order_status, $arrStockDecreaseOrderStates) && in_array($objNewStatus->id, $arrStockDecreaseOrderStates))
+		if (!in_array($objOrder->order_status, $arrStockIncreaseOrderStates) && in_array($objNewStatus->id, $arrStockIncreaseOrderStates))
 		{
 			foreach ($objOrder->getItems() as $objItem) {
-				$objProduct = $objItem->getProduct();
+				if (($objProduct = $objItem->getProduct()) !== null)
+				{
+					$intTotalQuantity = static::getTotalStockQuantity($objItem->quantity, $objProduct, null, $objItem->setQuantity);
 
-				$intTotalQuantity = static::getTotalStockQuantity($objItem->quantity, $objProduct, null, $objItem->setQuantity);
-
-				$objProduct->stock += $intTotalQuantity;
-				$objProduct->save();
+					if ($intTotalQuantity)
+					{
+						$objProduct->stock += $intTotalQuantity;
+						$objProduct->save();
+					}
+				}
 			}
 		}
 		// e.g. cancelled -> new => decrease the stock after validation
-		elseif (in_array($objOrder->order_status, $arrStockDecreaseOrderStates) && !in_array($objNewStatus->id, $arrStockDecreaseOrderStates))
+		elseif (in_array($objOrder->order_status, $arrStockIncreaseOrderStates) && !in_array($objNewStatus->id, $arrStockIncreaseOrderStates))
 		{
 			foreach ($objOrder->getItems() as $objItem) {
-				$objProduct = $objItem->getProduct();
-				$blnSkipValidation = static::getOverridableStockProperty('skipStockValidation', $objProduct);
-
-				// watch out: also in backend the current set quantity is used for validation!
-				if (!$blnSkipValidation && !static::validateQuantity($objProduct, $objItem->quantity))
+				if (($objProduct = $objItem->getProduct()) !== null)
 				{
-					// if the validation breaks for only one product collection item -> cancel the order status transition
-					return true;
+					$blnSkipValidation = static::getOverridableStockProperty('skipStockValidation', $objProduct);
+
+					// watch out: also in backend the current set quantity is used for validation!
+					if (!$blnSkipValidation && !static::validateQuantity($objProduct, $objItem->quantity))
+					{
+						// if the validation breaks for only one product collection item -> cancel the order status transition
+						return true;
+					}
 				}
 			}
 
 			foreach ($objOrder->getItems() as $objItem) {
-				$objProduct = $objItem->getProduct();
+				if (($objProduct = $objItem->getProduct()) !== null)
+				{
+					$intTotalQuantity = static::getTotalStockQuantity($objItem->quantity, $objProduct);
 
-				$intTotalQuantity = static::getTotalStockQuantity($objItem->quantity, $objProduct);
+					if ($intTotalQuantity)
+					{
+						$objProduct->stock -= $intTotalQuantity;
 
-				$objProduct->stock -= $intTotalQuantity;
+						if ($objProduct->stock <= 0 &&
+							!static::getOverridableStockProperty('skipExemptionFromShippingWhenStockEmpty', $objProduct)) {
+							$objProduct->shipping_exempt = true;
+						}
 
-				if ($objProduct->stock <= 0 &&
-					!static::getOverridableStockProperty('skipExemptionFromShippingWhenStockEmpty', $objProduct)) {
-					$objProduct->shipping_exempt = true;
+						$objProduct->save();
+					}
 				}
-
-				$objProduct->save();
 			}
 		}
 

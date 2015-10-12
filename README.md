@@ -10,7 +10,7 @@ A module that brings some new features to the isotope shopsystem
 - if these attributes have values, adding products to the cart or checking out is constrained by the stock left (depending on "set" if set)
 - if the stock reaches 0, shipping_exempt on the product is set to true
 - the stock validation (including setting of shipping_exempt) and the usage of sets can be configured in the shop config, the product type and the product (shop config has the lowest priority, product the highest)
-- the usage of sets when computing the quantity to remove from the stock of a product can be configured in the shop config and the current page (which also can have a certain shop config assigned)
+- the usage of sets when computing the quantity to remove from the stock of a product can be configured in the shop config
 - when removing an order or setting it to a certain status, the stock is decreased (configurable in the shop config)
 
 ### Order report & Stock report

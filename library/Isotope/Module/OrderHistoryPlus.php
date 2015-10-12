@@ -75,12 +75,26 @@ class OrderHistoryPlus extends OrderHistory
 	protected function compile()
 	{
 		$arrOrders = array();
-		$arrColumns = array(
-			'order_status>0',
-			'config_id IN (' . implode(',', array_map('intval', $this->iso_config_ids)) . ')');
+		$arrColumns = array();
+
+		if (\Input::get('order_status'))
+			$arrColumns[] = 'order_status > 0 AND order_status = ' . \Input::get('order_status');
+		else
+			$arrColumns[] = 'order_status > 0';
+
+		if (\Input::get('config_id'))
+			$arrColumns[] = 'config_id = ' . \Input::get('config_id');
+		else
+			$arrColumns[] = 'config_id IN (' . implode(',', array_map('intval', $this->iso_config_ids)) . ')';
 
 		if (!$this->iso_show_all_orders)
 			$arrColumns[] = 'member=' . \FrontendUser::getInstance()->id;
+
+		// auto_item = member
+		if(isset($_GET['items']))
+		{
+			$arrColumns[] = 'member=' . \Input::get('auto_item');
+		}
 
 		$objOrders = Order::findBy(
 			$arrColumns,

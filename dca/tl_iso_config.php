@@ -5,7 +5,7 @@ $arrDca = &$GLOBALS['TL_DCA']['tl_iso_config'];
 /**
  * Palettes
  */
-$arrDca['palettes']['default'] = str_replace('{analytics_legend}', '{stock_legend},skipSets,skipStockValidation,skipExemptionFromShippingWhenStockEmpty,stockDecreaseOrderStates;{analytics_legend}', $arrDca['palettes']['default']);
+$arrDca['palettes']['default'] = str_replace('{analytics_legend}', '{stock_legend},skipSets,skipStockValidation,skipExemptionFromShippingWhenStockEmpty,stockIncreaseOrderStates;{analytics_legend}', $arrDca['palettes']['default']);
 
 $arrDca['fields']['skipStockValidation'] = array
 (
@@ -34,9 +34,9 @@ $arrDca['fields']['skipSets'] = array
 	'sql'       => "char(1) NOT NULL default ''",
 );
 
-$arrDca['fields']['stockDecreaseOrderStates'] = array
+$arrDca['fields']['stockIncreaseOrderStates'] = array
 (
-	'label'                 => &$GLOBALS['TL_LANG']['tl_iso_config']['stockDecreaseOrderStates'],
+	'label'                 => &$GLOBALS['TL_LANG']['tl_iso_config']['stockIncreaseOrderStates'],
 	'exclude'               => true,
 	'inputType'             => 'select',
 	'options_callback'      => array('tl_iso_config_isotope_plus', 'getOrderStates'),
