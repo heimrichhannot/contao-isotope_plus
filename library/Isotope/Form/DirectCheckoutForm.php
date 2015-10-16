@@ -83,6 +83,18 @@ class DirectCheckoutForm extends Form
 			'inputType' => 'text'
 		));
 
+		// add subscription field
+		if (in_array('isotope_subscriptions', \ModuleLoader::getActive()) && $this->iso_addSubscriptionCheckbox)
+		{
+			$this->addEditableField('subscribeToProduct', array(
+				'label' => ' ',
+				'inputType' => 'checkbox',
+				'options'   => array(
+					'1' => $GLOBALS['TL_LANG']['MSC']['subscribeToProduct']
+				)
+			));
+		}
+
 		// add address fields
 		\Controller::loadDataContainer('tl_iso_address');
 		\System::loadLanguageFile('tl_iso_address');
