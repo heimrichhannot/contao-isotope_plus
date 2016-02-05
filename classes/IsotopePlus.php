@@ -34,6 +34,35 @@ use NotificationCenter\Model\Notification;
 
 class IsotopePlus extends \Isotope\Isotope
 {
+	/**
+	 * Remove isotope js, as we dont want to use mootools
+	 *
+	 * @param $strBuffer
+	 *
+	 * @return mixed
+	 */
+	public function hookReplaceDynamicScriptTags($strBuffer)
+	{
+		if(!is_array($GLOBALS['TL_JAVASCRIPT']))
+		{
+			return $strBuffer;
+		}
+
+		$arrJs = $GLOBALS['TL_JAVASCRIPT'];
+
+		foreach($arrJs as $key => $strValue)
+		{
+			$arrData = trimsplit('|', $strValue);
+
+			if(\HeimrichHannot\Haste\Util\StringUtil::endsWith($arrData[0], 'system/modules/isotope/assets/js/isotope.min.js'))
+			{
+				unset($GLOBALS['TL_JAVASCRIPT'][$key]);
+			}
+		}
+
+		return $strBuffer;
+	}
+
 	public function generateProductHook(&$objTemplate, $objProduct)
 	{
 		DownloadHelper::addDownloadsFromProductDownloadsToTemplate($objTemplate);
@@ -41,7 +70,7 @@ class IsotopePlus extends \Isotope\Isotope
 
 	public static function validateStockCheckout($objOrder)
 	{
-		$arrItems = $objOrder->getItems();
+		$arrItems  = $objOrder->getItems();
 		$arrOrders = array();
 
 		foreach ($arrItems as $objItem) {
@@ -65,8 +94,9 @@ class IsotopePlus extends \Isotope\Isotope
 
 			$objProduct->stock -= $intQuantity;
 
-			if ($objProduct->stock <= 0 &&
-				!static::getOverridableStockProperty('skipExemptionFromShippingWhenStockEmpty', $objProduct)) {
+			if ($objProduct->stock <= 0
+				&& !static::getOverridableStockProperty('skipExemptionFromShippingWhenStockEmpty', $objProduct)
+			) {
 				$objProduct->shipping_exempt = true;
 			}
 
@@ -96,21 +126,22 @@ class IsotopePlus extends \Isotope\Isotope
 		if (!static::validateQuantity($objProduct, $arrSet['quantity'])) {
 			\Controller::reload();
 		}
+
 		return $arrSet;
 	}
 
 	// watch out: also in backend the current set quantity is used
 	public static function getTotalStockQuantity($intQuantity, $objProduct, $objCartItem = null, $intSetQuantity = null, $objConfig = null)
 	{
-		if ($intSetQuantity)
+		if ($intSetQuantity) {
 			$intTotalQuantity = $intSetQuantity * $intQuantity;
-		elseif (!static::getOverridableShopConfigProperty('skipSets', $objConfig) && $objProduct->set)
+		} elseif (!static::getOverridableShopConfigProperty('skipSets', $objConfig) && $objProduct->set) {
 			$intTotalQuantity = $objProduct->set * $intQuantity;
-		else
+		} else {
 			$intTotalQuantity = $intQuantity;
+		}
 
-		if ($objCartItem !== null)
-		{
+		if ($objCartItem !== null) {
 			$intTotalQuantity += $objCartItem->quantity;
 		}
 
@@ -132,83 +163,90 @@ class IsotopePlus extends \Isotope\Isotope
 		$blnSkipStockValidation = static::getOverridableStockProperty('skipStockValidation', $objProduct);
 
 		// no quantity at all
-		if ($intQuantity === null)
+		if ($intQuantity === null) {
 			return true;
-		elseif ($intQuantity == '')
+		} elseif ($intQuantity == '') {
 			$intQuantity = 1;
+		}
 
 		$intQuantityTotal = static::getTotalStockQuantity($intQuantity, $objProduct, $objCartItem, $intSetQuantity);
 
 		// stock
-		if (!$blnSkipStockValidation && $objProduct->stock != '' && $objProduct->stock !== null)
-		{
-			if ($objProduct->stock <= 0)
-			{
+		if (!$blnSkipStockValidation && $objProduct->stock != '' && $objProduct->stock !== null) {
+			if ($objProduct->stock <= 0) {
 				$strErrorMessage = sprintf($GLOBALS['TL_LANG']['MSC']['stockEmpty'], $objProduct->name);
 
-				if (TL_MODE == 'FE')
+				if (TL_MODE == 'FE') {
 					$_SESSION['ISO_ERROR'][] = $strErrorMessage;
-				else
+				} else {
 					\Message::addError($strErrorMessage);
+				}
 
-				if ($blnIncludeError)
+				if ($blnIncludeError) {
 					return array(false, $strErrorMessage);
-				else
+				} else {
 					return false;
-			}
-			elseif ($intQuantityTotal > $objProduct->stock) {
+				}
+			} elseif ($intQuantityTotal > $objProduct->stock) {
 				$strErrorMessage = sprintf($GLOBALS['TL_LANG']['MSC']['stockExceeded'], $objProduct->name, $objProduct->stock);
 
-				if (TL_MODE == 'FE')
+				if (TL_MODE == 'FE') {
 					$_SESSION['ISO_ERROR'][] = $strErrorMessage;
-				else
+				} else {
 					\Message::addError($strErrorMessage);
+				}
 
-				if ($blnIncludeError)
+				if ($blnIncludeError) {
 					return array(false, $strErrorMessage);
-				else
+				} else {
 					return false;
+				}
 			}
 		}
 
 		// maxOrderSize
 		if ($objProduct->maxOrderSize != '' && $objProduct->maxOrderSize !== null) {
-			if ($intQuantityTotal <= $objProduct->maxOrderSize)
-			{
-				$strErrorMessage = sprintf($GLOBALS['TL_LANG']['MSC']['maxOrderSizeExceeded'],
-					$objProduct->name, $objProduct->maxOrderSize);
+			if ($intQuantityTotal <= $objProduct->maxOrderSize) {
+				$strErrorMessage = sprintf(
+					$GLOBALS['TL_LANG']['MSC']['maxOrderSizeExceeded'],
+					$objProduct->name,
+					$objProduct->maxOrderSize
+				);
 
-				if (TL_MODE == 'FE')
+				if (TL_MODE == 'FE') {
 					$_SESSION['ISO_ERROR'][] = $strErrorMessage;
-				else
+				} else {
 					\Message::addError($strErrorMessage);
+				}
 
 
-				if ($blnIncludeError)
+				if ($blnIncludeError) {
 					return array(false, $strErrorMessage);
-				else
+				} else {
 					return false;
+				}
 			}
 		}
 
-		if ($blnIncludeError)
+		if ($blnIncludeError) {
 			return array(true, null);
-		else
+		} else {
 			return true;
+		}
 	}
 
 	public static function setSetQuantity($objOrder, $arrTokens)
 	{
-		if (static::getOverridableShopConfigProperty('skipSets'))
+		if (static::getOverridableShopConfigProperty('skipSets')) {
 			return;
+		}
 
 		$arrItems = $objOrder->getItems();
 
 		foreach ($arrItems as $objItem) {
 			$objProduct = $objItem->getProduct();
 
-			if ($objProduct->set)
-			{
+			if ($objProduct->set) {
 				$objItem->setQuantity = $objProduct->set;
 				$objItem->save();
 			}
@@ -218,8 +256,8 @@ class IsotopePlus extends \Isotope\Isotope
 	public static function addDownloadSingleProductButton($arrButtons)
 	{
 		$arrButtons['downloadSingleProduct'] = array(
-			'label' => $GLOBALS['TL_LANG']['MSC']['buttonLabel']['downloadSingleProduct'],
-			'callback' => array('\HeimrichHannot\IsotopePlus\IsotopePlus', 'downloadSingleProduct')
+			'label'    => $GLOBALS['TL_LANG']['MSC']['buttonLabel']['downloadSingleProduct'],
+			'callback' => array('\HeimrichHannot\IsotopePlus\IsotopePlus', 'downloadSingleProduct'),
 		);
 
 		return $arrButtons;
@@ -227,14 +265,15 @@ class IsotopePlus extends \Isotope\Isotope
 
 	/**
 	 * Currently only works for products containing one single download
+	 *
 	 * @param IsotopeProduct $objProduct
 	 * @param array          $arrConfig
 	 */
 	public function downloadSingleProduct(IsotopeProduct $objProduct, array $arrConfig = array())
 	{
-		if (($objDownload = Download::findByPid($objProduct->getProductId())) !== null &&
-			$strPath = Files::getPathFromUuid($objDownload->singleSRC))
-		{
+		if (($objDownload = Download::findByPid($objProduct->getProductId())) !== null
+			&& $strPath = Files::getPathFromUuid($objDownload->singleSRC)
+		) {
 			// TODO count downloads
 			// start downloading the file (protected folders also supported)
 			\Controller::redirect(Environment::getUrl() . '?file=' . $strPath);
@@ -251,20 +290,20 @@ class IsotopePlus extends \Isotope\Isotope
 			$arrProductTypes[] = $objItem->getProduct()->type;
 		}
 
-		foreach (array_unique($arrProductTypes) as $intProductType)
-		{
-			if (($objProductType = ProductType::findByPk($intProductType)) !== null)
-			{
-				if ($objProductType->sendOrderNotification &&
-					($objNotification = Notification::findByPk($objProductType->orderNotification)) !== null) {
+		foreach (array_unique($arrProductTypes) as $intProductType) {
+			if (($objProductType = ProductType::findByPk($intProductType)) !== null) {
+				if ($objProductType->sendOrderNotification
+					&& ($objNotification = Notification::findByPk($objProductType->orderNotification)) !== null
+				) {
 
-					if ($objProductType->removeOtherProducts)
+					if ($objProductType->removeOtherProducts) {
 						$objNotification->send(
 							static::getCleanTokens($intProductType, $objOrder, $objNotification),
 							$GLOBALS['TL_LANGUAGE']
 						);
-					else
+					} else {
 						$objNotification->send($arrTokens, $GLOBALS['TL_LANGUAGE']);
+					}
 				}
 			}
 		}
@@ -282,8 +321,8 @@ class IsotopePlus extends \Isotope\Isotope
 			$objOrder,
 			$objTemplate,
 			array(
-				'gallery'   => $objNotification->iso_gallery,
-				'sorting'   => $objOrder->getItemsSortingCallable($objNotification->iso_orderCollectionBy),
+				'gallery' => $objNotification->iso_gallery,
+				'sorting' => $objOrder->getItemsSortingCallable($objNotification->iso_orderCollectionBy),
 			)
 		);
 
@@ -299,7 +338,7 @@ class IsotopePlus extends \Isotope\Isotope
 	{
 		$arrGalleries = array();
 		// FIX - call to custom function since addItemsToTemplate isn't static
-		$arrItems     = static::addItemsToTemplate($intProductType, $objOrder, $objTemplate, $arrConfig['sorting']);
+		$arrItems = static::addItemsToTemplate($intProductType, $objOrder, $objTemplate, $arrConfig['sorting']);
 
 		$objTemplate->id                = $objOrder->id;
 		$objTemplate->collection        = $objOrder;
@@ -318,7 +357,7 @@ class IsotopePlus extends \Isotope\Isotope
 			$objProduct = $objItem->getProduct();
 
 			return in_array($strAttribute, $objProduct->getAttributes())
-			|| in_array($strAttribute, $objProduct->getVariantAttributes());
+				   || in_array($strAttribute, $objProduct->getVariantAttributes());
 		};
 
 		$objTemplate->generateAttribute = function (
@@ -389,23 +428,23 @@ class IsotopePlus extends \Isotope\Isotope
 		$arrCSS = ($blnHasProduct ? deserialize($objProduct->cssID, true) : array());
 
 		$arrItem = array(
-			'id'                => $objItem->id,
-			'sku'               => $objItem->getSku(),
-			'name'              => $objItem->getName(),
-			'options'           => Isotope::formatOptions($objItem->getOptions()),
-			'configuration'     => $objItem->getConfiguration(),
-			'quantity'          => $objItem->quantity,
-			'price'             => Isotope::formatPriceWithCurrency($objItem->getPrice()),
-			'tax_free_price'    => Isotope::formatPriceWithCurrency($objItem->getTaxFreePrice()),
-			'total'             => Isotope::formatPriceWithCurrency($objItem->getTotalPrice()),
-			'tax_free_total'    => Isotope::formatPriceWithCurrency($objItem->getTaxFreeTotalPrice()),
-			'tax_id'            => $objItem->tax_id,
-			'href'              => false,
-			'hasProduct'        => $blnHasProduct,
-			'product'           => $objProduct,
-			'item'              => $objItem,
-			'raw'               => $objItem->row(),
-			'rowClass'          => trim('product ' . (($blnHasProduct && $objProduct->isNew()) ? 'new ' : '') . $arrCSS[1]),
+			'id'             => $objItem->id,
+			'sku'            => $objItem->getSku(),
+			'name'           => $objItem->getName(),
+			'options'        => Isotope::formatOptions($objItem->getOptions()),
+			'configuration'  => $objItem->getConfiguration(),
+			'quantity'       => $objItem->quantity,
+			'price'          => Isotope::formatPriceWithCurrency($objItem->getPrice()),
+			'tax_free_price' => Isotope::formatPriceWithCurrency($objItem->getTaxFreePrice()),
+			'total'          => Isotope::formatPriceWithCurrency($objItem->getTotalPrice()),
+			'tax_free_total' => Isotope::formatPriceWithCurrency($objItem->getTaxFreeTotalPrice()),
+			'tax_id'         => $objItem->tax_id,
+			'href'           => false,
+			'hasProduct'     => $blnHasProduct,
+			'product'        => $objProduct,
+			'item'           => $objItem,
+			'raw'            => $objItem->row(),
+			'rowClass'       => trim('product ' . (($blnHasProduct && $objProduct->isNew()) ? 'new ' : '') . $arrCSS[1]),
 		);
 
 		if (null !== $objItem->getRelated('jumpTo') && $blnHasProduct && $objProduct->isAvailableInFrontend()) {
@@ -425,8 +464,9 @@ class IsotopePlus extends \Isotope\Isotope
 
 		foreach ($objOrder->getItems($varCallable) as $objItem) {
 			// FIX - check for product type id
-			if ($objItem->getProduct()->type != $intProductType)
+			if ($objItem->getProduct()->type != $intProductType) {
 				continue;
+			}
 			// ENDFIX
 
 			$item = static::generateItem($objItem);
@@ -448,20 +488,13 @@ class IsotopePlus extends \Isotope\Isotope
 	public static function getOverridableStockProperty($strProperty, $objProduct)
 	{
 		// at first check for product and product type
-		if ($objProduct->overrideStockConfig)
-		{
+		if ($objProduct->overrideStockConfig) {
 			return $objProduct->{$strProperty};
-		}
-		else
-		{
-			if ($objProduct->overrideStockConfig)
-			{
+		} else {
+			if ($objProduct->overrideStockConfig) {
 				return $objProduct->{$strProperty};
-			}
-			else
-			{
-				if (($objProductType = ProductType::findByPk($objProduct->type)) !== null && $objProductType->overrideStockConfig)
-				{
+			} else {
+				if (($objProductType = ProductType::findByPk($objProduct->type)) !== null && $objProductType->overrideStockConfig) {
 					return $objProductType->{$strProperty};
 				}
 			}
@@ -482,8 +515,9 @@ class IsotopePlus extends \Isotope\Isotope
 
 	public static function getOverridableShopConfigProperty($strProperty, $objConfig = null)
 	{
-		if (!$objConfig)
+		if (!$objConfig) {
 			$objConfig = Isotope::getConfig();
+		}
 //		global $objPage;
 //
 //		if ($objPage->iso_config)
@@ -497,8 +531,9 @@ class IsotopePlus extends \Isotope\Isotope
 	public static function updateStock(Order $objOrder, $objNewStatus)
 	{
 		// atm only for backend
-		if (TL_MODE != 'BE')
+		if (TL_MODE != 'BE') {
 			return false;
+		}
 
 		// the order's config is used!
 		$objConfig = Isotope::getConfig();
@@ -506,32 +541,25 @@ class IsotopePlus extends \Isotope\Isotope
 		$arrStockIncreaseOrderStates = deserialize($objConfig->stockIncreaseOrderStates, true);
 
 		// e.g. new -> cancelled => increase the stock based on the order item's setQuantity-values (no validation required, of course)
-		if (!in_array($objOrder->order_status, $arrStockIncreaseOrderStates) && in_array($objNewStatus->id, $arrStockIncreaseOrderStates))
-		{
+		if (!in_array($objOrder->order_status, $arrStockIncreaseOrderStates) && in_array($objNewStatus->id, $arrStockIncreaseOrderStates)) {
 			foreach ($objOrder->getItems() as $objItem) {
-				if (($objProduct = $objItem->getProduct()) !== null)
-				{
+				if (($objProduct = $objItem->getProduct()) !== null) {
 					$intTotalQuantity = static::getTotalStockQuantity($objItem->quantity, $objProduct, null, $objItem->setQuantity);
 
-					if ($intTotalQuantity)
-					{
+					if ($intTotalQuantity) {
 						$objProduct->stock += $intTotalQuantity;
 						$objProduct->save();
 					}
 				}
 			}
-		}
-		// e.g. cancelled -> new => decrease the stock after validation
-		elseif (in_array($objOrder->order_status, $arrStockIncreaseOrderStates) && !in_array($objNewStatus->id, $arrStockIncreaseOrderStates))
-		{
+		} // e.g. cancelled -> new => decrease the stock after validation
+		elseif (in_array($objOrder->order_status, $arrStockIncreaseOrderStates) && !in_array($objNewStatus->id, $arrStockIncreaseOrderStates)) {
 			foreach ($objOrder->getItems() as $objItem) {
-				if (($objProduct = $objItem->getProduct()) !== null)
-				{
+				if (($objProduct = $objItem->getProduct()) !== null) {
 					$blnSkipValidation = static::getOverridableStockProperty('skipStockValidation', $objProduct);
 
 					// watch out: also in backend the current set quantity is used for validation!
-					if (!$blnSkipValidation && !static::validateQuantity($objProduct, $objItem->quantity))
-					{
+					if (!$blnSkipValidation && !static::validateQuantity($objProduct, $objItem->quantity)) {
 						// if the validation breaks for only one product collection item -> cancel the order status transition
 						return true;
 					}
@@ -539,16 +567,15 @@ class IsotopePlus extends \Isotope\Isotope
 			}
 
 			foreach ($objOrder->getItems() as $objItem) {
-				if (($objProduct = $objItem->getProduct()) !== null)
-				{
+				if (($objProduct = $objItem->getProduct()) !== null) {
 					$intTotalQuantity = static::getTotalStockQuantity($objItem->quantity, $objProduct);
 
-					if ($intTotalQuantity)
-					{
+					if ($intTotalQuantity) {
 						$objProduct->stock -= $intTotalQuantity;
 
-						if ($objProduct->stock <= 0 &&
-							!static::getOverridableStockProperty('skipExemptionFromShippingWhenStockEmpty', $objProduct)) {
+						if ($objProduct->stock <= 0
+							&& !static::getOverridableStockProperty('skipExemptionFromShippingWhenStockEmpty', $objProduct)
+						) {
 							$objProduct->shipping_exempt = true;
 						}
 

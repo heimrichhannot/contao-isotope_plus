@@ -17,6 +17,8 @@ $GLOBALS['ISO_HOOKS']['updateItemInCollection']['validateStockCollectionUpdate']
 $GLOBALS['ISO_HOOKS']['buttons'][] = array('HeimrichHannot\IsotopePlus\IsotopePlus', 'addDownloadSingleProductButton');
 $GLOBALS['ISO_HOOKS']['preOrderStatusUpdate']['updateStock'] = array('HeimrichHannot\IsotopePlus\IsotopePlus', 'updateStock');
 
+$GLOBALS['TL_HOOKS']['replaceDynamicScriptTags'][] = array('HeimrichHannot\IsotopePlus\IsotopePlus', 'hookReplaceDynamicScriptTags');
+
 /**
  * Frontend modules
  */

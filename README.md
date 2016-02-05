@@ -5,6 +5,9 @@ A module that brings some new features to the isotope shopsystem
 
 ## Features
 
+### jQuery instead of mootools
+- isotope mootools scripts has been removed from templates and replaced by jQuery if possible
+
 ### Set and stock
 
 - if these attributes have values, adding products to the cart or checking out is constrained by the stock left (depending on "set" if set)
@@ -26,6 +29,10 @@ A module that brings some new features to the isotope shopsystem
 ### ProductListPlus
 
 - modifies the list, that it can show the filter and sorting results
+
+### ProductListSlick
+
+- render products inside a slick content slider
 
 ### CartLink
 

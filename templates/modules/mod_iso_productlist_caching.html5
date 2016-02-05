@@ -1,0 +1,32 @@
+
+<!-- indexer::stop -->
+<div class="<?php echo $this->class; ?> block"<?php echo $this->cssID; ?><?php if ($this->style): ?> style="<?php echo $this->style; ?>"<?php endif; ?>>
+<?php if ($this->headline): ?>
+
+<<?php echo $this->hl; ?>><?php echo $this->headline; ?></<?php echo $this->hl; ?>>
+<?php endif; ?>
+
+<p class="message loading"><?php echo $this->message; ?></p>
+
+<noscript>
+<p class="message error"><?php echo $this->noscript; ?></p>
+</noscript>
+
+</div>
+<script>
+(function($){
+    $(document).ready(function(){
+        $.ajax({
+            url : window.location.href,
+            type: 'GET',
+            dataType : 'json',
+            data: {
+                buildCache: 1
+            },
+            complete: function(json) {
+                window.location.reload();
+            }
+        });
+    });
+})(jQuery);
+<!-- indexer::continue -->

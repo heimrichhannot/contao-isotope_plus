@@ -17,7 +17,7 @@ use HeimrichHannot\Slick\SlickConfigModel;
 class ProductListSlick extends ProductListPlus
 {
 
-	protected $blnCacheProducts = true;
+	protected $blnCacheProducts = false;
 
 	public function generate()
 	{

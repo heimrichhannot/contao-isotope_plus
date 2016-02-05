@@ -3,6 +3,11 @@
 $arrDca = &$GLOBALS['TL_DCA']['tl_iso_product'];
 
 /**
+ * Labels in Backend
+ */
+$arrDca['list']['label']['fields'] = array('images', 'name', 'sku', 'price', 'stock', 'initialStock'); // added stock and initialstock to product overview
+
+/**
  * Fields
  */
 $arrDca['fields']['shipping_exempt']['attributes']['fe_filter'] = true;
