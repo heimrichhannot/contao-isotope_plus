@@ -10,3 +10,4 @@ $GLOBALS['TL_LANG']['FMD']['iso_cart_link']			= array('Warenkorbverknüpfung', '
 $GLOBALS['TL_LANG']['FMD']['iso_orderhistory_plus']	= array('Vergangene Bestellungen Plus', '');
 $GLOBALS['TL_LANG']['FMD']['iso_orderdetails_plus']	= array('Bestellungsdetails Plus', '');
 $GLOBALS['TL_LANG']['FMD']['iso_direct_checkout']	= array('Direktbestellung', 'Schicken Sie Bestellungen ohne Login und Kasse ganz einfach über ein Formular ab.');
+$GLOBALS['TL_LANG']['FMD']['iso_product_ranking']	= array('Produktranking', 'Zeigt die Entwicklung der Verkaufszahlen für bestimmte Produkte in einer sortierbaren Liste an.');

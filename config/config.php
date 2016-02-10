@@ -32,6 +32,7 @@ $GLOBALS['FE_MOD']['isotopeplus'] = array
 	'iso_orderhistory_plus' => 'Isotope\Module\OrderHistoryPlus',
 	'iso_orderdetails_plus' => 'Isotope\Module\OrderDetailsPlus',
 	'iso_direct_checkout'   => 'Isotope\Module\DirectCheckout',
+	'iso_product_ranking'   => 'Isotope\Module\ProductRanking',
 );
 
 if (in_array('slick', \ModuleLoader::getActive()))
@@ -53,3 +54,9 @@ if (in_array('notification_center_plus', \ModuleLoader::getActive()))
  * Attributes
  */
 \Isotope\Model\Attribute::registerModelType('youtube', 'Isotope\Model\Attribute\Youtube');
+
+/**
+ * JS
+ */
+$GLOBALS['TL_JAVASCRIPT']['tablesorter'] = 'assets/components/tablesorter/js/tablesorter.min.js|static';
+$GLOBALS['TL_JAVASCRIPT']['isotope_plus'] = 'system/modules/isotope_plus/assets/js/isotope_plus.jquery.min.js|static';

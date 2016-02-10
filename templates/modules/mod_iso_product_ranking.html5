@@ -1,0 +1,34 @@
+<!-- indexer::stop -->
+<div class="<?php echo $this->class; ?> block"<?php echo $this->cssID; ?><?php if ($this->style): ?> style="<?php echo $this->style; ?>"<?php endif; ?>>
+	<?php if ($this->headline): ?>
+		<<?php echo $this->hl; ?>><?php echo $this->headline; ?></<?php echo $this->hl; ?>>
+	<?php endif; ?>
+
+	<?php if(is_array($this->products) && !empty($this->products)):?>
+		<div class="table-responsive">
+			<table class="table table-striped table-hover sortable">
+				<thead>
+					<tr>
+						<th><a href="#"><?php echo $GLOBALS['TL_LANG']['MSC']['product']; ?></a></th>
+						<th><a href="#"><?php echo $GLOBALS['TL_LANG']['MSC']['productType']; ?></a></th>
+						<th><a href="#"><?php echo date('m/Y', strtotime("-2 month")); ?></a></th>
+						<th><a href="#"><?php echo date('m/Y', strtotime("-1 month")); ?></a></th>
+						<th><a href="#"><?php echo date('m/Y', time())?></th>
+					</tr>
+				</thead>
+				<tbody>
+				  <?php foreach($this->products as $arrProduct): ?>
+					<tr>
+						<td><?php echo $arrProduct['name']; ?></td>
+						<td><?php echo $arrProduct['type']; ?></td>
+						<?php foreach($this->months as $month): ?>
+							<td class="center"><?php echo isset($this->ranking[$arrProduct['id']][$month]) ? $this->ranking[$arrProduct['id']][$month] : 0; ?></td>
+						<?php endforeach; ?>
+					  </tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+		</div>
+	<?php endif;?>
+</div>
+<!-- indexer::continue -->

@@ -42,6 +42,10 @@ A module that brings some new features to the isotope shopsystem
 
 - a module for directly checking out a certain quantity of some product specified in the module configuration (no need for logging in)
 
+### ProductRanking
+
+- a module for visualizing the development of sales for certain products
+
 ### Misc
 
 - adds new possible attributes to products: stock, initialStock, set, maxOrderSize, releaseDate
