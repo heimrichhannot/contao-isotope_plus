@@ -22,7 +22,7 @@ $arrDca['palettes']['iso_productfilterplus']
 	= '{title_legend},name,headline,type;{config_legend},iso_category_scope,iso_list_where,iso_enableLimit,iso_filterFields,iso_filterHideSingle,iso_searchFields,iso_searchAutocomplete,iso_sortingFields,iso_listingSortField,iso_listingSortDirection;{template_legend},customTpl,iso_filterTpl,iso_includeMessages,iso_hide_list;{redirect_legend},jumpTo;{reference_legend:hide},defineRoot;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
 
 $arrDca['palettes']['iso_productlistplus']
-	= '{title_legend},name,headline,type;{config_legend},iso_description,numberOfItems,perPage,iso_category_scope,iso_list_where,iso_filterModules,iso_newFilter,iso_listingSortField,iso_listingSortDirection;{redirect_legend},iso_addProductJumpTo,iso_jump_first;{reference_legend:hide},defineRoot;{template_legend:hide},customTpl,iso_list_layout,iso_gallery,iso_cols,iso_use_quantity,iso_hide_list,iso_includeMessages,iso_emptyMessage,iso_emptyFilter,iso_buttons;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
+	= '{title_legend},name,headline,type;{config_legend},iso_description,numberOfItems,perPage,iso_category_scope,iso_list_where,iso_filterModules,iso_price_filter,iso_newFilter,iso_producttype_filter,iso_listingSortField,iso_listingSortDirection;{redirect_legend},iso_addProductJumpTo,iso_jump_first;{reference_legend:hide},defineRoot;{template_legend:hide},customTpl,iso_list_layout,iso_gallery,iso_cols,iso_use_quantity,iso_hide_list,iso_includeMessages,iso_emptyMessage,iso_emptyFilter,iso_buttons;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
 
 $arrDca['palettes']['iso_productlist'] = str_replace('{config_legend}', '{config_legend},iso_description', $arrDca['palettes']['iso_productlist']);
 
@@ -45,7 +45,7 @@ $arrDca['palettes']['iso_orderdetails_plus'] = str_replace('iso_loginRequired', 
 
 if (in_array('slick', \ModuleLoader::getActive()))
 {
-	$arrDca['palettes']['iso_productlistslick'] = str_replace('iso_description', 'slickConfig,iso_description', $arrDca['palettes']['iso_productlist']);
+	$arrDca['palettes']['iso_productlistslick'] = str_replace('iso_description', 'slickConfig,iso_description', $arrDca['palettes']['iso_productlistplus']);
 }
 
 /**
@@ -232,6 +232,27 @@ $arrDca['fields']['iso_newFilter'] = array
 	'reference' => &$GLOBALS['TL_LANG']['tl_module']['iso_newFilter'],
 	'eval'      => array('tl_class' => 'w50'),
 	'sql'       => "varchar(8) NOT NULL default ''"
+);
+
+$arrDca['fields']['iso_price_filter'] = array
+(
+	'label'     => &$GLOBALS['TL_LANG']['tl_module']['iso_price_filter'],
+	'exclude'   => true,
+	'inputType' => 'select',
+	'options'   => array('paid', 'free'),
+	'reference' => &$GLOBALS['TL_LANG']['tl_module']['iso_price_filter'],
+	'eval'      => array('tl_class' => 'w50 clr', 'includeBlankOption' => true),
+	'sql'       => "varchar(64) NOT NULL default ''"
+);
+
+$arrDca['fields']['iso_producttype_filter'] = array
+(
+		'label'      => &$GLOBALS['TL_LANG']['tl_module']['iso_producttype_filter'],
+		'exclude'    => true,
+		'inputType'  => 'select',
+		'foreignKey' => 'tl_iso_producttype.name',
+		'eval'       => array('tl_class' => 'clr', 'multiple' => true, 'chosen' => true, 'style' => 'width: 100%'),
+		'sql'        => "blob NULL"
 );
 
 $arrDca['fields']['iso_addProductJumpTo'] = array

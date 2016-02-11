@@ -13,6 +13,10 @@ $GLOBALS['TL_LANG']['tl_module']['iso_direct_checkout_product'] = array('Produkt
 $GLOBALS['TL_LANG']['tl_module']['iso_direct_checkout_product_type'] = array('Produkttyp', 'Wählen Sie den Produkttyp aus, dem das Produkt zugeordnet sein muss, das über die Direktbestellung bestellt werden kann.');
 $GLOBALS['TL_LANG']['tl_module']['iso_direct_checkout_listingSortField'] = array('Auswahlfeld', 'Wählen Sie hier aus, welches Feld zur Auswahl eines Produkt aus des gewählten Produkttyps');
 $GLOBALS['TL_LANG']['tl_module']['iso_direct_checkout_listingSortDirection'] = array('Sortierrichtung', 'Wählen Sie Sortierrichtung aus, die für das Auswahlfeld gilt.');
+$GLOBALS['TL_LANG']['tl_module']['iso_price_filter'] = array('Produktpreisfilter', 'Wählen Sie eine Option aus, um eine Filterung bzgl. des Produktpreises zu aktivieren.');
+$GLOBALS['TL_LANG']['tl_module']['iso_price_filter']['paid'] = 'Nur kostenpflichtig';
+$GLOBALS['TL_LANG']['tl_module']['iso_price_filter']['free'] = 'Nur kostenlos';
+$GLOBALS['TL_LANG']['tl_module']['iso_producttype_filter'] = array('Produkttypfilter', 'Wählen Sie eine Option aus, um eine Filterung bzgl. des Produkttyps zu aktivieren.');
 
 /**
  * Misc

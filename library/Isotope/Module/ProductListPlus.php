@@ -283,6 +283,21 @@ class ProductListPlus extends ProductList
 			$arrColumns[] = $strWhere;
 		}
 
+		if ($this->iso_producttype_filter)
+		{
+			$arrProductTypes = deserialize($this->iso_producttype_filter, true);
+
+			if (!empty($arrProductTypes))
+			{
+				$arrColumns[] = 'tl_iso_product.type IN (' . implode(',', $arrProductTypes) . ')';
+			}
+		}
+
+		if ($this->iso_price_filter)
+		{
+			$arrColumns[] = '(SELECT tl_iso_product_pricetier.price FROM tl_iso_product_price LEFT JOIN tl_iso_product_pricetier ON tl_iso_product_pricetier.pid = tl_iso_product_price.id WHERE tl_iso_product.id = tl_iso_product_price.pid) ' . ($this->iso_price_filter == 'paid' ? '> 0' : '= 0');
+		}
+
 		$objProducts = Product::findAvailableBy(
 			$arrColumns,
 			$arrValues,
