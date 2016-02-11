@@ -200,7 +200,7 @@ class ProductListPlus extends ProductList
 			);
 
 			if (\Environment::get('isAjaxRequest') && \Input::post('AJAX_MODULE') == $this->id && \Input::post('AJAX_PRODUCT') == $objProduct->getProductId()) {
-				$arrCheck = IsotopePlus::validateQuantity($objProduct, \Input::post('quantity_requested'), Isotope::getCart()->getItemForProduct($objProduct), true, $this);
+				$arrCheck = IsotopePlus::validateQuantity($objProduct, \Input::post('quantity_requested'), Isotope::getCart()->getItemForProduct($objProduct), true);
 				if (!$arrCheck[0])
 				{
 					// remove synchronous error messages in case of ajax

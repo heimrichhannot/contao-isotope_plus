@@ -8,9 +8,9 @@ A module that brings some new features to the isotope shopsystem
 ### jQuery instead of mootools
 - isotope mootools scripts has been removed from templates and replaced by jQuery if possible
 
-### Set and stock
+### SetQuantity and stock
 
-- if these attributes have values, adding products to the cart or checking out is constrained by the stock left (depending on "set" if set)
+- if these attributes have values, adding products to the cart or checking out is constrained by the stock left (depending on "setQuantity" if set)
 - if the stock reaches 0, shipping_exempt on the product is set to true
 - the stock validation (including setting of shipping_exempt) and the usage of sets can be configured in the shop config, the product type and the product (shop config has the lowest priority, product the highest)
 - the usage of sets when computing the quantity to remove from the stock of a product can be configured in the shop config
@@ -48,7 +48,7 @@ A module that brings some new features to the isotope shopsystem
 
 ### Misc
 
-- adds new possible attributes to products: stock, initialStock, set, maxOrderSize, releaseDate
+- adds new possible attributes to products: stock, initialStock, setQuantity, maxOrderSize, releaseDate
 - adds a new attribute type: youtube
 
 ## Known issues/missing stuff

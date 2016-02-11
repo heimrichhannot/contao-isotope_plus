@@ -133,19 +133,21 @@ class IsotopePlus extends \Isotope\Isotope
 	// watch out: also in backend the current set quantity is used
 	public static function getTotalStockQuantity($intQuantity, $objProduct, $objCartItem = null, $intSetQuantity = null, $objConfig = null)
 	{
+		$intFinalSetQuantity = 1;
+
 		if ($intSetQuantity) {
-			$intTotalQuantity = $intSetQuantity * $intQuantity;
-		} elseif (!static::getOverridableShopConfigProperty('skipSets', $objConfig) && $objProduct->set) {
-			$intTotalQuantity = $objProduct->set * $intQuantity;
-		} else {
-			$intTotalQuantity = $intQuantity;
+			$intFinalSetQuantity = $intSetQuantity;
+		} elseif (!static::getOverridableShopConfigProperty('skipSets', $objConfig) && $objProduct->setQuantity) {
+			$intFinalSetQuantity = $objProduct->setQuantity;
 		}
+
+		$intQuantity *= $intFinalSetQuantity;
 
 		if ($objCartItem !== null) {
-			$intTotalQuantity += $objCartItem->quantity;
+			$intQuantity += $objCartItem->quantity * $intFinalSetQuantity;
 		}
 
-		return $intTotalQuantity;
+		return $intQuantity;
 	}
 
 	/**
@@ -246,8 +248,8 @@ class IsotopePlus extends \Isotope\Isotope
 		foreach ($arrItems as $objItem) {
 			$objProduct = $objItem->getProduct();
 
-			if ($objProduct->set) {
-				$objItem->setQuantity = $objProduct->set;
+			if ($objProduct->setQuantity) {
+				$objItem->setQuantity = $objProduct->setQuantity;
 				$objItem->save();
 			}
 		}
