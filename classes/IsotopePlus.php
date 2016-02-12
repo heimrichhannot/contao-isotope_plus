@@ -300,7 +300,7 @@ class IsotopePlus extends \Isotope\Isotope
 
 					if ($objProductType->removeOtherProducts) {
 						$objNotification->send(
-							static::getCleanTokens($intProductType, $objOrder, $objNotification),
+							static::getCleanTokens($intProductType, $objOrder, $objNotification, $arrTokens),
 							$GLOBALS['TL_LANGUAGE']
 						);
 					} else {
@@ -312,7 +312,7 @@ class IsotopePlus extends \Isotope\Isotope
 	}
 
 	// copy of code in Order->getNotificationTokens
-	public static function getCleanTokens($intProductType, Order $objOrder, $objNotification)
+	public static function getCleanTokens($intProductType, Order $objOrder, $objNotification, $arrTokens = array())
 	{
 		$objTemplate                 = new Template($objNotification->iso_collectionTpl);
 		$objTemplate->isNotification = true;

@@ -45,7 +45,7 @@ class DirectCheckoutForm extends Form
 		switch ($this->iso_direct_checkout_product_mode) {
 			case 'product_type':
 				$arrColumns = array(
-					'type'
+					'type=?'
 				);
 
 				$arrValues = array(
