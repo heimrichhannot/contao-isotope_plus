@@ -9,3 +9,4 @@ $GLOBALS['TL_LANG']['tl_iso_product']['releaseDate'] = array('Erscheinungsdatum'
 $GLOBALS['TL_LANG']['tl_iso_product']['maxOrderSize'] = array('Maximale Bestellmenge', 'Geben Sie hier die maximale Bestellmenge ein.');
 $GLOBALS['TL_LANG']['tl_iso_product']['setQuantity'] = array('Set', 'Geben Sie hier ein, wie viele Artikel zusammen im Set verkauft werden.');
 $GLOBALS['TL_LANG']['tl_iso_product']['overrideStockShopConfig'] = array('Bestandskonfiguration überschreiben', 'Wählen Sie diese Option, um die Konfiguration des Bestands, die Sie im Produkttyp bzw. in der aktuellen Shop-Konfiguration gesetzt haben, zu überschreiben.');
+$GLOBALS['TL_LANG']['tl_iso_product']['jumpTo'] = array('Weiterleitungsseite', 'Wählen Sie hier die Weiterleitungsseite aus.');

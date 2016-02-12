@@ -5,7 +5,7 @@ $arrDca = &$GLOBALS['TL_DCA']['tl_iso_product'];
 /**
  * Labels in Backend
  */
-$arrDca['list']['label']['fields'] = array('images', 'name', 'sku', 'price', 'stock', 'initialStock'); // added stock and initialstock to product overview
+$arrDca['list']['label']['fields'] = array('images', 'name', 'sku', 'price', 'stock', 'initialStock', 'jumpTo'); // added stock and initialstock to product overview
 
 /**
  * Fields
@@ -67,6 +67,18 @@ $arrDca['fields']['overrideStockShopConfig'] = array
 	'eval'      => array('tl_class' => 'w50'),
 	'attributes' => array('legend'=>'shipping_legend'),
 	'sql'       => "char(1) NOT NULL default ''",
+);
+
+$arrDca['fields']['jumpTo'] = array
+(
+	'label'      => &$GLOBALS['TL_LANG']['tl_iso_product']['jumpTo'],
+	'exclude'    => true,
+	'inputType'  => 'pageTree',
+	'foreignKey' => 'tl_page.title',
+	'eval'       => array('fieldType' => 'radio'),
+	'sql'        => "int(10) unsigned NOT NULL default '0'",
+	'attributes' => array('legend'=>'general_legend'),
+	'relation'   => array('type' => 'belongsTo', 'load' => 'lazy')
 );
 
 \Controller::loadDataContainer('tl_iso_config');
