@@ -59,4 +59,4 @@ if (in_array('notification_center_plus', \ModuleLoader::getActive()))
  * JS
  */
 $GLOBALS['TL_JAVASCRIPT']['tablesorter'] = 'assets/components/tablesorter/js/tablesorter.min.js|static';
-$GLOBALS['TL_JAVASCRIPT']['isotope_plus'] = 'system/modules/isotope_plus/assets/js/isotope_plus.jquery.min.js|static';
+$GLOBALS['TL_JAVASCRIPT']['isotope_plus'] = 'system/modules/isotope_plus/assets/js/isotope_plus' . (!$GLOBALS['TL_CONFIG']['debugMode'] ? '.min' : '') . '.js|static';
