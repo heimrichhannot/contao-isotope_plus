@@ -80,7 +80,8 @@ class DirectCheckoutForm extends Form
 		// add quantity
 		$this->addEditableField('quantity', array(
 			'label'     => &$GLOBALS['TL_LANG']['MSC']['quantity'],
-			'inputType' => 'text'
+			'inputType' => 'text',
+			'eval'      => array('mandatory'=>true)
 		));
 
 		// add subscription field
