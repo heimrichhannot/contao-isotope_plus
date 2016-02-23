@@ -35,6 +35,7 @@ class ProductRanking extends Module
 			t.name AS type,
 			SUM(quantity) as count,
 			p.id,
+			p.setQuantity,
 			MONTH(FROM_UNIXTIME(o.locked)) as month
 			FROM tl_iso_product p
 			INNER JOIN tl_iso_product_collection_item oi ON oi.product_id = p.id
@@ -45,7 +46,7 @@ class ProductRanking extends Module
 			GROUP BY p.id, month ORDER BY month DESC';
 
 		$objProducts = $this->Database->prepare($strQuery)->execute();
-			
+
 		if ($objProducts->numRows > 0)
 		{
 			while($objProducts->next())
