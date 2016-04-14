@@ -40,7 +40,7 @@ class DirectCheckoutForm extends Form
 		}
 	}
 
-	protected function modifyDC() {
+	public function modifyDC() {
 		// get the product
 		switch ($this->iso_direct_checkout_product_mode) {
 			case 'product_type':
@@ -110,8 +110,7 @@ class DirectCheckoutForm extends Form
 			if (!is_array($arrData) || $arrAddressField['billing'] == 'disabled')
 				continue;
 
-			if ($arrAddressField['billing'] == 'mandatory')
-				$arrData['eval']['mandatory'] = true;
+			$arrData['eval']['mandatory'] = $arrAddressField['billing'] == 'mandatory';
 
 			$this->arrBillingAddressFields[] = $strName;
 			$this->addEditableField($strName, $arrData);
