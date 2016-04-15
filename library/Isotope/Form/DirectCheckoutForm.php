@@ -131,8 +131,7 @@ class DirectCheckoutForm extends Form
 			if (!is_array($arrData) || $arrAddressField['shipping'] == 'disabled')
 				continue;
 
-			if ($arrAddressField['shipping'] == 'mandatory')
-				$arrData['eval']['mandatory'] = true;
+			$arrData['eval']['mandatory'] = $arrAddressField['shipping'] == 'mandatory';
 
 			$this->addEditableField('shippingaddress_' . $strName, $arrData);
 
