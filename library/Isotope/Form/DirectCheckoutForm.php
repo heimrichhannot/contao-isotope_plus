@@ -141,6 +141,16 @@ class DirectCheckoutForm extends Form
 		$this->dca['palettes']['__selector__'][] = 'shippingaddress';
 		$this->dca['subpalettes']['shippingaddress'] = implode(',', $arrShippingAddressFields);
 		$this->arrShippingAddressFields = $arrShippingAddressFields;
+
+		if($this->iso_use_notes){
+			$this->addEditableField('notes', array(
+					'label'                     => &$GLOBALS['TL_LANG']['tl_module']['iso_note'],
+					'exclude'                   => true,
+					'inputType'                 => 'textarea',
+					'eval'                      => array('tl_class'=>'clr w50'),
+					'sql'       				=> "text NULL"
+			));
+		}
 	}
 
 	// avoid standard formhybrid save and callback routines, just process the form
@@ -225,6 +235,8 @@ class DirectCheckoutForm extends Form
 
 		// add all the checkout info to the order
 		$objOrder->checkout_info = $arrCheckoutInfo;
+
+		$objOrder->notes = $objSubmission->notes;
 
 		//... restore the former cart again
 		Isotope::setCart($objCartTmp);

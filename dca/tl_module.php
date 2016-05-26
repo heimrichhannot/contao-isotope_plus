@@ -34,7 +34,7 @@ $arrDca['palettes']['iso_cart_link']
 	= '{title_legend},name,headline,type;{config_legend},jumpTo;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
 
 $arrDca['palettes']['iso_direct_checkout']
-	= '{title_legend},name,headline,type;{config_legend},jumpTo,iso_use_quantity,iso_direct_checkout_product_mode,iso_direct_checkout_product,nc_notification,iso_shipping_modules;{template_legend},formHybridTemplate;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
+	= '{title_legend},name,headline,type;{config_legend},jumpTo,iso_use_quantity,iso_direct_checkout_product_mode,iso_direct_checkout_product,nc_notification,iso_shipping_modules,iso_use_notes;{template_legend},formHybridTemplate;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
 
 $arrDca['palettes']['iso_product_ranking']
 		= '{title_legend},name,headline,type;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
@@ -386,6 +386,17 @@ $arrDca['fields']['iso_direct_checkout_product_type'] = array
 	'foreignKey'       => 'tl_iso_producttype.name',
 	'eval'             => array('mandatory' => true, 'tl_class' => 'w50', 'chosen' => true, 'includeBlankOption' => true),
 	'sql'              => "int(10) unsigned NOT NULL default '0'",
+);
+
+
+
+$arrDca['fields']['iso_use_notes'] = array
+(
+		'label'     => &$GLOBALS['TL_LANG']['tl_module']['iso_use_notes'],
+		'exclude'   => true,
+		'inputType' => 'checkbox',
+		'eval'      => array('submitOnChange' => true, 'tl_class' => 'clr'),
+		'sql'       => "char(1) NOT NULL default ''",
 );
 
 class tl_module_isotope_plus {

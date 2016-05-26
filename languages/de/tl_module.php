@@ -17,7 +17,8 @@ $GLOBALS['TL_LANG']['tl_module']['iso_price_filter'] = array('Produktpreisfilter
 $GLOBALS['TL_LANG']['tl_module']['iso_price_filter']['paid'] = 'Nur kostenpflichtig';
 $GLOBALS['TL_LANG']['tl_module']['iso_price_filter']['free'] = 'Nur kostenlos';
 $GLOBALS['TL_LANG']['tl_module']['iso_producttype_filter'] = array('Produkttypfilter', 'Wählen Sie eine Option aus, um eine Filterung bzgl. des Produkttyps zu aktivieren.');
-
+$GLOBALS['TL_LANG']['tl_module']['iso_use_notes'] = array('Bemerkungsfeld hinzufügen', 'Wählen Sie eine Option aus, um dem Bestellformular ein Bemerkungsfeld hinzuzufügen.');
+$GLOBALS['TL_LANG']['tl_module']['iso_note'] = array('Bemerkungen', '');
 /**
  * Misc
  */
