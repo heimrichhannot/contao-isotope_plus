@@ -40,3 +40,4 @@ $GLOBALS['TL_LANG']['MSC']['new_to_old'] = 'Neuste';
 $GLOBALS['TL_LANG']['MSC']['customer'] = 'Kunde';
 $GLOBALS['TL_LANG']['MSC']['product'] = 'Produkt';
 $GLOBALS['TL_LANG']['MSC']['productType'] = 'Typ';
+$GLOBALS['TL_LANG']['MSC']['iso_note'] = array('Bemerkungen', '');
