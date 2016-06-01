@@ -18,7 +18,7 @@ $arrDca['palettes']['__selector__'][] = 'overrideStockShopConfig';
  * Subpalettes
  */
 $arrDca['subpalettes']['sendOrderNotification'] = 'orderNotification,removeOtherProducts';
-$arrDca['subpalettes']['overrideStockShopConfig'] = 'skipStockValidation,skipExemptionFromShippingWhenStockEmpty';
+$arrDca['subpalettes']['overrideStockShopConfig'] = 'skipStockValidation,skipStockEdit,skipExemptionFromShippingWhenStockEmpty';
 
 /**
  * Fields
@@ -64,4 +64,5 @@ $arrDca['fields']['overrideStockShopConfig'] = array
 \System::loadLanguageFile('tl_iso_config');
 
 $arrDca['fields']['skipStockValidation'] = $GLOBALS['TL_DCA']['tl_iso_config']['fields']['skipStockValidation'];
+$arrDca['fields']['skipStockEdit'] = $GLOBALS['TL_DCA']['tl_iso_config']['fields']['skipStockEdit'];
 $arrDca['fields']['skipExemptionFromShippingWhenStockEmpty'] = $GLOBALS['TL_DCA']['tl_iso_config']['fields']['skipExemptionFromShippingWhenStockEmpty'];

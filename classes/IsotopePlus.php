@@ -90,6 +90,9 @@ class IsotopePlus extends \Isotope\Isotope
 		foreach ($arrOrders as $objItem) {
 			$objProduct = $objItem->getProduct();
 
+			if (static::getOverridableStockProperty('skipStockEdit', $objProduct))
+				continue;
+
 			$intQuantity = static::getTotalStockQuantity($objItem->quantity, $objProduct);
 
 			$objProduct->stock -= $intQuantity;
@@ -208,7 +211,7 @@ class IsotopePlus extends \Isotope\Isotope
 
 		// maxOrderSize
 		if ($objProduct->maxOrderSize != '' && $objProduct->maxOrderSize !== null) {
-			if ($intQuantityTotal <= $objProduct->maxOrderSize) {
+			if ($intQuantityTotal > $objProduct->maxOrderSize) {
 				$strErrorMessage = sprintf(
 					$GLOBALS['TL_LANG']['MSC']['maxOrderSizeExceeded'],
 					$objProduct->name,
@@ -490,15 +493,11 @@ class IsotopePlus extends \Isotope\Isotope
 	public static function getOverridableStockProperty($strProperty, $objProduct)
 	{
 		// at first check for product and product type
-		if ($objProduct->overrideStockConfig) {
+		if ($objProduct->overrideStockShopConfig) {
 			return $objProduct->{$strProperty};
 		} else {
-			if ($objProduct->overrideStockConfig) {
-				return $objProduct->{$strProperty};
-			} else {
-				if (($objProductType = ProductType::findByPk($objProduct->type)) !== null && $objProductType->overrideStockConfig) {
-					return $objProductType->{$strProperty};
-				}
+			if (($objProductType = ProductType::findByPk($objProduct->type)) !== null && $objProductType->overrideStockShopConfig) {
+				return $objProductType->{$strProperty};
 			}
 		}
 

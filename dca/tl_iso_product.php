@@ -89,5 +89,7 @@ $arrDca['fields']['jumpTo'] = array
 // arrays are always copied by value (not by reference) in php
 $arrDca['fields']['skipStockValidation'] = $GLOBALS['TL_DCA']['tl_iso_config']['fields']['skipStockValidation'];
 $arrDca['fields']['skipStockValidation']['attributes'] = array('legend'=>'shipping_legend');
+$arrDca['fields']['skipStockEdit'] = $GLOBALS['TL_DCA']['tl_iso_config']['fields']['skipStockEdit'];
+$arrDca['fields']['skipStockEdit']['attributes'] = array('legend'=>'shipping_legend');
 $arrDca['fields']['skipExemptionFromShippingWhenStockEmpty'] = $GLOBALS['TL_DCA']['tl_iso_config']['fields']['skipExemptionFromShippingWhenStockEmpty'];
 $arrDca['fields']['skipExemptionFromShippingWhenStockEmpty']['attributes'] = array('legend'=>'shipping_legend');

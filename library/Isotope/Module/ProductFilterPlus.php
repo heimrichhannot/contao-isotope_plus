@@ -175,7 +175,7 @@ class ProductFilterPlus extends ProductFilter
 					list($asc, $desc) = $this->getSortingLabels($field);
 					$objSorting = $first == $field ? Isotope::getRequestCache()->getSortingForModule($field, $this->id) : null;
 
-					if($field === "release_date")
+					if($field === "releaseDate")
 					{
 						$arrOptions[] = array
 						(
