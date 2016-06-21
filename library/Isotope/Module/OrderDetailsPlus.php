@@ -59,7 +59,8 @@ class OrderDetailsPlus extends OrderDetails
 		if (($objOrder = Order::findOneBy('uniqid', (string)\Input::get('uid'))) === null
 			|| (FE_USER_LOGGED_IN === true
 				&& $objOrder->member > 0
-				&& \FrontendUser::getInstance()->id != $objOrder->member)
+				&& \FrontendUser::getInstance()->id != $objOrder->member
+				&& !$this->iso_show_all_orders)
 		) {
 			$this->Template = new \Isotope\Template('mod_message');
 			$this->Template->type = 'error';

@@ -68,7 +68,17 @@ class IsotopePlus extends \Isotope\Isotope
 		DownloadHelper::addDownloadsFromProductDownloadsToTemplate($objTemplate);
 	}
 
-	public static function validateStockCheckout($objOrder)
+	public static function validateStockPreCheckout($objOrder)
+	{
+		return self::validateStockCheckout($objOrder);
+	}
+
+	public static function validateStockPostCheckout($objOrder)
+	{
+		return self::validateStockCheckout($objOrder, true);
+	}
+
+	public static function validateStockCheckout($objOrder, $blnIsPostCheckout = false)
 	{
 		$arrItems  = $objOrder->getItems();
 		$arrOrders = array();
@@ -82,28 +92,33 @@ class IsotopePlus extends \Isotope\Isotope
 					return false;
 				}
 
-				$arrOrders[] = $objItem;
+				if ($blnIsPostCheckout)
+				{
+					$arrOrders[] = $objItem;
+				}
 			}
 		}
 
 		// save new stock
-		foreach ($arrOrders as $objItem) {
-			$objProduct = $objItem->getProduct();
+		if ($blnIsPostCheckout) {
+			foreach ($arrOrders as $objItem) {
+				$objProduct = $objItem->getProduct();
 
-			if (static::getOverridableStockProperty('skipStockEdit', $objProduct))
-				continue;
+				if (static::getOverridableStockProperty('skipStockEdit', $objProduct))
+					continue;
 
-			$intQuantity = static::getTotalStockQuantity($objItem->quantity, $objProduct);
+				$intQuantity = static::getTotalStockQuantity($objItem->quantity, $objProduct);
 
-			$objProduct->stock -= $intQuantity;
+				$objProduct->stock -= $intQuantity;
 
-			if ($objProduct->stock <= 0
-				&& !static::getOverridableStockProperty('skipExemptionFromShippingWhenStockEmpty', $objProduct)
-			) {
-				$objProduct->shipping_exempt = true;
+				if ($objProduct->stock <= 0
+					&& !static::getOverridableStockProperty('skipExemptionFromShippingWhenStockEmpty', $objProduct)
+				) {
+					$objProduct->shipping_exempt = true;
+				}
+
+				$objProduct->save();
 			}
-
-			$objProduct->save();
 		}
 
 		return true;
