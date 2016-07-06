@@ -139,7 +139,21 @@ class OrderHistoryPlus extends OrderHistory
 			{
 				if (($objMember = \MemberModel::findByPk($intId)) !== null)
 				{
-					$arrOrders[count($arrOrders) - 1]['memberName'] = $objMember->firstname . ' ' . $objMember->lastname;
+					if ($objMember->firstname != '' && $objMember->lastname != '')
+					{
+						$arrOrders[count($arrOrders) - 1]['memberName'] = $objMember->firstname . ' ' . $objMember->lastname;
+					}
+					else
+					{
+						if (($objAddress = Address::findForMember($objOrder->row()['member'])) !== null)
+						{
+							$arrOrders[count($arrOrders) - 1]['memberName'] = $objAddress->firstname . ' ' . $objAddress->lastname;
+						}
+						else
+						{
+							$arrOrders[count($arrOrders) - 1]['memberName'] = $GLOBALS['TL_LANG']['tl_module']['notExistingAnyMore'];
+						}
+					}
 				}
 				else
 				{
