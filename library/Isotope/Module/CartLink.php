@@ -16,34 +16,45 @@ use Isotope\Module\Module;
 class CartLink extends Module
 {
 
-	protected $strTemplate = 'mod_iso_cart_link';
+    protected $strTemplate = 'mod_iso_cart_link';
 
-	public function generate()
-	{
-		if (TL_MODE == 'BE') {
-			$objTemplate = new \BackendTemplate('be_wildcard');
+    protected $objTarget = null;
 
-			$objTemplate->wildcard = '### ISOTOPE ECOMMERCE: CART LINK ###';
+    public function generate()
+    {
+        if (TL_MODE == 'BE') {
+            $objTemplate = new \BackendTemplate('be_wildcard');
 
-			$objTemplate->title = $this->headline;
-			$objTemplate->id = $this->id;
-			$objTemplate->link = $this->name;
-			$objTemplate->href = 'contao/main.php?do=themes&amp;table=tl_module&amp;act=edit&amp;id=' . $this->id;
+            $objTemplate->wildcard = '### ISOTOPE ECOMMERCE: CART LINK ###';
 
-			return $objTemplate->parse();
-		}
+            $objTemplate->title = $this->headline;
+            $objTemplate->id = $this->id;
+            $objTemplate->link = $this->name;
+            $objTemplate->href = 'contao/main.php?do=themes&amp;table=tl_module&amp;act=edit&amp;id=' . $this->id;
 
-		return parent::generate();
-	}
+            return $objTemplate->parse();
+        }
 
-	protected function compile()
-	{
-		global $objPage;
+        $this->objTarget = \PageModel::findByPk($this->jumpTo);
 
-		$this->Template->href = \Controller::generateFrontendUrl(\PageModel::findByPk($this->jumpTo)->row());
-		if ($objPage->id == $this->jumpTo) {
-			$this->Template->active = true;
-		}
-	}
+        if($this->objTarget === null)
+        {
+            return '';
+        }
+
+        return parent::generate();
+    }
+
+    protected function compile()
+    {
+        global $objPage;
+
+        $this->Template->href = \Controller::generateFrontendUrl($this->objTarget->row());
+
+        if ($objPage->id == $this->jumpTo)
+        {
+            $this->Template->active = true;
+        }
+    }
 
 }

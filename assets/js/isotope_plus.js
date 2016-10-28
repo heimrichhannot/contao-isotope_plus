@@ -1,9 +1,6 @@
-var Isotope = {};
-
-
 (function($){
 
-	Isotope = {
+	var Isotope = {
 		init: function () {
 			this.initRankingTableSorter();
 		},

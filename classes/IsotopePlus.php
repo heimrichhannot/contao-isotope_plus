@@ -57,6 +57,7 @@ class IsotopePlus extends \Isotope\Isotope
 			if(\HeimrichHannot\Haste\Util\StringUtil::endsWith($arrData[0], 'system/modules/isotope/assets/js/isotope.min.js'))
 			{
 				unset($GLOBALS['TL_JAVASCRIPT'][$key]);
+                break;
 			}
 		}
 
