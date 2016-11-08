@@ -4,11 +4,13 @@ namespace Isotope\Form;
 
 use HeimrichHannot\FormHybrid\Form;
 use HeimrichHannot\IsotopePlus\IsotopePlus;
+use HeimrichHannot\StatusMessages\StatusMessage;
 use Isotope\CheckoutStep\BillingAddress;
 use Isotope\CheckoutStep\ShippingAddress;
 use Isotope\CheckoutStep\ShippingMethod;
 use Isotope\Interfaces\IsotopeProductCollection;
 use Isotope\Isotope;
+use Isotope\Message;
 use Isotope\Model\Address;
 use Isotope\Model\Config;
 use Isotope\Model\Product;
@@ -26,6 +28,8 @@ class DirectCheckoutForm extends Form
 	protected $arrShippingAddressFields = array();
 	protected $objCheckoutModule;
 	protected $objProduct;
+
+    protected $noEntity = true;
 
 	public function __construct($objCheckoutModule, \ModuleModel $objModule = null, $instanceId = 0)
 	{
@@ -152,8 +156,6 @@ class DirectCheckoutForm extends Form
 		$this->dca['palettes']['__selector__'][] = 'shippingaddress';
 		$this->dca['subpalettes']['shippingaddress'] = implode(',', $arrShippingAddressFields);
 		$this->arrShippingAddressFields = $arrShippingAddressFields;
-
-
 	}
 
 	// avoid standard formhybrid save and callback routines, just process the form
@@ -180,10 +182,13 @@ class DirectCheckoutForm extends Form
 			)
 		);
 
-		$objSubmission = $this->getSubmission();
+		$objSubmission = $this->getSubmission(false);
 
 		if (!$objCart->addProduct($this->objProduct, $objSubmission->quantity))
-			return;
+        {
+            $this->transformIsotopeErrorMessages();
+            return;
+        }
 
 		$objCart->save();
 
@@ -264,8 +269,41 @@ class DirectCheckoutForm extends Form
 		$objOrder->checkout();
 		$objOrder->complete();
 
+        if(is_array($this->dca['config']['onsubmit_callback']))
+        {
+            foreach ($this->dca['config']['onsubmit_callback'] as $key => $callback)
+            {
+                if($callback[0] == 'Isotope\Backend\ProductCollection\Callback' && $callback[1] == 'executeSaveHook')
+                {
+                    unset($this->dca['config']['onsubmit_callback'][$key]);
+                    break;
+                }
+            }
+        }
+
+        $this->transformIsotopeErrorMessages();
+
 		parent::processForm();
 	}
+
+	protected function transformIsotopeErrorMessages()
+    {
+        if(is_array($_SESSION['ISO_ERROR']))
+        {
+            if (!empty($_SESSION['ISO_ERROR']))
+            {
+                // no redirect!
+                $this->jumpTo = null;
+            }
+
+            foreach ($_SESSION['ISO_ERROR'] as $strError)
+            {
+                StatusMessage::addError($strError, $this->getConfig()->getModule()->id);
+            }
+
+            unset($_SESSION['ISO_ERROR']);
+        }
+    }
 
 	// copy from Checkout.php
 	protected function getNotificationTokensFromSteps(array $arrSteps, IsotopeProductCollection $objOrder)
