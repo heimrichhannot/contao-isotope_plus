@@ -37,9 +37,9 @@ class DirectCheckout extends Checkout
 
 	protected function compile()
 	{
-		$this->objModel->formHybridDataContainer = 'tl_iso_product_collection';
+		$this->formHybridDataContainer = 'tl_iso_product_collection';
 
-		$objForm = new DirectCheckoutForm($this, $this->objModel);
+		$objForm = new DirectCheckoutForm($this);
 		$this->Template->checkoutForm = $objForm->generate();
 	}
 

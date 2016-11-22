@@ -34,7 +34,9 @@ $arrDca['palettes']['iso_cart_link']
 	= '{title_legend},name,headline,type;{config_legend},jumpTo;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
 
 $arrDca['palettes']['iso_direct_checkout']
-	= '{title_legend},name,headline,type;{config_legend},jumpTo,formHybridAsync,formHybridResetAfterSubmission,iso_use_quantity,iso_direct_checkout_product_mode,iso_direct_checkout_product,nc_notification,iso_shipping_modules,iso_use_notes;{template_legend},formHybridTemplate;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
+	= '{title_legend},name,headline,type;' .
+      '{config_legend},jumpTo,formHybridAsync,formHybridResetAfterSubmission,iso_direct_checkout_product_mode,iso_direct_checkout_products,nc_notification,iso_shipping_modules,iso_use_notes;' .
+      '{template_legend},formHybridTemplate;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
 
 $arrDca['palettes']['iso_product_ranking']
 		= '{title_legend},name,headline,type;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
@@ -368,27 +370,85 @@ $arrDca['fields']['iso_direct_checkout_product_mode'] = array
 	'sql'              => "varchar(64) NOT NULL default ''",
 );
 
-$arrDca['fields']['iso_direct_checkout_product'] = array
-(
-	'label'            => &$GLOBALS['TL_LANG']['tl_module']['iso_direct_checkout_product'],
-	'exclude'          => true,
-	'inputType'        => 'select',
-	'options_callback' => array('tl_module_isotope_plus', 'getProducts'),
-	'eval'             => array('mandatory' => true, 'tl_class' => 'w50', 'chosen' => true, 'includeBlankOption' => true),
-	'sql'              => "int(10) unsigned NOT NULL default '0'",
+$arrDca['fields']['iso_direct_checkout_products'] = array(
+    'label'      => &$GLOBALS['TL_LANG']['tl_module']['iso_direct_checkout_products'],
+    'exclude'    => true,
+    'inputType'  => 'fieldpalette',
+    'foreignKey' => 'tl_fieldpalette.id',
+    'relation'   => array('type' => 'hasMany', 'load' => 'eager'),
+    'sql'        => "blob NULL",
+    'eval'       => array('tl_class' => 'clr'),
+    'fieldpalette'      => array(
+        'config' => array(
+            'hidePublished' => true
+        ),
+        'list'     => array
+        (
+            'label' => array
+            (
+                'fields' => array('iso_direct_checkout_product'),
+                'format' => '%s',
+            ),
+        ),
+        'palettes' => array
+        (
+            'default' => 'iso_direct_checkout_product,iso_use_quantity',
+        ),
+        'fields'   => array(
+            'iso_direct_checkout_product' => array
+            (
+                'label'            => &$GLOBALS['TL_LANG']['tl_module']['iso_direct_checkout_product'],
+                'exclude'          => true,
+                'inputType'        => 'select',
+                'options_callback' => array('tl_module_isotope_plus', 'getProducts'),
+                'eval'             => array('mandatory' => true, 'tl_class' => 'long clr', 'style' => 'width: 97%',
+                                            'chosen' => true, 'includeBlankOption' => true),
+                'sql'              => "int(10) unsigned NOT NULL default '0'",
+            ),
+            'iso_use_quantity' => $arrDca['fields']['iso_use_quantity']
+        )
+    ),
 );
 
-$arrDca['fields']['iso_direct_checkout_product_type'] = array
-(
-	'label'            => &$GLOBALS['TL_LANG']['tl_module']['iso_direct_checkout_product_type'],
-	'exclude'          => true,
-	'inputType'        => 'select',
-	'foreignKey'       => 'tl_iso_producttype.name',
-	'eval'             => array('mandatory' => true, 'tl_class' => 'w50', 'chosen' => true, 'includeBlankOption' => true),
-	'sql'              => "int(10) unsigned NOT NULL default '0'",
+$arrDca['fields']['iso_direct_checkout_product_types'] = array(
+    'label'      => &$GLOBALS['TL_LANG']['tl_module']['iso_direct_checkout_product_types'],
+    'exclude'    => true,
+    'inputType'  => 'fieldpalette',
+    'foreignKey' => 'tl_fieldpalette.id',
+    'relation'   => array('type' => 'hasMany', 'load' => 'eager'),
+    'sql'        => "blob NULL",
+    'eval'       => array('tl_class' => 'clr'),
+    'fieldpalette'      => array(
+        'config' => array(
+            'hidePublished' => true
+        ),
+        'list'     => array
+        (
+            'label' => array
+            (
+                'fields' => array('iso_direct_checkout_product_type'),
+                'format' => '%s',
+            ),
+        ),
+        'palettes' => array
+        (
+            'default' => 'iso_direct_checkout_product_type,iso_use_quantity',
+        ),
+        'fields'   => array(
+            'iso_direct_checkout_product_type' => array
+            (
+                'label'            => &$GLOBALS['TL_LANG']['tl_module']['iso_direct_checkout_product_type'],
+                'exclude'          => true,
+                'inputType'        => 'select',
+                'foreignKey'       => 'tl_iso_producttype.name',
+                'eval'             => array('mandatory' => true, 'tl_class' => 'long clr', 'style' => 'width: 97%',
+                                            'chosen' => true, 'includeBlankOption' => true),
+                'sql'              => "int(10) unsigned NOT NULL default '0'"
+            ),
+            'iso_use_quantity' => $arrDca['fields']['iso_use_quantity']
+        )
+    ),
 );
-
-
 
 $arrDca['fields']['iso_use_notes'] = array
 (
@@ -412,7 +472,7 @@ class tl_module_isotope_plus {
 				if ($objModule->iso_direct_checkout_product_mode == 'product_type')
 				{
 					$arrDca['palettes']['iso_direct_checkout'] = str_replace(
-						'iso_direct_checkout_product,', 'iso_direct_checkout_product_type,iso_listingSortField,iso_listingSortDirection,',
+						'iso_direct_checkout_products,', 'iso_direct_checkout_product_types,iso_listingSortField,iso_listingSortDirection,',
 						$arrDca['palettes']['iso_direct_checkout']);
 
 					// fix field labels
