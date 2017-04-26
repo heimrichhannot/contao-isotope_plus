@@ -1,42 +1,44 @@
 {
-	"name": "heimrichhannot/contao-isotope_plus",
-	"description": "Enhancements for isotope shop",
-	"keywords": [
-		"contao",
-		"isotope"
-	],
-	"type": "contao-module",
-	"homepage": "https://github.com/heimrichhannot/contao-isotope_plus",
-	"license": "LGPL-3.0+",
-	"authors": [
-		{
-			"name": "Heimrich & Hannot",
-			"email": "digitales@heimrich-hannot.de",
-			"homepage": "http://www.heimrich-hannot.de",
-			"role": "Developer"
-		}
-	],
-	"support": {
-		"issues": "https://github.com/heimrichhannot/contao-isotope_plus/issues"
-	},
-	"require": {
-		"contao/core": ">=3.2,<4-dev",
-		"contao-community-alliance/composer-installer": "*",
-		"isotope/isotope-core": "*",
-		"heimrichhannot/contao-formhybrid": ">=2.0.30",
-		"heimrichhannot/contao-haste_plus": ">=1.1.1,<2-dev",
-		"contao-components/tablesorter": ">=2.0.5.2"
-	},
-	"autoload": {
-		"classmap": [
-			""
-		]
-	},
-	"extra": {
-		"contao": {
-			"sources": {
-				"": "system/modules/isotope_plus"
-			}
-		}
-	}
+  "name": "heimrichhannot/contao-isotope_plus",
+  "description": "Enhancements for isotope shop",
+  "keywords": [
+    "contao",
+    "isotope"
+  ],
+  "type": "contao-module",
+  "homepage": "https://github.com/heimrichhannot/contao-isotope_plus",
+  "license": "LGPL-3.0+",
+  "authors": [
+    {
+      "name": "Heimrich & Hannot",
+      "email": "digitales@heimrich-hannot.de",
+      "homepage": "http://www.heimrich-hannot.de",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/heimrichhannot/contao-isotope_plus/issues"
+  },
+  "require": {
+    "contao/core": ">=3.2,<4-dev",
+    "contao-community-alliance/composer-installer": "*",
+    "isotope/isotope-core": "*",
+    "heimrichhannot/contao-formhybrid": ">=2.0.30",
+    "heimrichhannot/contao-fieldpalette": ">=1.2.9",
+    "heimrichhannot/contao-frontendedit": ">=3.3.5",
+    "heimrichhannot/contao-haste_plus": ">=1.1.1,<2-dev",
+    "contao-components/tablesorter": ">=2.0.5.2"
+  },
+  "autoload": {
+    "classmap": [
+      ""
+    ]
+  },
+  "extra": {
+    "contao": {
+      "sources": {
+        "": "system/modules/isotope_plus"
+      }
+    }
+  }
 }

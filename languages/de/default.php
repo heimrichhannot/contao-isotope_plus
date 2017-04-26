@@ -16,6 +16,12 @@
 $GLOBALS['TL_LANG']['ATTR']['youtube']                = array('Youtube', 'Generiert ein Video.');
 
 /**
+ * Submit Labels
+ */
+$GLOBALS['TL_LANG']['MSC']['formhybrid']['submitLabels']['createProduct'] = 'Produkt erstellen';
+$GLOBALS['TL_LANG']['MSC']['formhybrid']['submitLabels']['createProducts'] = 'Produkte erstellen';
+
+/**
  * Buttons
  */
 $GLOBALS['TL_LANG']['MSC']['buttonLabel']['downloadSingleProduct'] = 'Download';
