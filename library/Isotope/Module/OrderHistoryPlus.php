@@ -15,6 +15,7 @@ namespace Isotope\Module;
 use Haste\Generator\RowClass;
 use Haste\Util\Format;
 use Isotope\Isotope;
+use Isotope\Model\Address;
 use Isotope\Model\ProductCollection\Order;
 
 

@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.5.10] 2017-05-29
+
+### Fixed
+- OrderHistoryPlus Address Model not found
+
 ## [1.5.9] 2017-04-26
 
 ### Added
