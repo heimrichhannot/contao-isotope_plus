@@ -50,7 +50,7 @@ class DownloadHelper extends \Isotope\Isotope
 						$arrMeta = \Frontend::getMetaData($objModel->meta, $objPage->rootFallbackLanguage);
 					}
 				}
-
+				
 				$strHref = \Environment::get('request');
 				// Remove an existing file parameter (see #5683)
 				if (preg_match('/(&(amp;)?|\?)file=/', $strHref)) {
@@ -72,7 +72,17 @@ class DownloadHelper extends \Isotope\Isotope
 				$objDownload->extension = $objFile->extension;
 				$objDownload->path = $objFile->dirname;
 				$objDownload->class = 'isotope-download isotope-download-file';
-
+				
+				// get width and height of download
+				if(in_array($objFile->extension, ['jpg', 'jpeg', 'tiff', 'png']))
+				{
+					$size = getimagesize($objFile->path);
+					
+					$objDownload->size = sprintf($GLOBALS['TL_LANG']['MSC']['downloadSize'], $size[0],$size[1], $objDownload->filesize);
+					$objDownload->downloadTitle = $arrFiles->title;
+				}
+				
+				
 				$objT = new \FrontendTemplate('isotope_download_from_attribute');
 				$objT->setData((array) $objDownload);
 				$objDownload->output = $objT->parse();

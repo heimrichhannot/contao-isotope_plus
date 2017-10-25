@@ -1,0 +1,56 @@
+<div class="<?php echo $this->class; ?><?php if ($this->skipScrollingToSuccessMessage): ?> noscroll<?php endif ?> block"<?php echo $this->cssID; ?>>
+	<script><?php echo \HeimrichHannot\FormHybrid\FormHelper::getLocaleString(); ?></script>
+	<form action="<?php echo $this->action; ?>"
+	id="<?php echo $this->formId; ?>"
+	method="<?php echo $this->method; ?>"
+	enctype="<?php echo $this->enctype; ?>"
+	<?php echo $this->attributes; ?>
+	<?php echo $this->novalidate; ?>
+	<?php if($this->formClass):?> class="<?php echo $this->formClass; ?>"<?php endif;?>>
+		<!-- formhybrid::stop -->
+		<?php if($this->message): ?>
+			<?= $this->message; ?>
+		<?php endif; ?>
+
+		<div class="formbody">
+			<?php if(!$this->invalid): ?>
+				<?php if ($this->method == FORMHYBRID_METHOD_POST): ?>
+					<input type="hidden" name="REQUEST_TOKEN" value="{{request_token}}">
+					<?php if ($this->maxFileSize): ?>
+						<input type="hidden" name="MAX_FILE_SIZE" value="<?php echo $this->maxFileSize; ?>">
+					<?php endif; ?>
+				<?php endif; ?>
+				<?php echo $this->hidden; ?>
+				<?php foreach($this->fields as $name => $objField): ?>
+                    <?php if($name == 'uploadedFiles' || $name == 'images'):?>
+            
+                        <div class="<?= $name ?> multifileupload-field form-group">
+                        <label id="lbl_<?= $name ?>" class="control-label" for="ctrl_<?= $name ?>">
+                            <?= $objField->label ?>
+                            <?php if($objField->mandatory): ?>
+                                <span class="invisible">Pflichtfeld</span>
+                                <span class="mandatory">*</span>
+                            <?php endif; ?>
+                        </label>
+                    <?php endif; ?>
+                    
+                    <?php if($name == 'tag'): ?>
+                        <div class="form-group tagsinput-container">
+                    <?php endif; ?>
+					<?php echo $objField->parse(); ?>
+	
+                    <?php if($name == 'tag'): ?>
+                        <div class="btn btn-primary add-trigger">
+                            hinzufügen
+                        </div>
+                    <?php endif; ?>
+                    
+                    <?php if($name == 'uploadedFiles' || $name == 'images' ||  $name == 'tag'):?>
+                        </div>
+                    <?php endif; ?>
+				<?php endforeach; ?>
+			<?php endif; ?>
+		</div>
+	</form>
+
+</div>

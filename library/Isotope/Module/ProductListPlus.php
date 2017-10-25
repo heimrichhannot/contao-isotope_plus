@@ -87,12 +87,12 @@ class ProductListPlus extends ProductList
 
 			return;
 		}
-
+		
 		global $objPage;
 		$intPage     = ($this->iso_category_scope == 'article' ? $GLOBALS['ISO_CONFIG']['current_article']['pid'] : $objPage->id);
 		$arrProducts = null;
 		$arrCacheIds = null;
-
+		
 		// Try to load the products from cache
 		if ($this->blnCacheProducts && ($objCache = ProductCache::findForPageAndModule($intPage, $this->id)) !== null) {
 			$arrCacheIds = $objCache->getProductIds();

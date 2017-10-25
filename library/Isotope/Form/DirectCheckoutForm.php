@@ -109,6 +109,8 @@ class DirectCheckoutForm extends Form
                             'useQuantity' => $objProducts->iso_use_quantity,
                         );
                         $this->addProductFields($objProduct, $objProducts->iso_use_quantity, $objProducts->iso_addSubscriptionCheckbox, $arrDca);
+                        
+                        
                     }
                 }
                 break;
@@ -118,8 +120,12 @@ class DirectCheckoutForm extends Form
         \Controller::loadDataContainer('tl_iso_address');
         \System::loadLanguageFile('tl_iso_address');
 
+        
+        
+        
         $arrAddressFields = deserialize(Config::findByPk($this->iso_config_id)->address_fields, true);
-
+	
+        
         // add billing address fields
         foreach ($arrAddressFields as $strName => $arrAddressField)
         {
@@ -135,7 +141,9 @@ class DirectCheckoutForm extends Form
             $this->arrBillingAddressFields[] = $strName;
             $this->addEditableField($strName, $arrData);
         }
-
+	
+		$this->addFieldsToDefaultPalette($this->arrBillingAddressFields);
+        
         if ($this->iso_use_notes)
         {
             $this->addEditableField(
@@ -181,8 +189,37 @@ class DirectCheckoutForm extends Form
         $this->dca['palettes']['__selector__'][]     = 'shippingaddress';
         $this->dca['subpalettes']['shippingaddress'] = implode(',', $arrShippingAddressFields);
         $this->arrShippingAddressFields              = $arrShippingAddressFields;
+	
+		$this->addFieldsToDefaultPalette($this->arrShippingAddressFields);
+	
     }
-
+	
+	
+	protected function addFieldsToDefaultPalette($arrFields)
+	{
+		$strFields = '';
+		
+		if(!is_array($arrFields))
+		{
+			if($arrFields && !preg_match("~\b " . $arrFields . "\b~",$this->dca['palettes']['default']))
+			{
+				$strFields .= ',' . $arrFields;
+			}
+		}
+		else {
+			foreach($arrFields as $field)
+			{
+				if(!preg_match("~\b " . $field . "\b~",$this->dca['palettes']['default']))
+				{
+					$strFields .= ',' . $field;
+				}
+			}
+		}
+		
+		$this->dca['palettes']['default'] .= $strFields . ';';
+		
+	}
+	
     protected function addProductFields($objProduct, $blnAddQuantity, $blnAddSubscriptionCheckbox, &$arrDca)
     {
         $blnSubPalette = $blnAddQuantity || (in_array('isotope_subscriptions', \ModuleLoader::getActive()) && $blnAddSubscriptionCheckbox);
@@ -203,6 +240,9 @@ class DirectCheckoutForm extends Form
                     ),
                 )
             );
+	
+			$this->addFieldsToDefaultPalette('product_' . $objProduct->id);
+			
 
             if ($blnSubPalette)
             {
@@ -230,6 +270,8 @@ class DirectCheckoutForm extends Form
                     'eval'      => array('mandatory' => true),
                 )
             );
+            
+            $this->addFieldsToDefaultPalette('quantity_' . $objProduct->id);
         }
 
 
@@ -245,6 +287,8 @@ class DirectCheckoutForm extends Form
                     ),
                 )
             );
+	
+			$this->addFieldsToDefaultPalette('subscribeToProduct_' . $objProduct->id);
         }
 
     }
@@ -341,10 +385,10 @@ class DirectCheckoutForm extends Form
 
         $objShippingAddress->save();
 
-//        $objOrder->setShippingAddress($objShippingAddress);
-//        $objShippingAddressStep              = new ShippingAddress($this->objCheckoutModule);
-//        $arrSteps[]                          = $objShippingAddressStep;
-//        $arrCheckoutInfo['shipping_address'] = $objShippingAddressStep->review()['shipping_address'];
+        $objOrder->setShippingAddress($objShippingAddress);
+        $objShippingAddressStep              = new ShippingAddress($this->objCheckoutModule);
+        $arrSteps[]                          = $objShippingAddressStep;
+        $arrCheckoutInfo['shipping_address'] = $objShippingAddressStep->review()['shipping_address'];
 
         // add shipping method
         $objIsotopeShipping = Flat::findByPk($this->iso_shipping_modules);
@@ -378,14 +422,14 @@ class DirectCheckoutForm extends Form
         {
             foreach ($GLOBALS['ISO_HOOKS']['preCheckout'] as $callback)
             {
-                $objCallback = \System::importStatic($callback[0]);
-
-                if ($objCallback->$callback[1]($objOrder, $this->objCheckoutModule) === false)
-                {
-                    \System::log('Callback ' . $callback[0] . '::' . $callback[1] . '() cancelled checkout for Order ID ' . $this->id, __METHOD__, TL_ERROR);
-
-                    $this->objCheckoutModule->redirectToStep('failed');
-                }
+                $this->import($callback[0]);
+	
+				if($this->{$callback[0]}->{$callback[1]}($objOrder, $this->objCheckoutModule) === false)
+				{
+					\System::log('Callback ' . $callback[0] . '::' . $callback[1] . '() cancelled checkout for Order ID ' . $this->id, __METHOD__, TL_ERROR);
+					
+					$this->objCheckoutModule->redirectToStep('failed');
+				}
             }
         }
 

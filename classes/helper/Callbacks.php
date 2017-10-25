@@ -13,12 +13,12 @@ namespace HeimrichHannot\IsotopePlus;
 
 use Contao\ModuleModel;
 use HeimrichHannot\Haste\Util\Files;
-use Isotope\Model\CreatorProduct;
+use Isotope\Model\FrontendProduct;
+use Isotope\Model\ProductModel;
 
 class Callbacks
 {
     protected static $strProductTable        = 'tl_iso_product';
-    protected static $strProductCreatorTable = 'tl_iso_product_creator';
 
     /**
      * option callback
@@ -53,106 +53,30 @@ class Callbacks
      *
      * @return array
      */
-    public function getProductCreatorFields()
-    {
-        return \HeimrichHannot\Haste\Dca\General::getFields(static::$strProductCreatorTable, false);
-    }
-
-    /**
-     * option callback
-     *
-     * @return array
-     */
     public function getDefaultValueFields()
     {
         return \HeimrichHannot\Haste\Dca\General::getFields(static::$strProductTable, false);
     }
-
-
-    /**
-     * upload path callback
-     *
-     * @return string
-     */
-    public function getUploadFolder()
-    {
-        $strDefaultPath = 'files/isotope-creator/uploads';
-
-        if (FE_USER_LOGGED_IN)
-        {
-            if (($objUser = \FrontendUser::getInstance()) === null)
-            {
-                return $strDefaultPath;
-            }
-
-            $path = Files::getPathFromUuid($objUser->homeDir) . '/uploads/' . date("Y") . '/' . date("m");
-
-            return $path;
-        }
-
-        return $strDefaultPath;
-    }
-
-    /**
-     * onsubmit_callback
-     *
-     * @param \DataContainer $objDc
-     */
-    public function createProductsFromFrontendCreator(\DataContainer $objDc)
-    {
-        $arrImageUploads = deserialize($objDc->activeRecord->uploadedFiles, true);
-        $arrProducts     = array();
-
-        if (empty($arrImageUploads))
-        {
-            return;
-        }
-
-        foreach ($arrImageUploads as $strUuid)
-        {
-            $objProduct    = new CreatorProduct();
-            $objProduct    = $objProduct->createImageProduct($strUuid, $objDc);
-            $arrProducts[] = $objProduct->id;
-        }
-
-        \Database::getInstance()->execute(
-            "UPDATE " . self::$strProductCreatorTable . " SET createdProducts='" . serialize($arrProducts) . "' WHERE id=" . intval($objDc->activeRecord->id)
-        );
-    }
-
-
-    /**
-     * post upload callback
-     *
-     * @param array $arrFiles
-     */
-    public function createProductsFromBackendUpload(array $arrFiles = array())
-    {
-        if (TL_MODE == 'BE')
-        {
-            $objModule     = null;
-            $strParentUuid = '';
-
-            if (empty($arrFiles))
-            {
-                return;
-            }
-
-            foreach ($arrFiles as $strPath)
-            {
-                if ($strParentUuid == '')
-                {
-                    if (($strParentUuid = \FilesModel::findByPath($strPath)->pid) === null
-                        || ($objModule = ModuleModel::findById(\FilesModel::findByUuid($strParentUuid)->addProductCreation)) === null
-                    )
-                    {
-                        return;
-                    }
-                }
-
-                $objProduct = new CreatorProduct();
-                $objProduct->createImageProduct($strPath, $objModule);
-            }
-        }
-    }
+	
+	/**
+	 * upload path callback
+	 *
+	 * @return string
+	 */
+	public function getUploadFolder(\DataContainer $dc)
+	{
+		$uploadFolder = \FilesModel::findByUuid($dc->objModule->iso_uploadFolder)->path;
+		
+		if (FE_USER_LOGGED_IN)
+		{
+			if (($objUser = \FrontendUser::getInstance()) === null)
+			{
+				return $uploadFolder;
+			}
+			
+			return $uploadFolder . '/' . $objUser->username;
+		}
+		
+		return $uploadFolder;
+	}
 }

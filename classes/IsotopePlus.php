@@ -12,6 +12,8 @@
 namespace HeimrichHannot\IsotopePlus;
 
 
+use Contao\Controller;
+use Contao\FilesModel;
 use Haste\Generator\RowClass;
 use Haste\Haste;
 use HeimrichHannot\HastePlus\Environment;
@@ -20,7 +22,6 @@ use Isotope\Frontend;
 use Isotope\Interfaces\IsotopeAttribute;
 use Isotope\Interfaces\IsotopeProduct;
 use Isotope\Isotope;
-use Isotope\Model\Config;
 use Isotope\Model\Download;
 use Isotope\Model\Gallery;
 use Isotope\Model\Gallery\Standard;
@@ -28,6 +29,7 @@ use Isotope\Model\Product;
 use Isotope\Model\ProductCollection;
 use Isotope\Model\ProductCollection\Order;
 use Isotope\Model\ProductCollectionItem;
+use Isotope\Model\ProductPrice;
 use Isotope\Model\ProductType;
 use Isotope\Template;
 use NotificationCenter\Model\Notification;
@@ -67,6 +69,7 @@ class IsotopePlus extends \Isotope\Isotope
 	public function generateProductHook(&$objTemplate, $objProduct)
 	{
 		DownloadHelper::addDownloadsFromProductDownloadsToTemplate($objTemplate);
+		
 	}
 
 	public static function validateStockPreCheckout($objOrder)
@@ -605,5 +608,54 @@ class IsotopePlus extends \Isotope\Isotope
 		// don't cancel
 		return false;
 	}
-
+	
+	
+	public function updateTemplateData($template, $product)
+	{
+		$module = $template->config['module'];
+		
+		if($product->uploadedFiles)
+		{
+			// main image
+			if(is_array($uploadedFiles = unserialize($product->uploadedFiles)))
+			{
+				$product->uploadedFiles = $uploadedFiles[0];
+			}
+			
+			$img =  \FilesModel::findByUuid($product->uploadedFiles);
+			$image = [];
+			
+			// Override the default image size
+			if ($module->imgSize != '')
+			{
+				$size = deserialize($module->imgSize);
+				
+				if ($size[0] > 0 || $size[1] > 0 || is_numeric($size[2]))
+				{
+					$image['size'] = $module->imgSize;
+				}
+			}
+			
+			$image['singleSRC'] = $img->path;
+			Controller::addImageToTemplate($template,$image);
+		}
+	}
+	
+	public function getUserGroup(\DataContainer $dc)
+	{
+		$mediathekGroups = \MemberGroupModel::findBy('useForIsoProducts', 1);
+		$userGroups = \FrontendUser::getInstance()->groups;
+		
+		$return = [];
+		foreach($userGroups as $group)
+		{
+			if(key_exists($group, $mediathekGroups))
+			{
+				$return[] = $group;
+			}
+		}
+		
+		return serialize($return);
+		
+	}
 }

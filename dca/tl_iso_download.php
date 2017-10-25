@@ -21,3 +21,6 @@ $arrDca['fields']['title'] = array
 	'eval'      => array('maxlength' => 255),
 	'sql'       => "varchar(255) NOT NULL default ''"
 );
+
+//$arrDca['fields']['singleSRC']['eval']['path'] = '/isotope';
+

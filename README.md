@@ -55,3 +55,8 @@ A module that brings some new features to the isotope shopsystem
 
 - stock isn't validated product variants at the moment (products only)
 - direct checkout may currently not make use of all of isotope's features and hooks
+
+## ProductEditor
+- create and edit isotope products in frontend
+- single and multi image products supported
+- single image product -> if multiple images are added to upload a product is created for each of the images that shares all other set attributes

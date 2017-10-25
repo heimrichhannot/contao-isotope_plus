@@ -1,12 +1,20 @@
 <?php
 
 /**
-* Fields
-*/
-$GLOBALS['TL_LANG']['tl_iso_product']['initialStock'] = array('Anfangsbestand', 'Geben Sie hier den Anfangsbestand des Produkts ein.');
-$GLOBALS['TL_LANG']['tl_iso_product']['stock'] = array('Bestand', 'Geben Sie hier den Bestand des Produkts ein.');
-$GLOBALS['TL_LANG']['tl_iso_product']['releaseDate'] = array('Erscheinungsdatum', 'Geben Sie hier Erscheinungsdatum des Produkts ein.');
-$GLOBALS['TL_LANG']['tl_iso_product']['maxOrderSize'] = array('Maximale Bestellmenge', 'Geben Sie hier die maximale Bestellmenge ein.');
-$GLOBALS['TL_LANG']['tl_iso_product']['setQuantity'] = array('Set', 'Geben Sie hier ein, wie viele Artikel zusammen im Set verkauft werden.');
-$GLOBALS['TL_LANG']['tl_iso_product']['overrideStockShopConfig'] = array('Bestandskonfiguration überschreiben', 'Wählen Sie diese Option, um die Konfiguration des Bestands, die Sie im Produkttyp bzw. in der aktuellen Shop-Konfiguration gesetzt haben, zu überschreiben.');
-$GLOBALS['TL_LANG']['tl_iso_product']['jumpTo'] = array('Weiterleitungsseite', 'Wählen Sie hier die Weiterleitungsseite aus.');
+ * Fields
+ */
+$GLOBALS['TL_LANG']['tl_iso_product']['initialStock']            = ['Anfangsbestand', 'Geben Sie hier den Anfangsbestand des Produkts ein.'];
+$GLOBALS['TL_LANG']['tl_iso_product']['stock']                   = ['Bestand', 'Geben Sie hier den Bestand des Produkts ein.'];
+$GLOBALS['TL_LANG']['tl_iso_product']['releaseDate']             = ['Erscheinungsdatum', 'Geben Sie hier Erscheinungsdatum des Produkts ein.'];
+$GLOBALS['TL_LANG']['tl_iso_product']['maxOrderSize']            = ['Maximale Bestellmenge', 'Geben Sie hier die maximale Bestellmenge ein.'];
+$GLOBALS['TL_LANG']['tl_iso_product']['setQuantity']             = ['Set', 'Geben Sie hier ein, wie viele Artikel zusammen im Set verkauft werden.'];
+$GLOBALS['TL_LANG']['tl_iso_product']['overrideStockShopConfig'] = [
+	'Bestandskonfiguration überschreiben',
+	'Wählen Sie diese Option, um die Konfiguration des Bestands, die Sie im Produkttyp bzw. in der aktuellen Shop-Konfiguration gesetzt haben, zu überschreiben.'
+];
+$GLOBALS['TL_LANG']['tl_iso_product']['jumpTo']                  = ['Weiterleitungsseite', 'Wählen Sie hier die Weiterleitungsseite aus.'];
+$GLOBALS['TL_LANG']['tl_iso_product']['addedBy']                 = ['Hinzugefügt durch', 'Tragen Sie hier ein, wer den Artikel hochgeladen hat.'];
+$GLOBALS['TL_LANG']['tl_iso_product']['tag']                     =
+	['Schlagworte', 'Geben Sie bitte die Begriffe einzeln ein. (Kommas dienen NICHT zur Trennung der Begriffe.)'];
+$GLOBALS['TL_LANG']['tl_iso_product']['createMultiImageProduct'] = ['Alle Bilder zu einem Produkt hinzufügen', 'Wählen Sie diese Option, wenn alle Bilder aus dem Bildupload zu einem Produkt hinzugefügt werden sollen.'];
+	
