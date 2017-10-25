@@ -24,14 +24,5 @@ use PHPExif\Reader\Reader;
 
 class ProductModel extends \Model
 {
-	// exif_read_data only reads jpeg and tiff
-	const ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'tiff', 'png'];
-	
 	protected static $strTable = 'tl_iso_product';
-	
-	protected $arrCreatorData = [];
-	
-	protected $arrExifData = [];
-	
-	protected $objFile;
 }

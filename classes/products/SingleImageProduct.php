@@ -75,6 +75,7 @@ class SingleImageProduct extends ProductEditor
 		$this->exifData = $objExifData->getData();
 	}
 	
+	// check if file exists in filesystem
 	public function setImages()
 	{
 		if (file_exists($this->objFile->path)) {

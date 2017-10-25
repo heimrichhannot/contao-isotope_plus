@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.6.1] 2017-10-25
+
+### Changed
+- deleted unnecessary files
+
 ## [1.6.0] 2017-10-25
 
 ### Added

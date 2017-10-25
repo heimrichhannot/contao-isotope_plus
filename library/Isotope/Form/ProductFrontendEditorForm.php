@@ -8,19 +8,17 @@ use Isotope\Model\ProductModel;
 
 class ProductFrontendEditorForm extends Form
 {
-	protected $strMethod = FORMHYBRID_METHOD_POST;
-	protected $strTable  = 'tl_iso_product';
-	
+	protected $strMethod   = FORMHYBRID_METHOD_POST;
+	protected $strTable    = 'tl_iso_product';
 	protected $strTemplate = 'iso_product_creator';
+	
 	
 	public function __construct($objModule = null, $instanceId = 0)
 	{
 		parent::__construct($objModule, $instanceId);
 	}
 	
-	protected function compile()
-	{
-	}
+	protected function compile(){}
 	
 	public function modifyDC(&$arrDca = null)
 	{
@@ -29,8 +27,7 @@ class ProductFrontendEditorForm extends Form
 		}
 		
 		// limit upload to one image for editing existing product
-		if(($product = ProductModel::findByPk(Request::getGet('id'))) !== null && $product->tstamp != 0 && !$product->createMultiImageProduct)
-		{
+		if (($product = ProductModel::findByPk(Request::getGet('id'))) !== null && $product->tstamp != 0 && !$product->createMultiImageProduct) {
 			$arrDca['fields']['uploadedFiles']['eval']['maxFiles'] = 1;
 		}
 		
@@ -47,19 +44,15 @@ class ProductFrontendEditorForm extends Form
 	{
 		$submission = $this->getSubmission();
 		
-		if(!empty($submission->uploadedFiles))
-		{
-			if($submission->createMultiImageProduct)
-			{
+		if (!empty($submission->uploadedFiles)) {
+			if ($submission->createMultiImageProduct) {
 				$strClass = ISO_PRODUCT_CREATOR_MULTI_IMAGE_PRODUCT;
-			}
-			else {
+			} else {
 				$strClass = ISO_PRODUCT_CREATOR_SINGLE_IMAGE_PRODUCT;
 			}
-			
 		}
 		
-		$product = new $strClass($this->objModule,$submission,$dc);
+		$product = new $strClass($this->objModule, $submission, $dc);
 		
 		$product->generateProduct();
 		

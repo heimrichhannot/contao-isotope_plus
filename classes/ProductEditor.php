@@ -17,7 +17,6 @@ use Isotope\Model\ProductType;
 
 abstract class ProductEditor
 {
-	const ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'tiff', 'png'];
 	protected $creatorData = [];
 	protected $exifData    = [];
 	protected $objFile;
@@ -41,8 +40,9 @@ abstract class ProductEditor
 			$product = $this->submission;
 			
 			if ($this->creatorData['id'] || (($pCheck = ProductModel::findByPk($product->id)) !== null && $pCheck->tstamp != 0)) {
-				if(($product = ProductModel::findByPk($this->creatorData['id'])) === null)
+				if (($product = ProductModel::findByPk($this->creatorData['id'])) === null) {
 					$product = new ProductModel();
+				}
 			}
 			
 			$product->setRow($arrData);
@@ -108,7 +108,7 @@ abstract class ProductEditor
 			}
 			
 			$arrPathInfo = pathinfo(TL_ROOT . '/' . $objFile->path);
-			if (in_array($arrPathInfo['extension'], self::ALLOWED_IMAGE_EXTENSIONS)) {
+			if (in_array($arrPathInfo['extension'], \Config::get('validImageTypes'))) {
 				$this->objFile = $objFile;
 				
 				return true;
@@ -242,7 +242,6 @@ abstract class ProductEditor
 		}
 	}
 	
-	
 	public function setTagData()
 	{
 		\Controller::loadDataContainer(static::$strTable);
@@ -293,8 +292,7 @@ abstract class ProductEditor
 		$this->creatorData['sku']   = $this->creatorData['alias'];
 		
 		// add user reference to product
-		if(FE_USER_LOGGED_IN)
-		{
+		if (FE_USER_LOGGED_IN) {
 			$objUser                      = \FrontendUser::getInstance();
 			$this->creatorData['addedBy'] = $objUser->id;
 		}
