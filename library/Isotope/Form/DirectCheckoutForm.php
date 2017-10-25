@@ -119,12 +119,8 @@ class DirectCheckoutForm extends Form
         // add address fields
         \Controller::loadDataContainer('tl_iso_address');
         \System::loadLanguageFile('tl_iso_address');
-
-        
-        
         
         $arrAddressFields = deserialize(Config::findByPk($this->iso_config_id)->address_fields, true);
-	
         
         // add billing address fields
         foreach ($arrAddressFields as $strName => $arrAddressField)
@@ -157,7 +153,36 @@ class DirectCheckoutForm extends Form
                 )
             );
         }
-
+	
+        if($this->iso_useAgb)
+		{
+			$this->addEditableField(
+				'agb' ,
+				[
+					'label'     => $this->iso_agbText,
+					'exclude'   => true,
+					'inputType' => 'checkbox',
+					'eval'      => ['tl_class' => 'clr', 'mandatory' => true],
+					'sql'       => "char(1) NOT NULL default ''"
+				],
+				true
+			);
+		}
+	
+		if($this->iso_useConsent)
+		{
+			$this->addEditableField(
+				'consent' ,
+				[
+					'label'     => $this->iso_consentText,
+					'exclude'   => true,
+					'inputType' => 'checkbox',
+					'eval'      => ['tl_class' => 'clr', 'mandatory' => true],
+					'sql'       => "char(1) NOT NULL default ''"
+				],
+				true
+			);
+		}
 
         $this->addEditableField(
             'shippingaddress',

@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.6.3] 2017-10-25
+
+### Added
+- added AGB and consent field to directcheckout
+
+
 ## [1.6.2] 2017-10-25
 
 ### Fixed

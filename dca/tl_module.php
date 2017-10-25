@@ -15,6 +15,8 @@ $arrDca = &$GLOBALS['TL_DCA']['tl_module'];
 
 $arrDca['palettes']['__selector__'][] = 'iso_useFieldsForTags';
 $arrDca['palettes']['__selector__'][] = 'iso_addImageSizes';
+$arrDca['palettes']['__selector__'][] = 'iso_useAgb';
+$arrDca['palettes']['__selector__'][] = 'iso_useConsent';
 
 /**
  * Palettes
@@ -39,7 +41,7 @@ $arrDca['palettes']['iso_cart_link'] =
 	'{title_legend},name,headline,type;{config_legend},jumpTo;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
 
 $arrDca['palettes']['iso_direct_checkout'] = '{title_legend},name,headline,type;'
-											 . '{config_legend},jumpTo,formHybridAsync,formHybridResetAfterSubmission,iso_direct_checkout_product_mode,iso_direct_checkout_products,nc_notification,iso_shipping_modules,iso_use_notes;'
+											 . '{config_legend},jumpTo,formHybridAsync,formHybridResetAfterSubmission,iso_direct_checkout_product_mode,iso_direct_checkout_products,nc_notification,iso_shipping_modules,iso_use_notes,iso_useAgb,iso_useConsent;'
 											 . '{template_legend},formHybridTemplate;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
 
 $arrDca['palettes']['iso_product_ranking'] =
@@ -51,16 +53,19 @@ $arrDca['palettes']['iso_orderdetails_plus'] =
 	str_replace('iso_loginRequired', 'iso_loginRequired,iso_show_all_orders', $arrDca['palettes']['iso_orderdetails']);
 
 $arrDca['palettes']['iso_product_frontend_editor'] = '{title_legend},name,headline,type;'
-													  . '{creator_legend},formHybridDataContainer,formHybridPalette,formHybridEditable,formHybridAddEditableRequired,formHybridAddReadOnly,formHybridAddPermanentFields;'
-													  . '{product_legend},iso_editableCategories,iso_productCategory,iso_exifMapping,formHybridAddDefaultValues,iso_useFieldsForTags,iso_tagFields,iso_addImageSizes,iso_useUploadsAsDownload,iso_creatorFallbackUser,iso_uploadFolder;'
-													  . '{action_legend},formHybridAllowIdAsGetParameter,noIdBehavior,disableSessionCheck,disableAuthorCheck,addUpdateConditions,allowDelete,formHybridAsync,deactivateTokens;'
-													  . '{misc_legend},formHybridSuccessMessage,formHybridSkipScrollingToSuccessMessage,formHybridCustomSubmit,setPageTitle,addClientsideValidation;'
-													  . '{template_legend},formHybridTemplate,modalTpl,customTpl;'
-													  . '{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
+													 . '{creator_legend},formHybridDataContainer,formHybridPalette,formHybridEditable,formHybridAddEditableRequired,formHybridAddReadOnly,formHybridAddPermanentFields;'
+													 . '{product_legend},iso_editableCategories,iso_productCategory,iso_exifMapping,formHybridAddDefaultValues,iso_useFieldsForTags,iso_tagFields,iso_addImageSizes,iso_useUploadsAsDownload,iso_creatorFallbackUser,iso_uploadFolder;'
+													 . '{action_legend},formHybridAllowIdAsGetParameter,noIdBehavior,disableSessionCheck,disableAuthorCheck,addUpdateConditions,allowDelete,formHybridAsync,deactivateTokens;'
+													 . '{misc_legend},formHybridSuccessMessage,formHybridSkipScrollingToSuccessMessage,formHybridCustomSubmit,setPageTitle,addClientsideValidation;'
+													 . '{template_legend},formHybridTemplate,modalTpl,customTpl;'
+													 . '{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
 
 
 $arrDca['subpalettes']['iso_useFieldsForTags'] = 'iso_tagField';
 $arrDca['subpalettes']['iso_addImageSizes']    = 'iso_imageSizes';
+$arrDca['subpalettes']['iso_useAgb']           = 'iso_agbText';
+$arrDca['subpalettes']['iso_useConsent']       = 'iso_consentText';
+
 
 if (in_array('slick', \ModuleLoader::getActive())) {
 	$arrDca['palettes']['iso_productlistslick'] =
@@ -499,6 +504,40 @@ $arrDca['fields']['iso_use_notes'] = [
 	'inputType' => 'checkbox',
 	'eval'      => ['submitOnChange' => true, 'tl_class' => 'clr'],
 	'sql'       => "char(1) NOT NULL default ''",
+];
+
+$arrDca['fields']['iso_useAgb'] = [
+	'label'     => &$GLOBALS['TL_LANG']['tl_module']['iso_useAgb'],
+	'exclude'   => true,
+	'inputType' => 'checkbox',
+	'eval'      => ['tl_class' => 'clr', 'submitOnChange' => true],
+	'sql'       => "char(1) NOT NULL default ''",
+];
+
+$arrDca['fields']['iso_agbText'] = [
+	'label'     => &$GLOBALS['TL_LANG']['tl_module']['iso_agbText'],
+	'exclude'   => true,
+	'search'    => true,
+	'inputType' => 'textarea',
+	'eval'      => ['rte' => 'tinyMCE', 'tl_class' => 'clr'],
+	'sql'       => "text NULL",
+];
+
+$arrDca['fields']['iso_useConsent'] = [
+	'label'     => &$GLOBALS['TL_LANG']['tl_module']['iso_useConsent'],
+	'exclude'   => true,
+	'inputType' => 'checkbox',
+	'eval'      => ['tl_class' => 'clr', 'submitOnChange' => true],
+	'sql'       => "char(1) NOT NULL default ''",
+];
+
+$arrDca['fields']['iso_consentText'] = [
+	'label'     => &$GLOBALS['TL_LANG']['tl_module']['iso_consentText'],
+	'exclude'   => true,
+	'search'    => true,
+	'inputType' => 'textarea',
+	'eval'      => ['rte' => 'tinyMCE', 'tl_class' => 'clr'],
+	'sql'       => "text NULL",
 ];
 
 $arrDca['fields']['iso_useFieldsForTags'] = [

@@ -51,6 +51,14 @@ $arrLang['iso_exifMapping']                                  = [
 	'iso_exifMapping_customTag'  => ['Weiterer EXIF-Tag', ''],
 	'iso_exifMapping_tableField' => ['Tabellenfeld', ''],
 ];
+
+
+$arrLang['iso_useAgb'] = ['Agb-Feld verwenden', 'Wählen Sie diese Option, dem Formular ein Feld für die Bestätigung der AGB hinzugefügt werden soll.'];
+$arrLang['iso_agbText'] = ['Agb-Text', 'Tragen Sie hier den Text ein, der für das Agb-Feld genutzt werden soll.'];
+
+$arrLang['iso_useConsent'] = ['Einverständniserklärung-Feld verwenden', 'Wählen Sie diese Option, dem Formular ein Feld für die Bestätigung der Einverständniserklärung hinzugefügt werden soll.'];
+$arrLang['iso_consentText'] = ['Einverständniserklärung-Text', 'Tragen Sie hier den Text ein, der für das Einverständniserklärung-Feld genutzt werden soll.'];
+
 $arrLang['iso_useFieldsForTags'] = ['Felder in Tag-Feld zusammenfassen', 'Wählen Sie diese Option, wenn verschiedene Felder zu einem tagsinput-Feld hinzugefügt werden sollen.'];
 $arrLang['iso_tagField'] = ['Tag-Feld', 'Wählen Sie hier das tagsinput-Feld zu dem die verschiedenen Felder hinzugefügt werden sollen.'];
 $arrLang['iso_tagFields'] = ['Felder', 'Wählen Sie hier die Felder, die dem tagsinput-Feld hinzugefügt werden sollen.'];
