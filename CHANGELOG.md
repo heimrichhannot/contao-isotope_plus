@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.6.2] 2017-10-25
+
+### Fixed
+- check if file has valid type
+
 ## [1.6.1] 2017-10-25
 
 ### Changed

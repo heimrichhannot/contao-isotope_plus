@@ -108,7 +108,7 @@ abstract class ProductEditor
 			}
 			
 			$arrPathInfo = pathinfo(TL_ROOT . '/' . $objFile->path);
-			if (in_array($arrPathInfo['extension'], \Config::get('validImageTypes'))) {
+			if (in_array($arrPathInfo['extension'], explode(',',\Config::get('validImageTypes')))) {
 				$this->objFile = $objFile;
 				
 				return true;
