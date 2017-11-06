@@ -57,18 +57,21 @@ class Backend
 						$row['uploadedFiles'] = $uploadedFiles[0];
 					}
 					
-					$image = FilesModel::findByUuid($row['uploadedFiles']);
-					$size = @getimagesize(TL_ROOT . '/' . $image->path);
-					
-					$args[$i] = sprintf(
-						'<a href="%s" onclick="Backend.openModalImage({\'width\':%s,\'title\':\'%s\',\'url\':\'%s\'});return false"><img src="%s" alt="%s" align="left"></a>',
-						TL_FILES_URL . $image->path,
-						$size[0],
-						str_replace("'", "\\'", $objProduct->name),
-						TL_FILES_URL . $image->path,
-						TL_ASSETS_URL . \Image::get($image->path, 50, 50, 'proportional'),
-						$image->alt
-					);
+					if(\Validator::isUuid($row['uploadedFiles']))
+					{
+						$image = FilesModel::findByUuid($row['uploadedFiles']);
+						$size = @getimagesize(TL_ROOT . '/' . $image->path);
+						
+						$args[$i] = sprintf(
+							'<a href="%s" onclick="Backend.openModalImage({\'width\':%s,\'title\':\'%s\',\'url\':\'%s\'});return false"><img src="%s" alt="%s" align="left"></a>',
+							TL_FILES_URL . $image->path,
+							$size[0],
+							str_replace("'", "\\'", $objProduct->name),
+							TL_FILES_URL . $image->path,
+							TL_ASSETS_URL . \Image::get($image->path, 50, 50, 'proportional'),
+							$image->alt
+						);
+					}
 					break;
 				case 'name':
 					$args[$i] = $objProduct->name;

@@ -11,129 +11,115 @@ namespace HeimrichHannot\IsotopePlus;
 
 use HeimrichHannot\Haste\Dca\General;
 use HeimrichHannot\Haste\Util\FormSubmission;
-use Isotope\Model\Product;
+use Isotope\Model\Download;
 use Isotope\Model\ProductModel;
 use Isotope\Model\ProductType;
 
 abstract class ProductEditor
 {
-	protected $creatorData = [];
+	protected $productData = [];
 	protected $exifData    = [];
-	protected $objFile;
+	protected $file;
 	
 	protected static $strTable = 'tl_iso_product';
 	
-	public function __construct($config, $submission, $dc)
+	public function __construct($module, $submission, $dc)
 	{
-		$this->config       = $config;
+		$this->module       = $module;
 		$this->submission   = $submission;
 		$this->imageCount   = count($submission->uploadedFiles);
 		$this->originalName = $submission->name;
 		$this->dc           = $dc;
 	}
 	
-	protected function createProduct()
+	/**
+	 * @return bool
+	 */
+	protected function create()
 	{
-		if (!empty($this->creatorData)) {
-			
-			$arrData = array_merge($this->submission->row(), $this->creatorData);
-			$product = $this->submission;
-			
-			if ($this->creatorData['id'] || (($pCheck = ProductModel::findByPk($product->id)) !== null && $pCheck->tstamp != 0)) {
-				if (($product = ProductModel::findByPk($this->creatorData['id'])) === null) {
-					$product = new ProductModel();
-				}
-			}
-			
-			$product->setRow($arrData);
-			// set arrModified -> otherwise save() thinks the db-entity is already up to date
-			
-			
-			foreach ($this->creatorData as $key => $modifiedField) {
-				$product->markModified($key);
-			}
-			
-			$product->save();
+		if (empty($this->productData)) {
+			return false;
 		}
+		
+		$product = new ProductModel();
+		$product->mergeRow($this->productData);
+		
+		return $product->save();
 	}
+	
 	
 	public function generateProduct()
 	{
-		if (!empty($this->submission->uploadedFiles)) {
-			$this->generateCommonData();
-			
-			$this->generateImageData();
+		if (empty($this->submission->uploadedFiles)) {
+			return false;
 		}
-	}
-	
-	
-	public function generateCommonData()
-	{
+		
+		// common data
 		$this->setBasicData();
 		
 		$this->setDataFromModule();
 		
 		$this->setDataFromExifData();
 		
-		$this->setAdditionalData();
-		
 		$this->setDataFromForm();
 		
 		$this->setTagData();
+		
+		$this->modifyData();
+		
+		// image data
+		$this->createImageProduct();
+		
+		$this->submission->delete();
+		
+		return true;
 	}
 	
 	/**
-	 * Check varFile input for allowed exif extensions
-	 *
-	 * @param $varFile
-	 *
-	 * @return bool
+	 * set basic values for product
 	 */
-	public function checkFile($file)
+	protected function setBasicData()
 	{
-		if ($file != '' && $file !== null) {
-			// check if input is a FilesModel, an uuid or a path
-			if (!($file instanceof \FilesModel)) {
-				if (\Validator::isUuid($file)) {
-					if (($objFile = \FilesModel::findByUuid($file)) === null) {
-						return false;
-					}
-				} else {
-					if (($objFile = \FilesModel::findByPath($file)) === null) {
-						return false;
-					}
-				}
-			} else {
-				$objFile = $file;
-			}
-			
-			$arrPathInfo = pathinfo(TL_ROOT . '/' . $objFile->path);
-			if (in_array($arrPathInfo['extension'], explode(',',\Config::get('validImageTypes')))) {
-				$this->objFile = $objFile;
-				
-				return true;
-			}
+		$this->productData['dateAdded'] = time();
+		$this->productData['tstamp']    = time();
+		
+		$this->productData['alias'] = General::generateAlias('', $this->submission->id, 'tl_iso_product', $this->submission->name);
+		$this->productData['sku']   = $this->productData['alias'];
+		
+		$this->productData['addedBy'] = \Contao\Config::get('iso_creatorFallbackMember');
+		
+		// add user reference to product
+		if (FE_USER_LOGGED_IN) {
+			$objUser                      = \FrontendUser::getInstance();
+			$this->productData['addedBy'] = $objUser->id;
+		}
+	}
+	
+	protected function setDataFromModule()
+	{
+		$this->productData['orderPages'] = $this->module->orderPages;
+		
+		$this->setDataFromDefaultValues();
+	}
+	
+	/**
+	 *
+	 */
+	protected function setDataFromExifData()
+	{
+		$mappings = deserialize($this->module->iso_exifMapping, true);
+		
+		if (empty($mappings)) {
+			return;
 		}
 		
-		return false;
-	}
-	
-	/**
-	 * Map the exif tags to database fields
-	 *
-	 * @param $objModule
-	 */
-	public function setDataFromExifData()
-	{
-		$arrMappings = deserialize($this->config->iso_exifMapping, true);
-		
-		foreach ($arrMappings as $arrMapping) {
-			$arrTableFields = explode('.', $arrMapping['tableField']);
+		foreach ($mappings as $mapping) {
+			$arrTableFields = explode('.', $mapping['tableField']);
 			$strValue       = '';
 			
 			if (!empty($arrTableFields) && ($strTableField = array_pop($arrTableFields)) != '') {
 				
-				switch ($arrMapping['exifTag']) {
+				switch ($mapping['exifTag']) {
 					case \PHPExif\Exif::CREATION_DATE :
 						$strValue = ProductHelper::prepareExifDataForSave(\PHPExif\Exif::CREATION_DATE, $this->exifData);
 						break;
@@ -141,7 +127,7 @@ abstract class ProductEditor
 						$strValue = ProductHelper::prepareExifDataForSave(\PHPExif\Exif::KEYWORDS, $this->exifData);
 						break;
 					case 'custom' :
-						$strValue = $this->exifData[$arrMapping['customTag']];
+						$strValue = $this->exifData[$mapping['customTag']];
 						break;
 					
 					case \PHPExif\Exif::APERTURE :
@@ -168,7 +154,7 @@ abstract class ProductEditor
 					case \PHPExif\Exif::VERTICAL_RESOLUTION :
 					case \PHPExif\Exif::WIDTH :
 					case \PHPExif\Exif::GPS :
-						$strValue = $this->exifData[$arrMapping['exifTag']];
+						$strValue = $this->exifData[$mapping['exifTag']];
 						break;
 					
 					default :
@@ -183,132 +169,194 @@ abstract class ProductEditor
 				) {
 					foreach ($GLOBALS['TL_HOOKS']['creatorProduct']['handleExifTags'] as $arrCallback) {
 						$objClass = \Controller::importStatic($arrCallback[0]);
-						$strValue = $objClass->{$arrCallback[1]}($arrMapping['exifTag'], $arrMapping, $strValue);
+						$strValue = $objClass->{$arrCallback[1]}($mapping['exifTag'], $mapping, $strValue);
 					}
 				}
 				
 				if ($strValue !== null) {
-					$this->creatorData[$strTableField] = $strValue;
+					$this->productData[$strTableField] = $strValue;
 				}
 			}
 		}
 	}
 	
-	public function setDataFromModule()
+	protected function setDataFromForm()
 	{
-		if (count(deserialize($this->config->iso_editableCategories)) > 1) {
-			$this->creatorData['type'] = $this->submission->type;
-		} else {
-			$this->creatorData['type'] = deserialize($this->config->iso_editableCategories)[0];
-		}
-		
-		$this->creatorData['orderPages'] = $this->config->orderPages;
-		
-		if ($this->config->formHybridAddDefaultValues) {
-			$this->setDataFromDefaultValues();
-		}
-	}
-	
-	public function setDataFromDefaultValues()
-	{
-		$arrDcaFields     = \HeimrichHannot\Haste\Dca\General::getFields(static::$strTable, false);
-		$arrDefaultValues = deserialize($this->config->formHybridDefaultValues, true);
-		
-		foreach ($arrDefaultValues as $arrValue) {
-			if (in_array($arrValue['field'], $arrDcaFields)) {
-				$this->creatorData[$arrValue['field']] = $arrValue['value'];
+		foreach (deserialize($this->module->formHybridEditable) as $value) {
+			if (!$this->productData[$value]) {
+				$this->productData[$value] = $this->submission->{$value};
 			}
 		}
 	}
 	
+	protected function setTagData()
+	{
+		if (!$this->module->iso_useFieldsForTags) {
+			return;
+		}
+		
+		$data = $this->productData;
+		$tags = [];
+		
+		foreach (deserialize($this->module->iso_tagFields) as $tagValueField) {
+			if ($tagValueField == 'type') {
+				$data[$tagValueField] = ProductType::findByPk($this->submission->type)->name;
+			}
+			
+			$tags[] = FormSubmission::prepareSpecialValueForPrint(
+				$data[$tagValueField],
+				$GLOBALS['TL_DCA']['tl_iso_product']['fields'][$tagValueField],
+				'tl_iso_product',
+				$this->dc
+			);
+		}
+		
+		// add tags from form-field
+		array_merge($this->submission->{$this->module->iso_tagField}, $tags);
+		
+		
+		// Hook : modify the product data
+		if (isset($GLOBALS['TL_HOOKS']['creatorProduct']['modifyTagData']) && is_array($GLOBALS['TL_HOOKS']['creatorProduct']['modifyTagData'])) {
+			foreach ($GLOBALS['TL_HOOKS']['creatorProduct']['modifyTagData'] as $arrCallback) {
+				$objClass = \Controller::importStatic($arrCallback[0]);
+				$tags     = $objClass->{$arrCallback[1]}($tags, $this);
+			}
+		}
+		
+		// add tag-array to field
+		$this->productData[$this->module->iso_tagField] = serialize($tags);
+	}
 	
-	public function setAdditionalData()
+	/**
+	 * hook to manipulate values before image product is created
+	 *
+	 * $this->module object
+	 * $this->productData array
+	 * $this-submission object
+	 */
+	protected function modifyData()
 	{
 		// Hook : modify the product data
-		if (isset($GLOBALS['TL_HOOKS']['creatorProduct']['modifyData']) && is_array($GLOBALS['TL_HOOKS']['creatorProduct']['modifyData'])) {
-			foreach ($GLOBALS['TL_HOOKS']['creatorProduct']['modifyData'] as $arrCallback) {
+		if (isset($GLOBALS['TL_HOOKS']['editProduct']['modifyData']) && is_array($GLOBALS['TL_HOOKS']['editProduct']['modifyData'])) {
+			foreach ($GLOBALS['TL_HOOKS']['editProduct']['modifyData'] as $arrCallback) {
 				$objClass = \Controller::importStatic($arrCallback[0]);
-				$objClass->{$arrCallback[1]}($this->config, $this->creatorData, $this->submission);
+				$objClass->{$arrCallback[1]}($this->module, $this->productData, $this->submission);
 			}
 		}
 	}
 	
-	public function setDataFromForm()
-	{
-		foreach (deserialize($this->config->formHybridEditable) as $value) {
-			if (!array_key_exists($value, $this->creatorData)) {
-				$this->creatorData[$value] = $this->submission->{$value};
-			}
-		}
-	}
 	
-	public function setTagData()
+	/**
+	 * global objFile is set when file exists
+	 *
+	 * @param $uuid
+	 *
+	 * @return bool
+	 */
+	protected function checkFile($uuid)
 	{
-		\Controller::loadDataContainer(static::$strTable);
-		$data = $this->creatorData;
+		if (!\Validator::isUuid($uuid) || ($file = \Contao\FilesModel::findByUuid($uuid)) === null || !file_exists($file->path)) {
+			return false;
+		}
 		
-		if ($this->config->iso_useFieldsForTags) {
-			$tags = [];
-			foreach (deserialize($this->config->iso_tagFields) as $tagValueField) {
-				if ($tagValueField == 'type') {
-					$data[$tagValueField] = ProductType::findByPk($this->submission->type)->name;
-				}
-				
-				$tags[] = FormSubmission::prepareSpecialValueForPrint(
-					$data[$tagValueField],
-					$GLOBALS['TL_DCA']['tl_iso_product']['fields'][$tagValueField],
-					'tl_iso_product',
-					$this->dc
-				);
+		$this->file = $file;
+		
+		return true;
+	}
+	
+	/**
+	 * set productData that was set default in module configuration
+	 */
+	protected function setDataFromDefaultValues()
+	{
+		if (!$this->module->formHybridAddDefaultValues) {
+			return;
+		}
+		
+		$dcaFields     = \HeimrichHannot\Haste\Dca\General::getFields(static::$strTable, false);
+		$defaultValues = deserialize($this->module->formHybridDefaultValues, true);
+		
+		foreach ($defaultValues as $value) {
+			if (in_array($value['field'], $dcaFields)) {
+				$this->productData[$value['field']] = $value['value'];
 			}
-			
-			// add tags from form-field
-			array_merge($this->submission->{$this->config->iso_tagField}, $tags);
-			
-			
-			// Hook : modify the product data
-			if (isset($GLOBALS['TL_HOOKS']['creatorProduct']['modifyTagData']) && is_array($GLOBALS['TL_HOOKS']['creatorProduct']['modifyTagData'])) {
-				foreach ($GLOBALS['TL_HOOKS']['creatorProduct']['modifyTagData'] as $arrCallback) {
-					$objClass = \Controller::importStatic($arrCallback[0]);
-					$tags     = $objClass->{$arrCallback[1]}($tags, $this);
-				}
+		}
+	}
+	
+	
+	
+	/**
+	 * delete all download items for a product before adding new ones
+	 *
+	 * @param $id
+	 */
+	protected function cleanDownloadItems($id)
+	{
+		if (($productDownloads = Download::findBy('pid', $id)) !== null) {
+			// clean downloads before adding new ones
+			while ($productDownloads->next()) {
+				$productDownloads->delete();
 			}
-			
-			
-			// add tag-array to field
-			$this->creatorData[$this->config->iso_tagField] = serialize($tags);
 		}
 	}
 	
 	/**
-	 * set basic values for product
+	 * @param $index int
+	 *
+	 * @return array
 	 */
-	public function setBasicData()
+	protected function getOriginalImageSize($index = null)
 	{
-		$this->creatorData['dateAdded'] = time();
-		$this->creatorData['tstamp']    = time();
+		$suffix = '';
 		
-		$this->creatorData['alias'] = General::generateAlias('', $this->submission->id, 'tl_iso_product', $this->submission->name);
-		$this->creatorData['sku']   = $this->creatorData['alias'];
-		
-		// add user reference to product
-		if (FE_USER_LOGGED_IN) {
-			$objUser                      = \FrontendUser::getInstance();
-			$this->creatorData['addedBy'] = $objUser->id;
+		if (!$this->exifData['width'] && !$this->exifData['height']) {
+			$orginalSize = getimagesize($this->file->path);
+			
+			$this->exifData['width']  = $orginalSize[0];
+			$this->exifData['height'] = $orginalSize[1];
 		}
 		
-		if (!$this->creatorData['addedBy']) {
-			$this->creatorData['addedBy'] = \Config::get('iso_creatorFallbackMember');
+		if ($index) {
+			$suffix = ' ' . ($index + 1);
+		}
+		
+		// add original image to download items
+		return [
+			'size' => [
+				$this->exifData['width'],
+				$this->exifData['height'],
+				'center-center'
+			],
+			'name' => $GLOBALS['TL_LANG']['MSC']['originalSize'] . $suffix
+		];
+	}
+	
+	/**
+	 * @param $id int
+	 */
+	protected function createDownloadItemsForSizes($id, $index = null)
+	{
+		$suffix = '';
+		
+		if ($index) {
+			$suffix = ' ' . ($index + 1);
+		}
+		
+		foreach (deserialize($this->module->iso_imageSizes) as $size) {
+			$size['name'] = $size['name'] . $suffix;
+			ProductHelper::createDownloadItem($id, $this->file, $size);
 		}
 	}
 	
-	abstract public function generateImageData();
+	abstract protected function createImageProduct();
 	
-	abstract public function getImageData();
+	abstract protected function getExifData();
 	
-	abstract public function setImages();
+	abstract protected function setProductImages($uuid);
 	
-	abstract public function setDownloadItems();
+	abstract protected function createDownloadItems($product);
 	
-	abstract public function additionalTasks();
+	abstract protected function afterCreate($product);
+	
+	
 }

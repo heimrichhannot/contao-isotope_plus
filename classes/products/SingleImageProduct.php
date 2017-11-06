@@ -9,38 +9,42 @@
 namespace HeimrichHannot\IsotopePlus;
 
 
-use HeimrichHannot\FileCredit\FilesModel;
 use HeimrichHannot\Haste\Dca\General;
 use HeimrichHannot\MultiFileUpload\FormMultiFileUpload;
 use Isotope\Backend\Product\Category;
 use Isotope\Backend\Product\Price;
-use Isotope\Model\Download;
 use Isotope\Model\ProductModel;
 use PHPExif\Reader\Reader;
 
 class SingleImageProduct extends ProductEditor
 {
-	public function generateImageData()
+	/**
+	 * @return bool
+	 */
+	protected function createImageProduct()
 	{
-		foreach($this->submission->uploadedFiles as $key => $upload)
-		{
-			if($this->checkFile($upload))
-			{
-				$this->updateBeforeSafe($key);
-				
-				$this->getImageData();
-				
-				$this->setImages();
-				
-				$this->createProduct();
-				
-				$this->setDownloadItems();
-				
-				$this->additionalTasks();
-				
-				$this->updateAfterSave($key);
+		foreach ($this->submission->uploadedFiles as $index => $upload) {
+			if (!$this->checkFile($upload)) {
+				continue;
 			}
+			
+			$this->updateProductDataBeforeSave($index);
+			
+			$this->exifData = $this->getExifData();
+			
+			$this->setProductImages($upload);
+			
+			$product = $this->create();
+			
+			$this->afterCreate($product);
+			
+			$this->createDownloadItems($product);
 		}
+		
+		// delete submission since for all products an new model was created
+		$this->submission->delete();
+		
+		return true;
 	}
 	
 	/**
@@ -48,123 +52,95 @@ class SingleImageProduct extends ProductEditor
 	 *
 	 * @param $index
 	 */
-	protected function updateBeforeSafe($index)
+	protected function updateProductDataBeforeSave($index)
 	{
-		if($this->imageCount > 1)
-		{
+		if ($this->imageCount > 1) {
 			$version = $index + 1;
 			
-			$this->creatorData['name'] = $this->originalName . ' ' . $version;
-			$this->creatorData['alias'] = $this->creatorData['sku'] = General::generateAlias('', $this->submission->id, 'tl_iso_product', $this->originalName) . '-' . $version;
+			$this->productData['name']  = $this->originalName . ' ' . $version;
+			$this->productData['alias'] =
+			$this->productData['sku'] = General::generateAlias('', $this->submission->id, 'tl_iso_product', $this->originalName) . '-' . $version;
 		}
 	}
 	
 	/**
-	 * Get exif/iptc data from image
+	 * get exif/iptc data from image
+	 * @return array
 	 */
-	public function getImageData()
+	protected function getExifData()
 	{
-		$objExifReader = Reader::factory(Reader::TYPE_NATIVE);
-		$objExifData   = $objExifReader->read(TL_ROOT . '/' . $this->objFile->path);
+		$exifReader = Reader::factory(Reader::TYPE_NATIVE);
+		$exifData   = $exifReader->read(TL_ROOT . '/' . $this->file->path);
 		
-		
-		if ($objExifData === null || $objExifData === false) {
-			return;
+		if ($exifData === null || $exifData === false) {
+			return [];
 		}
 		
-		$this->exifData = $objExifData->getData();
-	}
-	
-	// check if file exists in filesystem
-	public function setImages()
-	{
-		if (file_exists($this->objFile->path)) {
-			// need to move file now -> download items would otherwise create different sizes in tmp folder
-			FormMultiFileUpload::moveFiles($this->dc);
-			
-			$this->creatorData['uploadedFiles'] = $this->objFile->uuid;
-		}
+		return $exifData->getData();
 	}
 	
 	/**
-	 * add download elements to product for each set imageSizes and original size
-	 */
-	public function setDownloadItems()
-	{
-		if ($this->config->iso_useUploadsAsDownload) {
-			
-			$id = $this->creatorData['id'] ? $this->creatorData['id'] : $this->submission->id;
-			
-			if ($this->config->iso_addImageSizes) {
-				if(($productDownloads = Download::findBy('pid', $id)) !== null)
-				{
-					// clean downloads before adding new ones
-					while($productDownloads->next())
-					{
-						$productDownloads->delete();
-					}
-				}
-				
-				foreach (deserialize($this->config->iso_imageSizes) as $size) {
-					ProductHelper::createDownloadItem($id, $this->objFile, $size);
-				}
-			}
-			
-			// add original image to download items
-			$size = [
-				'size' => [
-					$this->exifData['width'],
-					$this->exifData['height'],
-					'center-center'
-				],
-				'name' => $GLOBALS['TL_LANG']['MSC']['originalSize']
-			];
-			ProductHelper::createDownloadItem($id, $this->objFile, $size);
-		}
-	}
-	
-	/**
-	 * reset dc for multiple images
+	 * check if file exists in filesystem
 	 *
-	 * @param $index
+	 * @param $uuid
 	 */
-	protected function updateAfterSave($index)
+	protected function setProductImages($uuid)
 	{
-		if($index < $this->imageCount - 1)
-		{
-			$this->creatorData['id'] = $this->creatorData['id'] ? $this->creatorData['id'] + 1 : $this->submission->id + 1;
-			
-			if(!isset($this->dc->activeRecord))
-			{
-				if(($this->dc->activeRecord = ProductModel::findByPk($this->creatorData['id'])) === null)
-					$this->dc->activeRecord = new ProductModel();
-
-				$arrData = array_merge($this->submission->row(), $this->creatorData);
-				$this->dc->activeRecord->setRow($arrData);
-			}
-			
-			$this->dc->intId = $this->creatorData['id'];
-		}
+		// need to move file now -> download items would otherwise create different sizes in tmp folder
+		FormMultiFileUpload::moveFiles($this->dc);
+		
+		$this->productData['uploadedFiles'] = $uuid;
 	}
 	
 	/**
-	 * save price and category for product
+	 * @param $product ProductModel
+	 *
+	 * @return bool
 	 */
+	protected function createDownloadItems($product)
+	{
+		if (!$this->module->iso_useUploadsAsDownload) {
+			return false;
+		}
+		
+		$this->cleanDownloadItems($product->id);
+		
+		$size = $this->getOriginalImageSize();
+		
+		ProductHelper::createDownloadItem($product->id, $this->file, $size);
+		
+		if (!$this->module->iso_addImageSizes) {
+			return true;
+		}
+		
+		$this->createDownloadItemsForSizes($product->id);
+		
+		return true;
+	}
 	
-	public function additionalTasks()
+	/**
+	 * category and price need to be saved with their own models
+	 * otherwise these values are not displayed in backend
+	 *
+	 * @param $product
+	 */
+	protected function afterCreate($product)
 	{
 		// save exif data in tl_files
 		if (!empty($this->exifData)) {
-			$this->objFile->exif = $this->exifData;
-			$this->objFile->save();
+			$this->file->exif = $this->exifData;
+			$this->file->save();
 		}
 		
-		// add product categories to isotope category table
-		Category::save(deserialize($this->config->orderPages), $this->dc);
+		// set intId to save category and price on correct id
+		$this->dc->intId = $product->id;
 		
+		// add product categories to isotope category table
+		Category::save(deserialize($this->module->orderPages), $this->dc);
+
 		// add price to product and isotope price table
 		Price::save(['value' => '0.00', 'unit' => 0], $this->dc);
-		
+
 		// clear product cache
 		\Isotope\Backend::truncateProductCache();
 	}

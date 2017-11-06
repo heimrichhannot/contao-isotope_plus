@@ -28,22 +28,24 @@ $GLOBALS['ISO_HOOKS']['buttons'][]                                              
 	['HeimrichHannot\IsotopePlus\IsotopePlus', 'addDownloadSingleProductButton'];
 $GLOBALS['ISO_HOOKS']['preOrderStatusUpdate']['updateStock']                     = ['HeimrichHannot\IsotopePlus\IsotopePlus', 'updateStock'];
 
-$GLOBALS['TL_HOOKS']['replaceDynamicScriptTags'][] = ['HeimrichHannot\IsotopePlus\IsotopePlus', 'hookReplaceDynamicScriptTags'];
+$GLOBALS['TL_HOOKS']['replaceDynamicScriptTags'][]             = ['HeimrichHannot\IsotopePlus\IsotopePlus', 'hookReplaceDynamicScriptTags'];
 $GLOBALS['ISO_HOOKS']['generateProduct']['updateTemplateData'] = ['\HeimrichHannot\IsotopePlus\IsotopePlus', 'updateTemplateData'];
+$GLOBALS['TL_HOOKS']['postDownload']['downloadCounter']        = ['HeimrichHannot\IsotopePlus\IsotopePlus', 'updateDownloadCounter'];
+
 /**
  * Frontend modules
  */
 $GLOBALS['FE_MOD']['isotopeplus'] = [
-	'iso_productfilterplus'        => 'Isotope\Module\ProductFilterPlus',
-	'iso_productlistplus'          => 'Isotope\Module\ProductListPlus',
-	'iso_stockreport'              => 'Isotope\Module\ModuleStockReport',
-	'iso_orderreport'              => 'Isotope\Module\ModuleOrderReport',
-	'iso_cart_link'                => 'HeimrichHannot\IsotopePlus\Module\CartLink',
-	'iso_orderhistory_plus'        => 'Isotope\Module\OrderHistoryPlus',
-	'iso_orderdetails_plus'        => 'Isotope\Module\OrderDetailsPlus',
-	'iso_direct_checkout'          => 'Isotope\Module\DirectCheckout',
-	'iso_product_ranking'          => 'Isotope\Module\ProductRanking',
-	'iso_product_frontend_editor'  => 'Isotope\Module\ProductFrontendEditor',
+	'iso_productfilterplus'       => 'Isotope\Module\ProductFilterPlus',
+	'iso_productlistplus'         => 'Isotope\Module\ProductListPlus',
+	'iso_stockreport'             => 'Isotope\Module\ModuleStockReport',
+	'iso_orderreport'             => 'Isotope\Module\ModuleOrderReport',
+	'iso_cart_link'               => 'HeimrichHannot\IsotopePlus\Module\CartLink',
+	'iso_orderhistory_plus'       => 'Isotope\Module\OrderHistoryPlus',
+	'iso_orderdetails_plus'       => 'Isotope\Module\OrderDetailsPlus',
+	'iso_direct_checkout'         => 'Isotope\Module\DirectCheckout',
+	'iso_product_ranking'         => 'Isotope\Module\ProductRanking',
+	'iso_product_frontend_editor' => 'Isotope\Module\ProductFrontendEditor',
 ];
 
 if (in_array('slick', \ModuleLoader::getActive())) {

@@ -11,7 +11,6 @@
 		<?php if($this->message): ?>
 			<?= $this->message; ?>
 		<?php endif; ?>
-
 		<div class="formbody">
 			<?php if(!$this->invalid): ?>
 				<?php if ($this->method == FORMHYBRID_METHOD_POST): ?>
@@ -21,7 +20,7 @@
 					<?php endif; ?>
 				<?php endif; ?>
 				<?php echo $this->hidden; ?>
-				<?php foreach($this->fields as $name => $objField): ?>
+			    <?php foreach($this->fields as $name => $objField): ?>
                     <?php if($name == 'uploadedFiles' || $name == 'images'):?>
             
                         <div class="<?= $name ?> multifileupload-field form-group">
@@ -52,5 +51,4 @@
 			<?php endif; ?>
 		</div>
 	</form>
-
 </div>

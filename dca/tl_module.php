@@ -54,9 +54,9 @@ $arrDca['palettes']['iso_orderdetails_plus'] =
 
 $arrDca['palettes']['iso_product_frontend_editor'] = '{title_legend},name,headline,type;'
 													 . '{creator_legend},formHybridDataContainer,formHybridPalette,formHybridEditable,formHybridAddEditableRequired,formHybridAddReadOnly,formHybridAddPermanentFields;'
-													 . '{product_legend},iso_editableCategories,iso_productCategory,iso_exifMapping,formHybridAddDefaultValues,iso_useFieldsForTags,iso_tagFields,iso_addImageSizes,iso_useUploadsAsDownload,iso_creatorFallbackUser,iso_uploadFolder;'
-													 . '{action_legend},formHybridAllowIdAsGetParameter,noIdBehavior,disableSessionCheck,disableAuthorCheck,addUpdateConditions,allowDelete,formHybridAsync,deactivateTokens;'
-													 . '{misc_legend},formHybridSuccessMessage,formHybridSkipScrollingToSuccessMessage,formHybridCustomSubmit,setPageTitle,addClientsideValidation;'
+													 . '{product_legend},iso_editableCategories,iso_productEditor_editableTypeFields,iso_productCategory,iso_exifMapping,formHybridAddDefaultValues,iso_useFieldsForTags,iso_tagFields,iso_addImageSizes,iso_useUploadsAsDownload,iso_creatorFallbackUser,iso_uploadFolder;'
+													 . '{action_legend},formHybridAllowIdAsGetParameter,noIdBehavior,disableSessionCheck,disableAuthorCheck,addUpdateConditions,allowDelete,deactivateTokens;'
+													 . '{misc_legend},jumpTo,formHybridSingleSubmission,formHybridAsync,formHybridResetAfterSubmission,formHybridSuccessMessage,formHybridSkipScrollingToSuccessMessage,formHybridCustomSubmit,setPageTitle,addClientsideValidation;'
 													 . '{template_legend},formHybridTemplate,modalTpl,customTpl;'
 													 . '{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
 

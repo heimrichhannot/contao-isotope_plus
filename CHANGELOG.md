@@ -1,6 +1,14 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.6.4] 2017-11-06
+
+### Added
+- directcheckout supports shipping method type `groups`
+
+### Changed
+- refactored product editor
+
 ## [1.6.3] 2017-10-25
 
 ### Added

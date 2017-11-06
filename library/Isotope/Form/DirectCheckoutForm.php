@@ -14,6 +14,7 @@ use Isotope\Model\Address;
 use Isotope\Model\Config;
 use Isotope\Model\Product;
 use Isotope\Model\ProductCollection\Cart;
+use Isotope\Model\Shipping;
 use Isotope\Model\Shipping\Flat;
 use Isotope\RequestCache\Sort;
 
@@ -394,7 +395,24 @@ class DirectCheckoutForm extends Form
         $arrCheckoutInfo['billing_address'] = $objBillingAddressStep->review()['billing_address'];
 
 
-
+		// check if shipping method is group
+		$shippingMethod = Shipping::findByPk($this->objCheckoutModule->iso_shipping_modules);
+		if($shippingMethod->type == 'group')
+		{
+			$quantity = $objCart->sumItemsQuantity();
+			foreach(deserialize($shippingMethod->group_methods) as $method)
+			{
+				$groupMethod = Shipping::findByPk($method);
+			
+				if($groupMethod->minimum_quantity <= $quantity &&  $groupMethod->maximum_quantity >= $quantity)
+				{
+					$this->objCheckoutModule->iso_shipping_modules = $groupMethod->id;
+					$this->iso_shipping_modules = $groupMethod->id;
+				}
+				
+			}
+		}
+        
         // shipping address
         $objShippingAddress = new Address();
 
@@ -414,7 +432,8 @@ class DirectCheckoutForm extends Form
         $objShippingAddressStep              = new ShippingAddress($this->objCheckoutModule);
         $arrSteps[]                          = $objShippingAddressStep;
         $arrCheckoutInfo['shipping_address'] = $objShippingAddressStep->review()['shipping_address'];
-
+		
+        
         // add shipping method
         $objIsotopeShipping = Flat::findByPk($this->iso_shipping_modules);
         $objOrder->setShippingMethod($objIsotopeShipping);

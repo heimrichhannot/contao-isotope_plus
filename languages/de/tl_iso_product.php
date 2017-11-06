@@ -16,5 +16,9 @@ $GLOBALS['TL_LANG']['tl_iso_product']['jumpTo']                  = ['Weiterleitu
 $GLOBALS['TL_LANG']['tl_iso_product']['addedBy']                 = ['Hinzugefügt durch', 'Tragen Sie hier ein, wer den Artikel hochgeladen hat.'];
 $GLOBALS['TL_LANG']['tl_iso_product']['tag']                     =
 	['Schlagworte', 'Geben Sie bitte die Begriffe einzeln ein. (Kommas dienen NICHT zur Trennung der Begriffe.)'];
-$GLOBALS['TL_LANG']['tl_iso_product']['createMultiImageProduct'] = ['Alle Bilder zu einem Produkt hinzufügen', 'Wählen Sie diese Option, wenn alle Bilder aus dem Bildupload zu einem Produkt hinzugefügt werden sollen.'];
-	
+$GLOBALS['TL_LANG']['tl_iso_product']['createMultiImageProduct'] = [
+	'Alle Bilder zu einem Produkt hinzufügen',
+	'Wählen Sie diese Option, wenn alle Bilder aus dem Bildupload zu einem Produkt hinzugefügt werden sollen.'
+];
+$GLOBALS['TL_LANG']['tl_iso_product']['downloadCount']           = ['Downloads', ''];
+$GLOBALS['TL_LANG']['tl_iso_product']['relevance']               = ['Beliebtheit', ''];

@@ -5,8 +5,13 @@ $arrDca = &$GLOBALS['TL_DCA']['tl_iso_product'];
 /**
  * Labels in Backend
  */
-$arrDca['list']['label']['fields'] =
-	['images', 'name', 'sku', 'price', 'stock', 'initialStock', 'jumpTo']; // added stock and initialstock to product overview
+$arrDca['list']['label']['fields']         =
+	['images','uploadedFiles', 'name', 'sku', 'price', 'stock', 'initialStock', 'jumpTo']; // added stock and initialstock to product overview
+$arrDca['list']['label']['label_callback'] = ['HeimrichHannot\IsotopePlus\Backend', 'getProductCreatorLabel'];
+
+$arrDca['palettes']['default'] = str_replace('type', 'type,name,uploadedFiles,tag,createMultiImageProduct,downloadCount,relevance', $arrDca['palettes']['default']);
+
+$arrDca['config']['onload_callback'][] = ['HeimrichHannot\IsotopePlus\IsotopePlus', 'updateRelevance'];
 
 /**
  * Fields
@@ -136,10 +141,25 @@ $arrDca['fields']['createMultiImageProduct'] = [
 	'sql'        => "char(1) NOT NULL default ''",
 ];
 
-\Controller::loadDataContainer('tl_iso_config');
-\System::loadLanguageFile('tl_iso_config');
-\Controller::loadDataContainer('tl_iso_producttype');
-\System::loadLanguageFile('tl_iso_producttype');
+$arrDca['fields']['downloadCount'] = [
+	'label'      => &$GLOBALS['TL_LANG']['tl_iso_product']['downloadCount'],
+	'inputType'  => 'text',
+	'eval'       => ['tl_class' => 'w50', 'rgxp' => 'digit'],
+	'sql'        => "int(10) unsigned NOT NULL",
+];
+
+$arrDca['fields']['relevance'] = [
+	'label'      => &$GLOBALS['TL_LANG']['tl_iso_product']['relevance'],
+	'inputType'  => 'text',
+	'eval'       => ['tl_class' => 'w50', 'rgxp' => 'digit'],
+	'sql'        => "int(10) unsigned NOT NULL",
+];
+
+//
+//\Controller::loadDataContainer('tl_iso_config');
+//\System::loadLanguageFile('tl_iso_config');
+//\Controller::loadDataContainer('tl_iso_producttype');
+//\System::loadLanguageFile('tl_iso_producttype');
 
 // arrays are always copied by value (not by reference) in php
 $arrDca['fields']['skipStockValidation']                                   = $GLOBALS['TL_DCA']['tl_iso_config']['fields']['skipStockValidation'];

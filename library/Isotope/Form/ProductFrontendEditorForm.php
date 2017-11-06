@@ -2,6 +2,7 @@
 
 namespace Isotope\Form;
 
+use HeimrichHannot\FieldPalette\FieldPaletteModel;
 use HeimrichHannot\FormHybrid\Form;
 use HeimrichHannot\Request\Request;
 use Isotope\Model\ProductModel;
@@ -22,20 +23,16 @@ class ProductFrontendEditorForm extends Form
 	
 	public function modifyDC(&$arrDca = null)
 	{
-		foreach (deserialize($this->objModule->formHybridEditable) as $field) {
-			$this->dca['palettes']['default'] .= ',' . $field;
-		}
-		
 		// limit upload to one image for editing existing product
 		if (($product = ProductModel::findByPk(Request::getGet('id'))) !== null && $product->tstamp != 0 && !$product->createMultiImageProduct) {
 			$arrDca['fields']['uploadedFiles']['eval']['maxFiles'] = 1;
 		}
 		
-		if (FE_USER_LOGGED_IN) {
-			$user = \FrontendUser::getInstance();
-			
-			if (count($user->groups) == 1 && (in_array($user->groups[0], \MemberGroupModel::findBy('useForIsoProducts', 1)->fetchEach('id')))) {
-				$arrDca['fields']['evu']['eval']['includeBlankOption'] = false;
+		// HOOK: send insert ID and user data
+		if (isset($GLOBALS['TL_HOOKS']['modifyDCProductEditor']) && is_array($GLOBALS['TL_HOOKS']['modifyDCProductEditor'])) {
+			foreach ($GLOBALS['TL_HOOKS']['modifyDCProductEditor'] as $callback) {
+				$this->import($callback[0]);
+				$this->{$callback[0]}->{$callback[1]}($this->dca, $this->objModule);
 			}
 		}
 	}
@@ -44,17 +41,24 @@ class ProductFrontendEditorForm extends Form
 	{
 		$submission = $this->getSubmission();
 		
-		if (!empty($submission->uploadedFiles)) {
-			if ($submission->createMultiImageProduct) {
-				$strClass = ISO_PRODUCT_CREATOR_MULTI_IMAGE_PRODUCT;
-			} else {
-				$strClass = ISO_PRODUCT_CREATOR_SINGLE_IMAGE_PRODUCT;
-			}
+		if(empty($submission->uploadedFiles))
+		{
+			return;
+		}
+		
+		$strClass = ISO_PRODUCT_CREATOR_SINGLE_IMAGE_PRODUCT;
+		
+		if ($submission->createMultiImageProduct) {
+			$strClass = ISO_PRODUCT_CREATOR_MULTI_IMAGE_PRODUCT;
+		}
+		
+		if(!class_exists($strClass))
+		{
+			return;
 		}
 		
 		$product = new $strClass($this->objModule, $submission, $dc);
 		
 		$product->generateProduct();
-		
 	}
 }
