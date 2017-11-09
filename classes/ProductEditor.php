@@ -41,13 +41,15 @@ abstract class ProductEditor
 			return false;
 		}
 		
-		$product = new ProductModel();
+		$product = clone $this->submission;
 		$product->mergeRow($this->productData);
 		
 		return $product->save();
 	}
 	
-	
+	/**
+	 * @return bool
+	 */
 	public function generateProduct()
 	{
 		if (empty($this->submission->uploadedFiles)) {
@@ -55,15 +57,15 @@ abstract class ProductEditor
 		}
 		
 		// common data
-		$this->setBasicData();
+		$this->prepareBasicData();
 		
-		$this->setDataFromModule();
+		$this->prepareDataFromModule();
 		
-		$this->setDataFromExifData();
+		$this->prepareDataFromExifData();
 		
-		$this->setDataFromForm();
+		$this->prepareDataFromForm();
 		
-		$this->setTagData();
+		$this->prepareTagData();
 		
 		$this->modifyData();
 		
@@ -78,12 +80,14 @@ abstract class ProductEditor
 	/**
 	 * set basic values for product
 	 */
-	protected function setBasicData()
+	protected function prepareBasicData()
 	{
-		$this->productData['dateAdded'] = time();
+		$this->productData['dateAdded'] = $this->submission->dateAdded ? $this->submission->dateAdded : time();
+		
 		$this->productData['tstamp']    = time();
 		
-		$this->productData['alias'] = General::generateAlias('', $this->submission->id, 'tl_iso_product', $this->submission->name);
+		$this->productData['alias'] = $this->submission->alias ? $this->submission->alias : General::generateAlias('', $this->submission->id, 'tl_iso_product', $this->submission->name);
+		
 		$this->productData['sku']   = $this->productData['alias'];
 		
 		$this->productData['addedBy'] = \Contao\Config::get('iso_creatorFallbackMember');
@@ -95,7 +99,10 @@ abstract class ProductEditor
 		}
 	}
 	
-	protected function setDataFromModule()
+	/**
+	 * set productData from module configuration
+	 */
+	protected function prepareDataFromModule()
 	{
 		$this->productData['orderPages'] = $this->module->orderPages;
 		
@@ -103,9 +110,9 @@ abstract class ProductEditor
 	}
 	
 	/**
-	 *
+	 * map exif data according to module settings
 	 */
-	protected function setDataFromExifData()
+	protected function prepareDataFromExifData()
 	{
 		$mappings = deserialize($this->module->iso_exifMapping, true);
 		
@@ -115,7 +122,6 @@ abstract class ProductEditor
 		
 		foreach ($mappings as $mapping) {
 			$arrTableFields = explode('.', $mapping['tableField']);
-			$strValue       = '';
 			
 			if (!empty($arrTableFields) && ($strTableField = array_pop($arrTableFields)) != '') {
 				
@@ -130,34 +136,8 @@ abstract class ProductEditor
 						$strValue = $this->exifData[$mapping['customTag']];
 						break;
 					
-					case \PHPExif\Exif::APERTURE :
-					case \PHPExif\Exif::AUTHOR :
-					case \PHPExif\Exif::CAMERA :
-					case \PHPExif\Exif::CAPTION :
-					case \PHPExif\Exif::COLORSPACE :
-					case \PHPExif\Exif::COPYRIGHT :
-					case \PHPExif\Exif::CREDIT :
-					case \PHPExif\Exif::EXPOSURE :
-					case \PHPExif\Exif::FILESIZE :
-					case \PHPExif\Exif::FOCAL_LENGTH :
-					case \PHPExif\Exif::FOCAL_DISTANCE :
-					case \PHPExif\Exif::HEADLINE :
-					case \PHPExif\Exif::HEIGHT :
-					case \PHPExif\Exif::HORIZONTAL_RESOLUTION :
-					case \PHPExif\Exif::ISO :
-					case \PHPExif\Exif::JOB_TITLE :
-					case \PHPExif\Exif::MIMETYPE :
-					case \PHPExif\Exif::ORIENTATION :
-					case \PHPExif\Exif::SOFTWARE :
-					case \PHPExif\Exif::SOURCE :
-					case \PHPExif\Exif::TITLE :
-					case \PHPExif\Exif::VERTICAL_RESOLUTION :
-					case \PHPExif\Exif::WIDTH :
-					case \PHPExif\Exif::GPS :
-						$strValue = $this->exifData[$mapping['exifTag']];
-						break;
-					
 					default :
+						$strValue = $this->exifData[$mapping['exifTag']];
 						break;
 				}
 				
@@ -173,23 +153,30 @@ abstract class ProductEditor
 					}
 				}
 				
-				if ($strValue !== null) {
+				if ($strValue) {
 					$this->productData[$strTableField] = $strValue;
 				}
 			}
 		}
 	}
 	
-	protected function setDataFromForm()
+	/**
+	 * set productData values from submission
+	 */
+	protected function prepareDataFromForm()
 	{
-		foreach (deserialize($this->module->formHybridEditable) as $value) {
-			if (!$this->productData[$value]) {
-				$this->productData[$value] = $this->submission->{$value};
+		foreach (deserialize($this->module->formHybridEditable,true) as $value) {
+			if ($this->productData[$value]) {
+				continue;
 			}
+			$this->productData[$value] = $this->submission->{$value};
 		}
 	}
 	
-	protected function setTagData()
+	/**
+	 * join fields from submission into tag field (has to be set in module)
+	 */
+	protected function prepareTagData()
 	{
 		if (!$this->module->iso_useFieldsForTags) {
 			return;
@@ -198,7 +185,7 @@ abstract class ProductEditor
 		$data = $this->productData;
 		$tags = [];
 		
-		foreach (deserialize($this->module->iso_tagFields) as $tagValueField) {
+		foreach (deserialize($this->module->iso_tagFields,true) as $tagValueField) {
 			if ($tagValueField == 'type') {
 				$data[$tagValueField] = ProductType::findByPk($this->submission->type)->name;
 			}
@@ -212,8 +199,7 @@ abstract class ProductEditor
 		}
 		
 		// add tags from form-field
-		array_merge($this->submission->{$this->module->iso_tagField}, $tags);
-		
+		$tags = array_merge(deserialize($this->submission->{$this->module->iso_tagField},true), $tags);
 		
 		// Hook : modify the product data
 		if (isset($GLOBALS['TL_HOOKS']['creatorProduct']['modifyTagData']) && is_array($GLOBALS['TL_HOOKS']['creatorProduct']['modifyTagData'])) {
@@ -237,8 +223,8 @@ abstract class ProductEditor
 	protected function modifyData()
 	{
 		// Hook : modify the product data
-		if (isset($GLOBALS['TL_HOOKS']['editProduct']['modifyData']) && is_array($GLOBALS['TL_HOOKS']['editProduct']['modifyData'])) {
-			foreach ($GLOBALS['TL_HOOKS']['editProduct']['modifyData'] as $arrCallback) {
+		if (isset($GLOBALS['TL_HOOKS']['editProduct_modifyData']) && is_array($GLOBALS['TL_HOOKS']['editProduct_modifyData'])) {
+			foreach ($GLOBALS['TL_HOOKS']['editProduct_modifyData'] as $arrCallback) {
 				$objClass = \Controller::importStatic($arrCallback[0]);
 				$objClass->{$arrCallback[1]}($this->module, $this->productData, $this->submission);
 			}
@@ -277,9 +263,11 @@ abstract class ProductEditor
 		$defaultValues = deserialize($this->module->formHybridDefaultValues, true);
 		
 		foreach ($defaultValues as $value) {
-			if (in_array($value['field'], $dcaFields)) {
-				$this->productData[$value['field']] = $value['value'];
+			if (!in_array($value['field'], $dcaFields)) {
+				continue;
 			}
+			
+			$this->productData[$value['field']] = $value['value'];
 		}
 	}
 	
@@ -342,7 +330,7 @@ abstract class ProductEditor
 			$suffix = ' ' . ($index + 1);
 		}
 		
-		foreach (deserialize($this->module->iso_imageSizes) as $size) {
+		foreach (deserialize($this->module->iso_imageSizes,true) as $size) {
 			$size['name'] = $size['name'] . $suffix;
 			ProductHelper::createDownloadItem($id, $this->file, $size);
 		}
@@ -352,7 +340,7 @@ abstract class ProductEditor
 	
 	abstract protected function getExifData();
 	
-	abstract protected function setProductImages($uuid);
+	abstract protected function prepareProductImages($uuid);
 	
 	abstract protected function createDownloadItems($product);
 	

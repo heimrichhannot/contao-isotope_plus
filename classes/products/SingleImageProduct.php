@@ -32,7 +32,7 @@ class SingleImageProduct extends ProductEditor
 			
 			$this->exifData = $this->getExifData();
 			
-			$this->setProductImages($upload);
+			$this->prepareProductImages($upload);
 			
 			$product = $this->create();
 			
@@ -84,7 +84,7 @@ class SingleImageProduct extends ProductEditor
 	 *
 	 * @param $uuid
 	 */
-	protected function setProductImages($uuid)
+	protected function prepareProductImages($uuid)
 	{
 		// need to move file now -> download items would otherwise create different sizes in tmp folder
 		FormMultiFileUpload::moveFiles($this->dc);
@@ -136,7 +136,7 @@ class SingleImageProduct extends ProductEditor
 		$this->dc->intId = $product->id;
 		
 		// add product categories to isotope category table
-		Category::save(deserialize($this->module->orderPages), $this->dc);
+		Category::save(deserialize($this->module->orderPages,true), $this->dc);
 
 		// add price to product and isotope price table
 		Price::save(['value' => '0.00', 'unit' => 0], $this->dc);

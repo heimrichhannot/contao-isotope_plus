@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.6.5] 2017-11-09
+
+### Changed
+- refactored product editor
+
 ## [1.6.4] 2017-11-06
 
 ### Added

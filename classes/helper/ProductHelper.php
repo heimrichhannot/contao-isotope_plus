@@ -123,7 +123,7 @@ class ProductHelper
 		
 		$categories = [];
 
-		foreach (deserialize($module->iso_editableCategories) as $cat) {
+		foreach (deserialize($module->iso_editableCategories,true) as $cat) {
 			$categories[$cat] = ProductType::findByPk($cat)->name;
 		}
 

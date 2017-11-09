@@ -24,7 +24,7 @@ class MultiImageProduct extends ProductEditor
 	{
 		if($this->checkFiles($this->submission->uploadedFiles))
 		{
-			$this->setProductImages($this->submission->uploadedFiles);
+			$this->prepareProductImages($this->submission->uploadedFiles);
 			
 			$product = $this->create();
 			
@@ -60,7 +60,7 @@ class MultiImageProduct extends ProductEditor
 	/**
 	 * @param $uuids array
 	 */
-	protected function setProductImages($uuids)
+	protected function prepareProductImages($uuids)
 	{
 		foreach($uuids as $upload)
 		{
@@ -103,7 +103,7 @@ class MultiImageProduct extends ProductEditor
 	protected function afterCreate($product)
 	{
 		// add product categories to isotope category table
-		Category::save(deserialize($this->module->orderPages), $this->dc);
+		Category::save(deserialize($this->module->orderPages,true), $this->dc);
 		
 		// add price to product and isotope price table
 		Price::save(['value' => '0.00', 'unit' => 0], $this->dc);
