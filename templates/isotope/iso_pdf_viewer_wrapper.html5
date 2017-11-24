@@ -1,0 +1,45 @@
+<script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
+<script>
+    var activeID = <?= reset($this->items)['id']?>,
+        pdfDoc = null,
+        pageNum = 1,
+        pageRendering = false,
+        pageNumPending = null,
+        scale = 1,
+        loader = '<div id="loader"><div class="inside"><div class="spinner"><div class="rect1"><\/div><div class="rect2"><\/div><div class="rect3"><\/div><div class="rect4"><\/div><div class="rect5"><\/div><\/div>Daten werden geladen.<\/div><\/div>',
+        canvas,ctx;
+    PDFJS.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.js';
+	<?php include TL_ROOT . '/system/modules/isotope_plus/assets/js/pdfViewer.min.js' ?>
+</script>
+
+<?php if(count($this->items) > 1): ?>
+<div class="tab-body block">
+	<div class="tabcontrol_panes tab-content block">
+<?php endif; ?>
+
+    <?php foreach($this->panels as $key => $panel):?>
+    <?php if(count($this->items) > 1): ?>
+    <div role="tabpanel" class="ce_tabcontrol_pane tab-pane pane_<?= $key ?> block <?php if($key == 0):?>active<?php endif; ?>" id="pane_<?= $this->items[$key]['id'] ?>">
+        <div class="panes">
+    <?php endif; ?>
+            <?= $panel ?>
+
+    <?php if(count($this->items) > 1): ?>
+        </div>
+    </div>
+    <?php endif; ?>
+    <?php endforeach; ?>
+		
+<?php if(count($this->items) > 1): ?>
+	</div>
+</div>
+    <div class="tabcontrol_tabs tabs_pdfViewer block">
+        <ul class="nav nav-tabs upside-down" role="tablist">
+			<?php foreach($this->items as $key => $item): ?>
+                <li role="presentation" class="tabs tab_<?= $key ?> list <?php if($key == 0):?>active<?php endif; ?>" data-target="<?= $item['id'] ?>" id="<?= $item['id'] ?>_<?= $key ?>">
+                    <a title="PDF <?= $key +1 ?> ansehen" href="#pane_<?= $item['id'] ?>" aria-controls="pane_<?= $item['id'] ?>" role="tab" data-toggle="tab">PDF <?= $key +1 ?></a>
+                </li>
+			<?php endforeach; ?>
+        </ul>
+    </div>
+<?php endif; ?>

@@ -1,6 +1,17 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.6.6] 2017-11-23
+
+### Added
+- support for PDF-Products
+
+## [1.6.6] 2017-11-24
+
+### Added
+- support for PDF products
+- hook to display pdf preview in template (`parseItems` hook from formhybrid_list ModuleReader)
+
 ## [1.6.5] 2017-11-09
 
 ### Changed

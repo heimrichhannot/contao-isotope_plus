@@ -49,3 +49,6 @@ $GLOBALS['TL_LANG']['MSC']['productType'] = 'Typ';
 $GLOBALS['TL_LANG']['MSC']['iso_note'] = array('Bemerkungen', '');
 $GLOBALS['TL_LANG']['MSC']['originalSize'] = 'Originalgröße';
 $GLOBALS['TL_LANG']['MSC']['downloadSize'] = '%s';
+$GLOBALS['TL_LANG']['MSC']['downloadSizePdf'] = '%s (%s)';
+
+$GLOBALS['TL_LANG']['MSC']['downloadPdfItem'] = 'PDF herunterladen';

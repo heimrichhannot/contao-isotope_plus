@@ -1,0 +1,13 @@
+<div class="pdfViewer-wrapper pdfViewer-wrapper_<?= $this->id ?>">
+    <canvas id="pdfViewer_<?= $this->id ?>" data-src="<?= $this->href ?>"></canvas>
+    <div class="ctrl-wrapper">
+        <div class="ctrl">
+            <button id="ctrl-prev_<?= $this->id ?>" class="pdfViewer-ctrl-prev"></button>
+            <div class="ctrl-page-wrapper">
+                <input id="ctrl-pageNum_<?= $this->id ?>" class="pdfViewer-ctrl-pageNum" value="1"/>/<span id="pageCount_<?= $this->id ?>" class="pdfViewer-ctrl-pageCount"></span>
+            </div>
+            <button id="ctrl-next_<?= $this->id ?>" class="pdfViewer-ctrl-next"></button>
+            <a id="ctrl-fullScreen_<?= $this->id ?>" class="pdfViewer-ctrl-fullScreen" href="<?= $this->href ?>" target="_blank"></a>
+        </div>
+    </div>
+</div>

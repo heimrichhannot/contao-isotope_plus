@@ -31,6 +31,8 @@ $GLOBALS['ISO_HOOKS']['preOrderStatusUpdate']['updateStock']                    
 $GLOBALS['TL_HOOKS']['replaceDynamicScriptTags'][]             = ['HeimrichHannot\IsotopePlus\IsotopePlus', 'hookReplaceDynamicScriptTags'];
 $GLOBALS['ISO_HOOKS']['generateProduct']['updateTemplateData'] = ['\HeimrichHannot\IsotopePlus\IsotopePlus', 'updateTemplateData'];
 $GLOBALS['TL_HOOKS']['postDownload']['downloadCounter']        = ['HeimrichHannot\IsotopePlus\IsotopePlus', 'updateDownloadCounter'];
+$GLOBALS['TL_HOOKS']['parseItems']['addPdfViewerToTemplate']   = ['HeimrichHannot\IsotopePlus\ProductHelper', 'addPdfViewerToTemplate'];
+
 
 /**
  * Frontend modules
@@ -80,5 +82,4 @@ if (TL_MODE == 'FE') {
 	$GLOBALS['TL_JAVASCRIPT']['isotope_plus'] =
 		'system/modules/isotope_plus/assets/js/isotope_plus' . (!$GLOBALS['TL_CONFIG']['debugMode'] ? '.min' : '') . '.js|static';
 }
-
 

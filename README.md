@@ -60,3 +60,5 @@ A module that brings some new features to the isotope shopsystem
 - create and edit isotope products in frontend
 - single and multi image products supported
 - single image product -> if multiple images are added to upload a product is created for each of the images that shares all other set attributes
+- when pdf is uploaded jpg preview is made and set as product image, pdf is set as download element
+- for product reader a pdf preview is generated with pdf.js (inserted via hook `parseItems` as `pdfViewer`)

@@ -77,11 +77,13 @@ class DownloadHelper extends \Isotope\Isotope
 				if(in_array($objFile->extension, ['jpg', 'jpeg', 'tiff', 'png']))
 				{
 					$size = getimagesize($objFile->path);
-					
 					$objDownload->size = sprintf($GLOBALS['TL_LANG']['MSC']['downloadSize'], $size[0],$size[1], $objDownload->filesize);
-					$objDownload->downloadTitle = $arrFiles->title;
 				}
 				
+				if($objFile->extension == 'pdf')
+					$objDownload->size = sprintf($GLOBALS['TL_LANG']['MSC']['downloadSizePdf'], $objDownload->name,$objDownload->filesize);
+				
+				$objDownload->downloadTitle = $arrFiles->title;
 				
 				$objT = new \FrontendTemplate('isotope_download_from_attribute');
 				$objT->setData((array) $objDownload);

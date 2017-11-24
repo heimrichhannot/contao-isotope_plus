@@ -9,7 +9,7 @@ $arrDca['list']['label']['fields']         =
 	['images','uploadedFiles', 'name', 'sku', 'price', 'stock', 'initialStock', 'jumpTo']; // added stock and initialstock to product overview
 $arrDca['list']['label']['label_callback'] = ['HeimrichHannot\IsotopePlus\Backend', 'getProductCreatorLabel'];
 
-$arrDca['palettes']['default'] = str_replace('type', 'type,name,uploadedFiles,tag,createMultiImageProduct,downloadCount,relevance', $arrDca['palettes']['default']);
+$arrDca['palettes']['default'] = str_replace('type', 'type,name,uploadedFiles,tag,createMultiImageProduct,downloadCount,relevance,isPdfProduct', $arrDca['palettes']['default']);
 
 $arrDca['config']['onload_callback'][] = ['HeimrichHannot\IsotopePlus\IsotopePlus', 'updateRelevance'];
 
@@ -86,7 +86,7 @@ $arrDca['fields']['addedBy'] = [
 	'exclude'    => true,
 	'search'     => true,
 	'default'    => FE_USER_LOGGED_IN ? FrontendUser::getInstance()->id : \Config::get('iso_creatorFallbackMember'),
-	'foreignKey' => 'tl_member.company',
+	'foreignKey' => 'tl_member.username',
 	'eval'       => ['doNotCopy' => true, 'mandatory' => true, 'chosen' => true, 'tl_class' => 'w50'],
 	'relation'   => ['type' => 'hasOne', 'load' => 'eager'],
 	'attributes' => ['fe_sorting' => true, 'fe_search' => true],
@@ -99,7 +99,7 @@ $arrDca['fields']['uploadedFiles'] = [
 	'inputType'  => 'multifileupload',
 	'eval'       => [
 		'tl_class'           => 'clr',
-		'extensions'         => \Config::get('validImageTypes'),
+		'extensions'         => 'jpg,jpeg,gif,png,tif,tiff,bmp,svg,svgz,pdf',
 		'filesOnly'          => true,
 		'fieldType'          => 'checkbox',
 		'maxImageWidth'      => \Config::get('gdMaxImgWidth'),
@@ -155,6 +155,15 @@ $arrDca['fields']['relevance'] = [
 	'sql'        => "int(10) unsigned NOT NULL",
 ];
 
+$arrDca['fields']['isPdfProduct'] = [
+	'label'      => &$GLOBALS['TL_LANG']['tl_iso_product']['isPdfProduct'],
+	'exclude'    => true,
+	'inputType'  => 'checkbox',
+	'eval'       => ['tl_class' => 'w50'],
+	'attributes' => ['legend' => 'shipping_legend'],
+	'sql'        => "char(1) NOT NULL default ''",
+];
+
 //
 //\Controller::loadDataContainer('tl_iso_config');
 //\System::loadLanguageFile('tl_iso_config');
@@ -173,3 +182,6 @@ $arrDca['fields']['skipExemptionFromShippingWhenStockEmpty']['attributes'] = ['l
 if (TL_MODE == 'FE') {
 	$arrDca['fields']['type']['options_callback'] = ['\HeimrichHannot\IsotopePlus\ProductHelper', 'getEditableCategories'];
 }
+
+
+

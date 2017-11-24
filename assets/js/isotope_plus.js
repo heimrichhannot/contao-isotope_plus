@@ -3,6 +3,7 @@
 	var Isotope = {
 		init: function () {
 			this.initRankingTableSorter();
+			this.initPdfViewer();
 		},
 		initRankingTableSorter: function() {
 			$('.mod_iso_product_ranking table').tablesorter();
@@ -18,6 +19,9 @@
 			} else {
 				document.getElementById(id).style.display = 'none';
 			}
+		},
+		initPdfViewer: function() {
+
 		}
 	};
 

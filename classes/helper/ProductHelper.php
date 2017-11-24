@@ -11,7 +11,6 @@
 
 namespace HeimrichHannot\IsotopePlus;
 
-use HeimrichHannot\Haste\Dca\General;
 use Isotope\Model\Download;
 use Isotope\Model\ProductType;
 
@@ -65,10 +64,14 @@ class ProductHelper
 	 * @param $file object
 	 * @param $size array
 	 */
-	public static function createDownloadItem($id, $file, $size)
+	public static function createDownloadItem($id, $file, $size, $pdf = false)
 	{
-		$name = str_replace('.' . $file->extension, ProductHelper::getReplacer($file, $size), ltrim($file->name, '_'));
-		$path = $downloadPath = str_replace($file->name, $name, $file->path);
+		if (!$pdf) {
+			$name = str_replace('.' . $file->extension, ProductHelper::getReplacer($file, $size), ltrim($file->name, '_'));
+			$path = $downloadPath = str_replace($file->name, $name, $file->path);
+		} else {
+			$path = $downloadPath = $pdf->path;
+		}
 		
 		if (!file_exists($path)) {
 			$downloadPath = \Image::get($file->path, $size['size'][0], $size['size'][1], $size['size'][2], $path);
@@ -89,7 +92,6 @@ class ProductHelper
 		$objDownload->published = 1;
 		
 		$objDownload->save();
-		
 	}
 	
 	/**
@@ -118,17 +120,46 @@ class ProductHelper
 	 */
 	public function getEditableCategories($module)
 	{
-		if(!$module->iso_editableCategories)
+		if (!$module->iso_editableCategories) {
 			return [];
+		}
 		
 		$categories = [];
-
-		foreach (deserialize($module->iso_editableCategories,true) as $cat) {
+		
+		foreach (deserialize($module->iso_editableCategories, true) as $cat) {
 			$categories[$cat] = ProductType::findByPk($cat)->name;
 		}
-
+		
 		asort($categories);
 		
 		return $categories;
+	}
+	
+	public static function addPdfViewerToTemplate($template, $item, $module)
+	{
+		if (!$item->isPdfProduct)
+			return;
+		
+		if(($downloads = Download::findBy('pid', $item->id)) === null)
+			return;
+			
+		
+		$downloads = $downloads->fetchAll();
+		$viewer    = [];
+		
+		foreach ($downloads as $download) {
+			$pdfViewer       = new \FrontendTemplate('iso_pdf_viewer');
+			$pdfViewer->href = \FilesModel::findByUuid($download['singleSRC'])->path;
+			$pdfViewer->id   = $download['id'];
+			
+			$viewer[] = $pdfViewer->parse();
+		}
+		
+		$pdfViewerWrapper         = new \FrontendTemplate('iso_pdf_viewer_wrapper');
+		$pdfViewerWrapper->items  = $downloads;
+		$pdfViewerWrapper->panels = $viewer;
+		
+		
+		$template->pdfViewer = $pdfViewerWrapper->parse();
 	}
 }

@@ -246,6 +246,7 @@ abstract class ProductEditor
 		}
 		
 		$this->file = $file;
+		$this->file->addedBy = $this->productData['addedBy'];
 		
 		return true;
 	}
