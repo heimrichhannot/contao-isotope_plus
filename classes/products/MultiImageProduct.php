@@ -9,6 +9,7 @@
 namespace HeimrichHannot\IsotopePlus;
 
 
+use Ghostscript\Transcoder;
 use HeimrichHannot\FileCredit\FilesModel;
 use HeimrichHannot\Haste\Util\Files;
 use HeimrichHannot\MultiFileUpload\FormMultiFileUpload;
@@ -18,7 +19,7 @@ use Isotope\Model\ProductModel;
 
 class MultiImageProduct extends ProductEditor
 {
-	protected static $convertFileType = 'jpg';
+	protected static $convertFileType = 'png';
 	/**
 	 * @return bool
 	 */
@@ -114,26 +115,16 @@ class MultiImageProduct extends ProductEditor
 	 */
 	protected function getPreviewFromPdf($uploadFolder,$file)
 	{
-		$im                  = new \Orbitale\Component\ImageMagick\Command();
 		$destinationFileName = 'preview-' . str_replace('.pdf', '', $file->name) . '.' . static::$convertFileType;
 		
-		$im->convert($file->path)->file($uploadFolder . '/' . $destinationFileName, false)->run();
+		// ghostscript
+		$transcoder = Transcoder::create();
+		$transcoder->toImage($this->file->path,$uploadFolder . '/' . $destinationFileName);
 		
 		$search = str_replace('.'.static::$convertFileType,'',$destinationFileName);
-		
 		$files = preg_grep('~^'.$search.'.*\.'.static::$convertFileType.'$~', scandir($uploadFolder));
 		
-		$previewFile = reset($files);
-		
-		foreach ($files as $key => $fileVersion) {
-			if ($fileVersion == $previewFile) {
-				continue;
-			}
-			
-			unlink($uploadFolder . '/' . $fileVersion);
-		}
-		
-		return $previewFile;
+		return reset($files);
 	}
 	
 	

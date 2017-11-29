@@ -28,7 +28,8 @@
     "heimrichhannot/contao-frontendedit": ">=3.3.5",
     "heimrichhannot/contao-haste_plus": ">=1.1.1,<2-dev",
     "contao-components/tablesorter": ">=2.0.5.2",
-    "heimrichhannot/contao-request": ">=1.1.3"
+    "heimrichhannot/contao-request": ">=1.1.3",
+    "alchemy/ghostscript": ">=0.4.0"
   },
   "autoload": {
     "classmap": [

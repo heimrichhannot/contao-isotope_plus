@@ -1,10 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [1.6.6] 2017-11-23
+## [1.6.7] 2017-11-29
 
-### Added
-- support for PDF-Products
+### Changed
+- using Ghostscript to create PDF preview 
+- switched filetype for preview to png (better display of font)
 
 ## [1.6.6] 2017-11-24
 

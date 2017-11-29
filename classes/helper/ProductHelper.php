@@ -137,7 +137,7 @@ class ProductHelper
 	
 	public static function addPdfViewerToTemplate($template, $item, $module)
 	{
-		if (!$item->isPdfProduct)
+		if (!$item->raw['isPdfProduct'])
 			return;
 		
 		if(($downloads = Download::findBy('pid', $item->id)) === null)
