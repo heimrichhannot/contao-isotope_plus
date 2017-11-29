@@ -19,7 +19,6 @@ use Isotope\Model\ProductModel;
 
 class MultiImageProduct extends ProductEditor
 {
-	protected static $convertFileType = 'png';
 	/**
 	 * @return bool
 	 */
@@ -69,6 +68,8 @@ class MultiImageProduct extends ProductEditor
 		{
 			$file = \FilesModel::findByUuid($upload);
 			
+			$this->moveFile($file, $this->getUploadFolder($this->dc));
+			
 			if(strtolower($file->extension) != 'pdf')
 			{
 				continue;
@@ -77,56 +78,26 @@ class MultiImageProduct extends ProductEditor
 			$this->productData['uploadedFiles'][$key] = $this->preparePdfPreview($file);
 			$this->productData['isPdfProduct'] = true;
 		}
+		
+		unset($GLOBALS['TL_DCA']['tl_iso_product']['config']['onsubmit_callback']['multifileupload_moveFiles']);
 	}
 	
 	
 	protected function preparePdfPreview($file)
 	{
 		// copy original pdf to user folder to keep it as download element
-		$originalName = $file->name;
+		$uploadFolder = $this->getUploadFolder($this->dc);
+		$this->moveFile($file, $uploadFolder);
 		
-		$uploadFolder = Files::getFolderFromDca($GLOBALS['TL_DCA']['tl_iso_product']['fields']['uploadedFiles']['eval']['uploadFolder'], $this->dc);
+		$this->productData['downloadPdf'][] = $file;
 		
-		// create new File to enable moving the pdf to user folder
-		$pdfFile = new \File($file->path);
-		$pdfFile->close();
-		$strTarget = $uploadFolder . '/' . $originalName;
-		$strTarget = Files::getUniqueFileNameWithinTarget($strTarget, FormMultiFileUpload::UNIQID_PREFIX);
-		
-		// move pdf to user folder
-		$pdfFile->renameTo($strTarget);
-		$this->productData['downloadPdf'][] = $pdfFile->getModel();
-		
-		$completePath = $uploadFolder . '/' . $this->getPreviewFromPdf($uploadFolder,$file);
+		$completePath = $uploadFolder . '/' . $this->getPreviewFromPdf($file, $uploadFolder);
 		
 		// replace $this->file with the preview image of the pdf
 		if (file_exists($completePath)) {
 			return \Dbafs::addResource(urldecode($completePath))->uuid;
 		}
 	}
-	
-	/**
-	 * convert pdf to png and return only first page/image
-	 * delete the other png files
-	 *
-	 * @param $uploadFolder string
-	 *
-	 * @return string name of preview file
-	 */
-	protected function getPreviewFromPdf($uploadFolder,$file)
-	{
-		$destinationFileName = 'preview-' . str_replace('.pdf', '', $file->name) . '.' . static::$convertFileType;
-		
-		// ghostscript
-		$transcoder = Transcoder::create();
-		$transcoder->toImage($this->file->path,$uploadFolder . '/' . $destinationFileName);
-		
-		$search = str_replace('.'.static::$convertFileType,'',$destinationFileName);
-		$files = preg_grep('~^'.$search.'.*\.'.static::$convertFileType.'$~', scandir($uploadFolder));
-		
-		return reset($files);
-	}
-	
 	
 	/**
 	 * @param $product ProductModel

@@ -9,14 +9,19 @@
 namespace HeimrichHannot\IsotopePlus;
 
 
+use Ghostscript\Transcoder;
 use HeimrichHannot\Haste\Dca\General;
 use HeimrichHannot\Haste\Util\FormSubmission;
+use HeimrichHannot\HastePlus\Files;
+use HeimrichHannot\MultiFileUpload\FormMultiFileUpload;
 use Isotope\Model\Download;
 use Isotope\Model\ProductModel;
 use Isotope\Model\ProductType;
 
 abstract class ProductEditor
 {
+	protected static $convertFileType = 'png';
+	
 	protected $productData = [];
 	protected $exifData    = [];
 	protected $file;
@@ -72,6 +77,7 @@ abstract class ProductEditor
 		// image data
 		$this->createImageProduct();
 		
+		// delete submission since for all products an new model was created
 		$this->submission->delete();
 		
 		return true;
@@ -335,6 +341,62 @@ abstract class ProductEditor
 			$size['name'] = $size['name'] . $suffix;
 			ProductHelper::createDownloadItem($id, $this->file, $size);
 		}
+	}
+	
+	/**
+	 * move file to destination
+	 *
+	 * @param $file \FilesModel
+	 * @param $folder string
+	 */
+	public function moveFile($file, $folder)
+	{
+		// create new File to enable moving the pdf to user folder
+		$moveFile = new \File($file->path);
+		$moveFile->close();
+		$strTarget = $folder . '/' . $file->name;
+		$strTarget = Files::getUniqueFileNameWithinTarget($strTarget, FormMultiFileUpload::UNIQID_PREFIX);
+		
+		// move file to upload folder
+		$moveFile->renameTo($strTarget);
+	}
+	
+	
+	/**
+	 * @param $dc \DataContainer
+	 *
+	 * @return string
+	 */
+	public function getUploadFolder($dc)
+	{
+		$uploadFolder = Callbacks::getUploadFolder($dc);
+		
+		if($this->module->iso_useFieldDependendUploadFolder)
+			$uploadFolder .= '/' . $this->productData[$this->module->iso_fieldForUploadFolder];
+		
+		return $uploadFolder;
+	}
+	
+	/**
+	 * convert pdf to png and return only first page/image
+	 * delete the other png files
+	 *
+	 * @param $uploadFolder string
+	 *
+	 * @return string name of preview file
+	 */
+	public function getPreviewFromPdf($file,$uploadFolder)
+	{
+		$destinationFileName = 'preview-' . str_replace('.pdf', '', $this->file->name) . '.' . static::$convertFileType;
+		
+		// ghostscript
+		$transcoder = Transcoder::create();
+		$transcoder->toImage($file->path,$uploadFolder . '/' . $destinationFileName);
+		
+		$search = str_replace('.'.static::$convertFileType,'',$destinationFileName);
+		$files = preg_grep('~^'.$search.'.*\.'.static::$convertFileType.'$~', scandir($uploadFolder));
+		
+		return reset($files);
 	}
 	
 	abstract protected function createImageProduct();

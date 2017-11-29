@@ -10,10 +10,7 @@ namespace HeimrichHannot\IsotopePlus;
 
 
 
-use Ghostscript\Transcoder;
 use HeimrichHannot\Haste\Dca\General;
-use HeimrichHannot\Haste\Util\Files;
-use HeimrichHannot\MultiFileUpload\FormMultiFileUpload;
 use Isotope\Backend\Product\Category;
 use Isotope\Backend\Product\Price;
 use Isotope\Model\ProductModel;
@@ -21,8 +18,6 @@ use PHPExif\Reader\Reader;
 
 class SingleImageProduct extends ProductEditor
 {
-	protected static $convertFileType = 'png';
-	
 	/**
 	 * @return bool
 	 */
@@ -45,9 +40,6 @@ class SingleImageProduct extends ProductEditor
 			
 			$this->createDownloadItems($product);
 		}
-		
-		// delete submission since for all products an new model was created
-		$this->submission->delete();
 		
 		return true;
 	}
@@ -79,50 +71,19 @@ class SingleImageProduct extends ProductEditor
 	protected function preparePdfPreview()
 	{
 		// copy original pdf to user folder to keep it as download element
-		$originalName = $this->file->name;
+		$uploadFolder = $this->getUploadFolder($this->dc);
+		$this->moveFile($this->file, $uploadFolder);
 		
-		$uploadFolder = Files::getFolderFromDca($GLOBALS['TL_DCA']['tl_iso_product']['fields']['uploadedFiles']['eval']['uploadFolder'], $this->dc);
-		
-		// create new File to enable moving the pdf to user folder
-		$pdfFile = new \File($this->file->path);
-		$pdfFile->close();
-		$strTarget = $uploadFolder . '/' . $originalName;
-		$strTarget = Files::getUniqueFileNameWithinTarget($strTarget, FormMultiFileUpload::UNIQID_PREFIX);
-		
-		// move pdf to user folder
-		$pdfFile->renameTo($strTarget);
 		$this->productData['downloadPdf'] = clone $this->file;
 		
-		$completePath = $uploadFolder . '/' . $this->getPreviewFromPdf($uploadFolder);
+		$completePath = $uploadFolder . '/' . $this->getPreviewFromPdf($this->file, $uploadFolder);
 		
 		// replace $this->file with the preview image of the pdf
+
 		if (file_exists($completePath)) {
 			$this->file = \Dbafs::addResource(urldecode($completePath));
 		}
 	}
-	
-	/**
-	 * convert pdf to png and return only first page/image
-	 * delete the other png files
-	 *
-	 * @param $uploadFolder string
-	 *
-	 * @return string name of preview file
-	 */
-	protected function getPreviewFromPdf($uploadFolder)
-	{
-		$destinationFileName = 'preview-' . str_replace('.pdf', '', $this->file->name) . '.' . static::$convertFileType;
-		
-		// ghostscript
-		$transcoder = Transcoder::create();
-		$transcoder->toImage($this->file->path,$uploadFolder . '/' . $destinationFileName);
-		
-		$search = str_replace('.'.static::$convertFileType,'',$destinationFileName);
-		$files = preg_grep('~^'.$search.'.*\.'.static::$convertFileType.'$~', scandir($uploadFolder));
-
-		return reset($files);
-	}
-	
 	
 	/**
 	 * get exif/iptc data from image
@@ -149,10 +110,14 @@ class SingleImageProduct extends ProductEditor
 	protected function prepareProductImages($uuid)
 	{
 		// need to move file now -> download items would otherwise create different sizes in tmp folder
-		FormMultiFileUpload::moveFiles($this->dc);
+		$this->moveFile($this->file, $this->getUploadFolder($this->dc));
+		
+		// need to unset callback to prevent moving of file to uploadFolder disregarding field dependend uploadFolder
+		unset($GLOBALS['TL_DCA']['tl_iso_product']['config']['onsubmit_callback']['multifileupload_moveFiles']);
 		
 		$this->productData['uploadedFiles'] = $this->file->uuid;
 	}
+	
 	
 	/**
 	 * @param $product ProductModel
@@ -178,7 +143,7 @@ class SingleImageProduct extends ProductEditor
 		
 		ProductHelper::createDownloadItem($product->id, $this->file, $size);
 		
-		if (!$this->module->iso_addImageSizes || strtolower($this->file->path) == 'pdf') {
+		if (!$this->module->iso_addImageSizes || strtolower($this->file->extension) == 'pdf') {
 			return true;
 		}
 		

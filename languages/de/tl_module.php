@@ -71,6 +71,9 @@ $arrLang['iso_imageSizes']['height'] = ['Höhe', 'Geben Sie hier die Bildhöhe a
 $arrLang['iso_useUploadsAsDownload'] = ['Artikelbild als Download verwenden', 'Wählen Sie diese Option, wenn die Artikelbilder als Download in der Detailansicht ausgegeben werden sollen.'];
 $arrLang['iso_uploadFolder'] = ['Upload-Ordner', 'Wählen Sie hier den Ordner aus, in den die hochgeladenen Bilder abgespeichert werden sollen.'];
 
+$arrLang['iso_useFieldDependendUploadFolder'] = ['Feldabhängiger Upload-Ordner', 'Wählen Sie diese Option, wenn der Upload-Ordner von einem Feld-Wert im Formular abhängen soll.'];
+$arrLang['iso_fieldForUploadFolder'] = ['Feld', 'Wählen Sie hier das Feld, das zur Bestimmung des Upload-Ordners genutzt werden soll.'];
+
 /**
  * Legends
  */

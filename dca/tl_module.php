@@ -17,6 +17,7 @@ $arrDca['palettes']['__selector__'][] = 'iso_useFieldsForTags';
 $arrDca['palettes']['__selector__'][] = 'iso_addImageSizes';
 $arrDca['palettes']['__selector__'][] = 'iso_useAgb';
 $arrDca['palettes']['__selector__'][] = 'iso_useConsent';
+$arrDca['palettes']['__selector__'][] = 'iso_useFieldDependendUploadFolder';
 
 /**
  * Palettes
@@ -54,17 +55,18 @@ $arrDca['palettes']['iso_orderdetails_plus'] =
 
 $arrDca['palettes']['iso_product_frontend_editor'] = '{title_legend},name,headline,type;'
 													 . '{creator_legend},formHybridDataContainer,formHybridPalette,formHybridEditable,formHybridAddEditableRequired,formHybridAddReadOnly,formHybridAddPermanentFields;'
-													 . '{product_legend},iso_editableCategories,iso_productEditor_editableTypeFields,iso_productCategory,iso_exifMapping,formHybridAddDefaultValues,iso_useFieldsForTags,iso_tagFields,iso_addImageSizes,iso_useUploadsAsDownload,iso_creatorFallbackUser,iso_uploadFolder;'
+													 . '{product_legend},iso_editableCategories,iso_productEditor_editableTypeFields,iso_productCategory,iso_exifMapping,formHybridAddDefaultValues,iso_useFieldsForTags,iso_tagFields,iso_addImageSizes,iso_useUploadsAsDownload,iso_creatorFallbackUser,iso_uploadFolder,iso_useFieldDependendUploadFolder;'
 													 . '{action_legend},formHybridAllowIdAsGetParameter,noIdBehavior,disableSessionCheck,disableAuthorCheck,addUpdateConditions,allowDelete,deactivateTokens;'
 													 . '{misc_legend},jumpTo,formHybridSingleSubmission,formHybridAsync,formHybridResetAfterSubmission,formHybridSuccessMessage,formHybridSkipScrollingToSuccessMessage,formHybridCustomSubmit,setPageTitle,addClientsideValidation;'
 													 . '{template_legend},formHybridTemplate,modalTpl,customTpl;'
 													 . '{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
 
 
-$arrDca['subpalettes']['iso_useFieldsForTags'] = 'iso_tagField';
-$arrDca['subpalettes']['iso_addImageSizes']    = 'iso_imageSizes';
-$arrDca['subpalettes']['iso_useAgb']           = 'iso_agbText';
-$arrDca['subpalettes']['iso_useConsent']       = 'iso_consentText';
+$arrDca['subpalettes']['iso_useFieldsForTags']              = 'iso_tagField';
+$arrDca['subpalettes']['iso_addImageSizes']                 = 'iso_imageSizes';
+$arrDca['subpalettes']['iso_useAgb']                        = 'iso_agbText';
+$arrDca['subpalettes']['iso_useConsent']                    = 'iso_consentText';
+$arrDca['subpalettes']['iso_useFieldDependendUploadFolder'] = 'iso_fieldForUploadFolder';
 
 
 if (in_array('slick', \ModuleLoader::getActive())) {
@@ -626,6 +628,24 @@ $arrDca['fields']['iso_uploadFolder'] = [
 	'eval'      => ['fieldType' => 'radio', 'tl_class' => 'clr w50'],
 	'sql'       => "binary(16) NULL",
 ];
+
+$arrDca['fields']['iso_useFieldDependendUploadFolder'] = [
+	'label'     => &$GLOBALS['TL_LANG']['tl_module']['iso_useFieldDependendUploadFolder'],
+	'exclude'   => true,
+	'inputType' => 'checkbox',
+	'eval'      => ['tl_class' => 'clr','submitOnChange'=>true],
+	'sql'       => "char(1) NOT NULL default ''",
+];
+
+$arrDca['fields']['iso_fieldForUploadFolder'] = [
+	'label'            => &$GLOBALS['TL_LANG']['tl_module']['iso_fieldForUploadFolder'],
+	'exclude'          => true,
+	'inputType'        => 'select',
+	'options_callback' => ['HeimrichHannot\FormHybrid\Backend\Module', 'getFields'],
+	'eval'             => ['tl_class' => 'clr'],
+	'sql'              => "varchar(32) NOT NULL default ''",
+];
+
 
 
 class tl_module_isotope_plus

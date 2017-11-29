@@ -1,6 +1,14 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.6.8] 2017-11-29
+
+### Added
+- field dependend uploadFolder 
+
+### Fixed
+- refactor pdf preview generation and file handling
+
 ## [1.6.7] 2017-11-29
 
 ### Changed
