@@ -12,10 +12,16 @@
 namespace HeimrichHannot\IsotopePlus;
 
 use Isotope\Model\Download;
+use Isotope\Model\Product;
 use Isotope\Model\ProductType;
 
 class ProductHelper
 {
+	// licence
+	const ISO_LICENCE_FREE      = 'free';
+	const ISO_LICENCE_COPYRIGHT = 'copyright';
+	const ISO_LICENCE_LOCKED    = 'locked';
+	
 	public static function prepareExifDataForSave($strExifTag, $arrExifData)
 	{
 		switch ($strExifTag) {
@@ -57,41 +63,21 @@ class ProductHelper
 	}
 	
 	
-	/**
-	 * create download element for each set size of isotope product image
-	 *
-	 * @param $id   int
-	 * @param $file object
-	 * @param $size array
-	 */
-	public static function createDownloadItem($id, $file, $size, $pdf = false)
+	public static function getFileName($file, $size)
 	{
-		if (!$pdf) {
-			$name = str_replace('.' . $file->extension, ProductHelper::getReplacer($file, $size), ltrim($file->name, '_'));
-			$path = $downloadPath = str_replace($file->name, $name, $file->path);
-		} else {
-			$path = $downloadPath = $pdf->path;
+		if ($size && $file->extension != 'pdf') {
+			return str_replace('.' . $file->extension, ProductHelper::getFileSizeName($file, $size), ltrim($file->name, '_'));
 		}
 		
-		if (!file_exists($path)) {
-			$downloadPath = \Image::get($file->path, $size['size'][0], $size['size'][1], $size['size'][2], $path);
-		}
+		return $file->name;
+	}
+	
+	public static function getFilePath($file, $name)
+	{
+		if($file->extension != 'pdf')
+			return str_replace($file->name, $name, $file->path);
 		
-		// TODO check if file exists
-		
-		if (($downloadFile = \FilesModel::findByPath($path)) === null) {
-			$downloadFile = \Dbafs::addResource(urldecode($downloadPath));
-		}
-		
-		// create Isotope download
-		$objDownload            = new Download();
-		$objDownload->pid       = $id;
-		$objDownload->tstamp    = time();
-		$objDownload->title     = $size['name'];
-		$objDownload->singleSRC = $downloadFile->uuid;
-		$objDownload->published = 1;
-		
-		$objDownload->save();
+		return $file->path;
 	}
 	
 	/**
@@ -100,7 +86,7 @@ class ProductHelper
 	 *
 	 * @return string
 	 */
-	protected static function getReplacer($file, $size)
+	public static function getFileSizeName($file, $size)
 	{
 		$suffix = '';
 		if ($size['name'] != $GLOBALS['TL_LANG']['MSC']['originalSize']) {
@@ -161,5 +147,14 @@ class ProductHelper
 		
 		
 		$template->pdfViewer = $pdfViewerWrapper->parse();
+	}
+	
+	public function getLicenceTitle()
+	{
+		return [
+			static::ISO_LICENCE_FREE,
+			static::ISO_LICENCE_COPYRIGHT,
+			static::ISO_LICENCE_LOCKED,
+		];
 	}
 }

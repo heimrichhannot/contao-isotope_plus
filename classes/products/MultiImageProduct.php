@@ -30,9 +30,11 @@ class MultiImageProduct extends ProductEditor
 			
 			$product = $this->create();
 			
-			$this->createDownloadItems($product);
-			
 			$this->afterCreate($product);
+			
+			$this->createDownloadItemsFromProductImage($product);
+			
+			$this->createDownloadItemsFromUploadedDownloadFiles($product);
 			
 			return true;
 		}
@@ -104,7 +106,7 @@ class MultiImageProduct extends ProductEditor
 	 *
 	 * @return bool
 	 */
-	protected function createDownloadItems($product)
+	protected function createDownloadItemsFromProductImage($product)
 	{
 		if (!$this->module->iso_useUploadsAsDownload) {
 			return false;
@@ -115,7 +117,7 @@ class MultiImageProduct extends ProductEditor
 			foreach($this->productData['downloadPdf'] as $pdf)
 			{
 				$size = ['name' => sprintf($GLOBALS['TL_LANG']['MSC']['downloadPdfItem'],$pdf->name)];
-				ProductHelper::createDownloadItem($product->id, $pdf, $size, $pdf);
+				$this->createDownloadItem($product, $pdf, $size);
 			}
 			
 			return true;
@@ -124,17 +126,18 @@ class MultiImageProduct extends ProductEditor
 		foreach($this->submission->uploadedFiles as $key => $value)
 		{
 			$size = $this->getOriginalImageSize($key);
-			ProductHelper::createDownloadItem($product->id, $this->file, $size);
+			$this->createDownloadItem($product, $this->file, $size);
 			
 			if (!$this->module->iso_addImageSizes) {
 				continue;
 			}
 			
-			$this->createDownloadItemsForSizes($product->id, $key);
+			$this->createDownloadItemsForSizes($product, $key);
 		}
 		
 		return true;
 	}
+	
 	
 	/**
 	 * save price and category for product

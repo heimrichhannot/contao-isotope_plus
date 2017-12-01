@@ -9,7 +9,7 @@ $arrDca['list']['label']['fields']         =
 	['images','uploadedFiles', 'name', 'sku', 'price', 'stock', 'initialStock', 'jumpTo']; // added stock and initialstock to product overview
 $arrDca['list']['label']['label_callback'] = ['HeimrichHannot\IsotopePlus\Backend', 'getProductCreatorLabel'];
 
-$arrDca['palettes']['default'] = str_replace('type', 'type,name,uploadedFiles,tag,createMultiImageProduct,downloadCount,relevance,isPdfProduct', $arrDca['palettes']['default']);
+$arrDca['palettes']['default'] = str_replace('type', 'type,name,uploadedFiles,uploadedDownloadFiles,tag,createMultiImageProduct,downloadCount,relevance,isPdfProduct', $arrDca['palettes']['default']);
 
 $arrDca['config']['onload_callback'][] = ['HeimrichHannot\IsotopePlus\IsotopePlus', 'updateRelevance'];
 
@@ -116,6 +116,26 @@ $arrDca['fields']['uploadedFiles'] = [
 	'sql' => "blob NULL",
 ];
 
+$arrDca['fields']['uploadedDownloadFiles'] = [
+	'label'      => &$GLOBALS['TL_LANG']['tl_iso_product']['uploadedDownloadFiles'],
+	'exclude'    => true,
+	'inputType'  => 'multifileupload',
+	'eval'       => [
+		'tl_class'           => 'clr',
+		'extensions'         => \Config::get('uploadTypes'),
+		'filesOnly'          => true,
+		'fieldType'          => 'checkbox',
+		'skipPrepareForSave' => true,
+		'uploadFolder'       => ['HeimrichHannot\IsotopePlus\Callbacks', 'getUploadFolder'],
+		'addRemoveLinks'     => true,
+		'multipleFiles'      => 25,
+		'maxUploadSize'      => \Config::get('maxFileSize'),
+	],
+	'attributes' => ['legend' => 'media_legend'],
+	
+	'sql' => "blob NULL",
+];
+
 $arrDca['fields']['tag'] = [
 	'label'      => &$GLOBALS['TL_LANG']['tl_iso_product']['tag'],
 	'exclude'    => true,
@@ -130,6 +150,19 @@ $arrDca['fields']['tag'] = [
 	],
 	'attributes' => ['legend' => 'general_legend', 'multilingual' => true, 'fixed' => true, 'fe_sorting' => true, 'fe_search' => true],
 	'sql'        => "blob NULL",
+];
+
+$arrDca['fields']['licence'] = [
+	'label'            => &$GLOBALS['TL_LANG']['tl_iso_product']['licence'],
+	'exclude'          => true,
+	'search'           => true,
+	'sorting'          => true,
+	'inputType'        => 'select',
+	'reference'        => &$GLOBALS['TL_LANG']['tl_iso_product']['licence'],
+	'options_callback' => ['\HeimrichHannot\IsotopePlus\ProductHelper', 'getLicenceTitle'],
+	'eval'             => ['mandatory' => true, 'tl_class' => 'clr w50', 'includeBlankOption' => true],
+	'attributes'       => ['legend' => 'general_legend', 'fe_sorting' => true, 'fe_search' => true],
+	'sql'              => "varchar(255) NOT NULL default ''",
 ];
 
 $arrDca['fields']['createMultiImageProduct'] = [
@@ -163,12 +196,6 @@ $arrDca['fields']['isPdfProduct'] = [
 	'attributes' => ['legend' => 'shipping_legend'],
 	'sql'        => "char(1) NOT NULL default ''",
 ];
-
-//
-//\Controller::loadDataContainer('tl_iso_config');
-//\System::loadLanguageFile('tl_iso_config');
-//\Controller::loadDataContainer('tl_iso_producttype');
-//\System::loadLanguageFile('tl_iso_producttype');
 
 // arrays are always copied by value (not by reference) in php
 $arrDca['fields']['skipStockValidation']                                   = $GLOBALS['TL_DCA']['tl_iso_config']['fields']['skipStockValidation'];

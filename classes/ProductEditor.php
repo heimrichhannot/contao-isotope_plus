@@ -10,6 +10,7 @@ namespace HeimrichHannot\IsotopePlus;
 
 
 use Ghostscript\Transcoder;
+use HeimrichHannot\FileCredit\FilesModel;
 use HeimrichHannot\Haste\Dca\General;
 use HeimrichHannot\Haste\Util\FormSubmission;
 use HeimrichHannot\HastePlus\Files;
@@ -90,11 +91,18 @@ abstract class ProductEditor
 	{
 		$this->productData['dateAdded'] = $this->submission->dateAdded ? $this->submission->dateAdded : time();
 		
-		$this->productData['tstamp']    = time();
+		$this->productData['tstamp'] = time();
 		
-		$this->productData['alias'] = $this->submission->alias ? $this->submission->alias : General::generateAlias('', $this->submission->id, 'tl_iso_product', $this->submission->name);
+		$this->productData['alias'] = $this->submission->alias
+			? $this->submission->alias
+			: General::generateAlias(
+				'',
+				$this->submission->id,
+				'tl_iso_product',
+				$this->submission->name
+			);
 		
-		$this->productData['sku']   = $this->productData['alias'];
+		$this->productData['sku'] = $this->productData['alias'];
 		
 		$this->productData['addedBy'] = \Contao\Config::get('iso_creatorFallbackMember');
 		
@@ -171,7 +179,7 @@ abstract class ProductEditor
 	 */
 	protected function prepareDataFromForm()
 	{
-		foreach (deserialize($this->module->formHybridEditable,true) as $value) {
+		foreach (deserialize($this->module->formHybridEditable, true) as $value) {
 			if ($this->productData[$value]) {
 				continue;
 			}
@@ -191,7 +199,7 @@ abstract class ProductEditor
 		$data = $this->productData;
 		$tags = [];
 		
-		foreach (deserialize($this->module->iso_tagFields,true) as $tagValueField) {
+		foreach (deserialize($this->module->iso_tagFields, true) as $tagValueField) {
 			if ($tagValueField == 'type') {
 				$data[$tagValueField] = ProductType::findByPk($this->submission->type)->name;
 			}
@@ -205,7 +213,7 @@ abstract class ProductEditor
 		}
 		
 		// add tags from form-field
-		$tags = array_merge(deserialize($this->submission->{$this->module->iso_tagField},true), $tags);
+		$tags = array_merge(deserialize($this->submission->{$this->module->iso_tagField}, true), $tags);
 		
 		// Hook : modify the product data
 		if (isset($GLOBALS['TL_HOOKS']['creatorProduct']['modifyTagData']) && is_array($GLOBALS['TL_HOOKS']['creatorProduct']['modifyTagData'])) {
@@ -252,7 +260,6 @@ abstract class ProductEditor
 		}
 		
 		$this->file = $file;
-		$this->file->addedBy = $this->productData['addedBy'];
 		
 		return true;
 	}
@@ -277,8 +284,6 @@ abstract class ProductEditor
 			$this->productData[$value['field']] = $value['value'];
 		}
 	}
-	
-	
 	
 	/**
 	 * delete all download items for a product before adding new ones
@@ -326,6 +331,77 @@ abstract class ProductEditor
 		];
 	}
 	
+	
+	/**
+	 * create download element for each set size of isotope product image
+	 *
+	 * @param $id   int
+	 * @param $file object
+	 * @param $size array
+	 */
+	public static function createDownloadItem($product, $file, $size)
+	{
+		$name = ProductHelper::getFileName($file, $size);
+		$path = ProductHelper::getFilePath($file, $name);
+		
+		if (!file_exists($path)) {
+			$path = \Image::get($file->path, $size['size'][0], $size['size'][1], $size['size'][2], $path);
+		}
+		
+		if (($downloadFile = \FilesModel::findByPath($path)) === null) {
+			$downloadFile = \Dbafs::addResource(urldecode($path));
+		}
+		
+		ProductEditor::saveCopyrightForFile($downloadFile, $product);
+		
+		// create Isotope download
+		$objDownload            = new Download();
+		$objDownload->pid       = $product->id;
+		$objDownload->tstamp    = time();
+		$objDownload->title     = $size['name'];
+		$objDownload->singleSRC = $downloadFile->uuid;
+		$objDownload->published = 1;
+		
+		$objDownload->save();
+	}
+	
+	/**
+	 * @param $product ProductModel
+	 */
+	protected function createDownloadItemsFromUploadedDownloadFiles($product)
+	{
+		$downloadUploads = deserialize($product->uploadedDownloadFiles,true);
+		
+		if(empty($downloadUploads))
+			return;
+		
+		foreach($downloadUploads as $downloadUpload)
+		{
+			$file = \FilesModel::findByUuid($downloadUpload);
+			
+			$this->moveFile($file, $this->getUploadFolder($this->dc));
+			
+			
+			$size = ['name' => $GLOBALS['TL_LANG']['MSC']['downloadItem']];
+			$this->createDownloadItem($product, $file, $size);
+		}
+	}
+	
+	/**
+	 *
+	 *
+	 * @param $file    \FilesModel
+	 * @param $product ProductModel
+	 */
+	public function saveCopyrightForFile($file, $product)
+	{
+		$file->licence   = $product->licence;
+		$file->addedBy   = $product->addedBy;
+		$file->copyright = $product->photographer;
+		$file->save();
+	}
+	
+	
 	/**
 	 * @param $id int
 	 */
@@ -337,16 +413,16 @@ abstract class ProductEditor
 			$suffix = ' ' . ($index + 1);
 		}
 		
-		foreach (deserialize($this->module->iso_imageSizes,true) as $size) {
+		foreach (deserialize($this->module->iso_imageSizes, true) as $size) {
 			$size['name'] = $size['name'] . $suffix;
-			ProductHelper::createDownloadItem($id, $this->file, $size);
+			ProductEditor::createDownloadItem($id, $this->file, $size);
 		}
 	}
 	
 	/**
 	 * move file to destination
 	 *
-	 * @param $file \FilesModel
+	 * @param $file   \FilesModel
 	 * @param $folder string
 	 */
 	public function moveFile($file, $folder)
@@ -371,8 +447,9 @@ abstract class ProductEditor
 	{
 		$uploadFolder = Callbacks::getUploadFolder($dc);
 		
-		if($this->module->iso_useFieldDependendUploadFolder)
+		if ($this->module->iso_useFieldDependendUploadFolder) {
 			$uploadFolder .= '/' . $this->productData[$this->module->iso_fieldForUploadFolder];
+		}
 		
 		return $uploadFolder;
 	}
@@ -385,16 +462,16 @@ abstract class ProductEditor
 	 *
 	 * @return string name of preview file
 	 */
-	public function getPreviewFromPdf($file,$uploadFolder)
+	public function getPreviewFromPdf($file, $uploadFolder)
 	{
 		$destinationFileName = 'preview-' . str_replace('.pdf', '', $this->file->name) . '.' . static::$convertFileType;
 		
 		// ghostscript
 		$transcoder = Transcoder::create();
-		$transcoder->toImage($file->path,$uploadFolder . '/' . $destinationFileName);
+		$transcoder->toImage($file->path, $uploadFolder . '/' . $destinationFileName);
 		
-		$search = str_replace('.'.static::$convertFileType,'',$destinationFileName);
-		$files = preg_grep('~^'.$search.'.*\.'.static::$convertFileType.'$~', scandir($uploadFolder));
+		$search = str_replace('.' . static::$convertFileType, '', $destinationFileName);
+		$files  = preg_grep('~^' . $search . '.*\.' . static::$convertFileType . '$~', scandir($uploadFolder));
 		
 		return reset($files);
 	}
@@ -405,7 +482,7 @@ abstract class ProductEditor
 	
 	abstract protected function prepareProductImages($uuid);
 	
-	abstract protected function createDownloadItems($product);
+	abstract protected function createDownloadItemsFromProductImage($product);
 	
 	abstract protected function afterCreate($product);
 	

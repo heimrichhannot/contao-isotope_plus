@@ -13,6 +13,7 @@ namespace HeimrichHannot\IsotopePlus;
 use HeimrichHannot\Haste\Dca\General;
 use Isotope\Backend\Product\Category;
 use Isotope\Backend\Product\Price;
+use Isotope\Model\Product;
 use Isotope\Model\ProductModel;
 use PHPExif\Reader\Reader;
 
@@ -38,7 +39,9 @@ class SingleImageProduct extends ProductEditor
 			
 			$this->afterCreate($product);
 			
-			$this->createDownloadItems($product);
+			$this->createDownloadItemsFromProductImage($product);
+			
+			$this->createDownloadItemsFromUploadedDownloadFiles($product);
 		}
 		
 		return true;
@@ -124,34 +127,31 @@ class SingleImageProduct extends ProductEditor
 	 *
 	 * @return bool
 	 */
-	protected function createDownloadItems($product)
+	protected function createDownloadItemsFromProductImage($product)
 	{
 		if (!$this->module->iso_useUploadsAsDownload) {
 			return false;
 		}
 		
-		$this->cleanDownloadItems($product->id);
-		
 		if ($this->productData['isPdfProduct']) {
 			$size = ['name' => $GLOBALS['TL_LANG']['MSC']['downloadPdfItem']];
-			ProductHelper::createDownloadItem($product->id, $this->productData['downloadPdf'], $size, $this->productData['downloadPdf']);
+			$this->createDownloadItem($product, $this->productData['downloadPdf'], $size);
 			
 			return true;
 		}
 		
 		$size = $this->getOriginalImageSize();
 		
-		ProductHelper::createDownloadItem($product->id, $this->file, $size);
+		$this->createDownloadItem($product, $this->file, $size);
 		
 		if (!$this->module->iso_addImageSizes || strtolower($this->file->extension) == 'pdf') {
 			return true;
 		}
 		
-		$this->createDownloadItemsForSizes($product->id);
+		$this->createDownloadItemsForSizes($product);
 		
 		return true;
 	}
-	
 	
 	/**
 	 * category and price need to be saved with their own models
@@ -166,6 +166,9 @@ class SingleImageProduct extends ProductEditor
 			$this->file->exif = $this->exifData;
 			$this->file->save();
 		}
+		
+		// clean the download elements so only the ones according current configuration exist
+		$this->cleanDownloadItems($product->id);
 		
 		// set intId to save category and price on correct id
 		$this->dc->intId = $product->id;

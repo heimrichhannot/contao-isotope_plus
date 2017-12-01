@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.7.0] 2017-01-12
+
+### Added
+- support own uploadField for download items
+- `licence`, `addedBy` and `copyright` are added to tl_files from submission
+
 ## [1.6.8] 2017-11-29
 
 ### Added

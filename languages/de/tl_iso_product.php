@@ -22,3 +22,10 @@ $GLOBALS['TL_LANG']['tl_iso_product']['createMultiImageProduct'] = [
 ];
 $GLOBALS['TL_LANG']['tl_iso_product']['downloadCount']           = ['Downloads', ''];
 $GLOBALS['TL_LANG']['tl_iso_product']['relevance']               = ['Beliebtheit', ''];
+$GLOBALS['TL_LANG']['tl_iso_product']['licence']                 = [
+	'Lizenz',
+	'Wählen Sie hier die Lizenz aus, die für die Aufnahme gilt.',
+	\HeimrichHannot\IsotopePlus\ProductHelper::ISO_LICENCE_FREE      => 'frei',
+	\HeimrichHannot\IsotopePlus\ProductHelper::ISO_LICENCE_COPYRIGHT => 'Copyright angeben',
+	\HeimrichHannot\IsotopePlus\ProductHelper::ISO_LICENCE_LOCKED    => 'geschützt (lizenzpflichtig)',
+];

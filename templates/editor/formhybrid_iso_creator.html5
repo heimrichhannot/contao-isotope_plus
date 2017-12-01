@@ -21,7 +21,7 @@
 				<?php endif; ?>
 				<?php echo $this->hidden; ?>
 			    <?php foreach($this->fields as $name => $objField): ?>
-                    <?php if($name == 'uploadedFiles' || $name == 'images'):?>
+                    <?php if($name == 'uploadedFiles' || $name == 'images' || $name == 'uploadedDownloadFiles'):?>
             
                         <div class="<?= $name ?> multifileupload-field form-group">
                         <label id="lbl_<?= $name ?>" class="control-label" for="ctrl_<?= $name ?>">
