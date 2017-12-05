@@ -22,7 +22,6 @@
 				<?php echo $this->hidden; ?>
 			    <?php foreach($this->fields as $name => $objField): ?>
                     <?php if($name == 'uploadedFiles' || $name == 'images' || $name == 'uploadedDownloadFiles'):?>
-            
                         <div class="<?= $name ?> multifileupload-field form-group">
                         <label id="lbl_<?= $name ?>" class="control-label" for="ctrl_<?= $name ?>">
                             <?= $objField->label ?>
@@ -44,7 +43,7 @@
                         </div>
                     <?php endif; ?>
                     
-                    <?php if($name == 'uploadedFiles' || $name == 'images' ||  $name == 'tag'):?>
+                    <?php if($name == 'uploadedFiles' || $name == 'images' || $name == 'uploadedDownloadFiles' ||  $name == 'tag'):?>
                         </div>
                     <?php endif; ?>
 				<?php endforeach; ?>

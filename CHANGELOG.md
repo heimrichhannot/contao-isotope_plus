@@ -1,7 +1,13 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [1.7.0] 2017-01-12
+## [1.7.1] 2017-12-05
+
+### Changed
+- field for copyright
+- serialize copyright on file entity
+
+## [1.7.0] 2017-12-01
 
 ### Added
 - support own uploadField for download items

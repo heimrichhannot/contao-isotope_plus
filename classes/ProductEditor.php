@@ -397,7 +397,8 @@ abstract class ProductEditor
 	{
 		$file->licence   = $product->licence;
 		$file->addedBy   = $product->addedBy;
-		$file->copyright = $product->photographer;
+		$file->copyright = serialize($product->copyright);
+		
 		$file->save();
 	}
 	

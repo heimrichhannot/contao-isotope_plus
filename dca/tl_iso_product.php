@@ -9,7 +9,7 @@ $arrDca['list']['label']['fields']         =
 	['images','uploadedFiles', 'name', 'sku', 'price', 'stock', 'initialStock', 'jumpTo']; // added stock and initialstock to product overview
 $arrDca['list']['label']['label_callback'] = ['HeimrichHannot\IsotopePlus\Backend', 'getProductCreatorLabel'];
 
-$arrDca['palettes']['default'] = str_replace('type', 'type,name,uploadedFiles,uploadedDownloadFiles,tag,createMultiImageProduct,downloadCount,relevance,isPdfProduct', $arrDca['palettes']['default']);
+$arrDca['palettes']['default'] = str_replace('type', 'type,name,uploadedFiles,uploadedDownloadFiles,tag,createMultiImageProduct,downloadCount,relevance,isPdfProduct,copyright', $arrDca['palettes']['default']);
 
 $arrDca['config']['onload_callback'][] = ['HeimrichHannot\IsotopePlus\IsotopePlus', 'updateRelevance'];
 
@@ -195,6 +195,17 @@ $arrDca['fields']['isPdfProduct'] = [
 	'eval'       => ['tl_class' => 'w50'],
 	'attributes' => ['legend' => 'shipping_legend'],
 	'sql'        => "char(1) NOT NULL default ''",
+];
+
+$arrDca['fields']['copyright'] = [
+	'label'      => &$GLOBALS['TL_LANG']['tl_iso_product']['copyright'],
+	'exclude'    => true,
+	'search'     => true,
+	'sorting'    => true,
+	'inputType'  => 'text',
+	'eval'       => ['tl_class' => 'w50'],
+	'attributes' => ['legend' => 'general_legend'],
+	'sql'        => "varchar(255) NOT NULL default ''",
 ];
 
 // arrays are always copied by value (not by reference) in php

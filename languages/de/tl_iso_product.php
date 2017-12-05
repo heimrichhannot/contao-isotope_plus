@@ -29,3 +29,4 @@ $GLOBALS['TL_LANG']['tl_iso_product']['licence']                 = [
 	\HeimrichHannot\IsotopePlus\ProductHelper::ISO_LICENCE_COPYRIGHT => 'Copyright angeben',
 	\HeimrichHannot\IsotopePlus\ProductHelper::ISO_LICENCE_LOCKED    => 'geschützt (lizenzpflichtig)',
 ];
+$arrLang['copyright']                                            = ['Copyright', 'Bitte geben Sie einen Copyright an.'];
