@@ -54,11 +54,11 @@ $arrDca['palettes']['iso_orderdetails_plus'] =
 	str_replace('iso_loginRequired', 'iso_loginRequired,iso_show_all_orders', $arrDca['palettes']['iso_orderdetails']);
 
 $arrDca['palettes']['iso_product_frontend_editor'] = '{title_legend},name,headline,type;'
-													 . '{creator_legend},formHybridDataContainer,formHybridPalette,formHybridEditable,formHybridAddEditableRequired,formHybridAddReadOnly,formHybridAddPermanentFields;'
+													 . '{creator_legend},formHybridDataContainer,formHybridForcePaletteRelation,formHybridEditable,formHybridAddEditableRequired,formHybridAddReadOnly,formHybridAddPermanentFields;'
 													 . '{product_legend},iso_editableCategories,iso_productEditor_editableTypeFields,iso_productCategory,iso_exifMapping,formHybridAddDefaultValues,iso_useFieldsForTags,iso_tagFields,iso_addImageSizes,iso_useUploadsAsDownload,iso_creatorFallbackUser,iso_uploadFolder,iso_useFieldDependendUploadFolder;'
 													 . '{action_legend},formHybridAllowIdAsGetParameter,noIdBehavior,disableSessionCheck,disableAuthorCheck,addUpdateConditions,allowDelete,deactivateTokens;'
 													 . '{misc_legend},jumpTo,formHybridSingleSubmission,formHybridAsync,formHybridResetAfterSubmission,formHybridSuccessMessage,formHybridSkipScrollingToSuccessMessage,formHybridCustomSubmit,setPageTitle,addClientsideValidation;'
-													 . '{template_legend},formHybridTemplate,modalTpl,customTpl;'
+													 . '{template_legend},formHybridTemplate,modalTpl,customTpl,formHybridCustomSubTemplates;'
 													 . '{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space';
 
 

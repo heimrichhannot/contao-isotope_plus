@@ -71,15 +71,16 @@ abstract class ProductEditor
 		
 		$this->prepareDataFromForm();
 		
-		$this->prepareTagData();
-		
 		$this->modifyData();
+		
+		$this->prepareTagData();
 		
 		// image data
 		$this->createImageProduct();
 		
 		// delete submission since for all products an new model was created
 		$this->submission->delete();
+		
 		
 		return true;
 	}
@@ -200,9 +201,12 @@ abstract class ProductEditor
 		$tags = [];
 		
 		foreach (deserialize($this->module->iso_tagFields, true) as $tagValueField) {
-			if ($tagValueField == 'type') {
-				$data[$tagValueField] = ProductType::findByPk($this->submission->type)->name;
-			}
+//			if ($tagValueField == 'type') {
+//				$data[$tagValueField] = ProductType::findByPk($this->submission->type)->name;
+//			}
+			
+			if('' == $data[$tagValueField])
+				continue;
 			
 			$tags[] = FormSubmission::prepareSpecialValueForPrint(
 				$data[$tagValueField],
@@ -240,7 +244,7 @@ abstract class ProductEditor
 		if (isset($GLOBALS['TL_HOOKS']['editProduct_modifyData']) && is_array($GLOBALS['TL_HOOKS']['editProduct_modifyData'])) {
 			foreach ($GLOBALS['TL_HOOKS']['editProduct_modifyData'] as $arrCallback) {
 				$objClass = \Controller::importStatic($arrCallback[0]);
-				$objClass->{$arrCallback[1]}($this->module, $this->productData, $this->submission);
+				list($this->module,$this->productData,$this->submission) = $objClass->{$arrCallback[1]}($this->module, $this->productData, $this->submission);
 			}
 		}
 	}
@@ -339,7 +343,7 @@ abstract class ProductEditor
 	 * @param $file object
 	 * @param $size array
 	 */
-	public static function createDownloadItem($product, $file, $size)
+	public function createDownloadItem($product, $file, $size)
 	{
 		$name = ProductHelper::getFileName($file, $size);
 		$path = ProductHelper::getFilePath($file, $name);
@@ -356,14 +360,49 @@ abstract class ProductEditor
 		
 		// create Isotope download
 		$objDownload            = new Download();
+		
+		if('pdf' == $file->extension)
+		{
+			$objDownload->download_thumbnail = serialize([$this->getPDFDownloadThumbnail($file)]);
+		}
+		else {
+			$objDownload->download_thumbnail = serialize([$file->uuid]);
+		}
+		
+		if('' == $size['name'])
+		{
+			$size['name'] = str_replace(['_', '-','.'.$file->extension], [' ',' ',''], $file->name);
+		}
+		
 		$objDownload->pid       = $product->id;
 		$objDownload->tstamp    = time();
 		$objDownload->title     = $size['name'];
 		$objDownload->singleSRC = $downloadFile->uuid;
 		$objDownload->published = 1;
 		
+		
 		$objDownload->save();
 	}
+	
+	protected function getPDFThumbnail($file)
+	{
+		$uploadFolder = $this->getUploadFolder($this->dc);
+		$completePath = $uploadFolder . '/' . $this->getPreviewFromPdf($file, $uploadFolder);
+		if (file_exists($completePath)) {
+			$completePath = \Dbafs::addResource(urldecode($completePath));
+		}
+		
+		
+		if($completePath->uuid)
+		{
+			return $completePath->uuid;
+		}
+		
+		else {
+			return \FilesModel::findByPath($completePath)->uuid;
+		}
+	}
+	
 	
 	/**
 	 * @param $product ProductModel
@@ -465,7 +504,7 @@ abstract class ProductEditor
 	 */
 	public function getPreviewFromPdf($file, $uploadFolder)
 	{
-		$destinationFileName = 'preview-' . str_replace('.pdf', '', $this->file->name) . '.' . static::$convertFileType;
+		$destinationFileName = 'preview-' . str_replace('.pdf', '', $file->name) . '.' . static::$convertFileType;
 		
 		// ghostscript
 		$transcoder = Transcoder::create();

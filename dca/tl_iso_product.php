@@ -9,9 +9,12 @@ $arrDca['list']['label']['fields']         =
 	['images','uploadedFiles', 'name', 'sku', 'price', 'stock', 'initialStock', 'jumpTo']; // added stock and initialstock to product overview
 $arrDca['list']['label']['label_callback'] = ['HeimrichHannot\IsotopePlus\Backend', 'getProductCreatorLabel'];
 
-$arrDca['palettes']['default'] = str_replace('type', 'type,name,uploadedFiles,uploadedDownloadFiles,tag,createMultiImageProduct,downloadCount,relevance,isPdfProduct,copyright', $arrDca['palettes']['default']);
+//$arrDca['palettes']['default'] = str_replace('type', 'type,name,', $arrDca['palettes']['default']);
+
 
 $arrDca['config']['onload_callback'][] = ['HeimrichHannot\IsotopePlus\IsotopePlus', 'updateRelevance'];
+
+
 
 /**
  * Fields

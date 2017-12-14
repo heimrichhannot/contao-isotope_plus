@@ -56,26 +56,6 @@ class Youtube extends Attribute implements IsotopeAttribute
         $objContentModel->type = 'youtube';
         $objContentModel->cssID = serialize(array('', $this->field_name));
 
-        // Vorschaubild TODO
-        /*
-        $arrImages = deserialize($objProduct->images, true);
-        if( is_array($arrImages) && !empty($arrImages[0])) {
-            $objContentModel->addPreviewImage = true;
-            $objContentModel->addPlayButton = true;
-
-            echo '<pre>';
-            $pth = array("files/markenportal/images/filme/".$arrImages[0]['src']);
-            $objFiles = \FilesModel::findMultipleByPaths( $pth);
-
-
-            var_dump($objFiles->first());
-            //$objProduct->images
-            echo '</pre>';
-
-            $objContentModel->posterSRC = $objFiles->path;
-        } //*/
-
-
 
         //$objContentModel->playerSRC = serialize($arrFiles);
         // $objContentModel->posterSRC = $strPoster;
