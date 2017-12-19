@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.8.1] 2017-12-19
+
+### Changed
+- `copyright` to tagsinput 
+
 ## [1.8.0] 2017-12-14
 
 ### Added

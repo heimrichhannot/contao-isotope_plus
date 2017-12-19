@@ -18,6 +18,7 @@ use HeimrichHannot\MultiFileUpload\FormMultiFileUpload;
 use Isotope\Model\Download;
 use Isotope\Model\ProductModel;
 use Isotope\Model\ProductType;
+use PhpImap\Exception;
 
 abstract class ProductEditor
 {
@@ -119,7 +120,18 @@ abstract class ProductEditor
 	 */
 	protected function prepareDataFromModule()
 	{
-		$this->productData['orderPages'] = $this->module->orderPages;
+		$pages = deserialize($this->module->orderPages,true);
+		
+		
+		if(null !== $this->submission->orderPages)
+		{
+			foreach(deserialize($this->submission->orderPages, true) as $page)
+			{
+				$pages[] = $page;
+			}
+		}
+		
+		$this->productData['orderPages'] = serialize($pages);
 		
 		$this->setDataFromDefaultValues();
 	}
@@ -343,12 +355,13 @@ abstract class ProductEditor
 	 * @param $file object
 	 * @param $size array
 	 */
-	public function createDownloadItem($product, $file, $size)
+	public function createDownloadItem($product, $file, $size,$uploadFolder = null)
 	{
 		$name = ProductHelper::getFileName($file, $size);
 		$path = ProductHelper::getFilePath($file, $name);
 		
-		if (!file_exists($path)) {
+		
+		if (!file_exists($path) && in_array($file->extension,['mp4','mp3','html','tif','eps'])) {
 			$path = \Image::get($file->path, $size['size'][0], $size['size'][1], $size['size'][2], $path);
 		}
 		
@@ -356,22 +369,17 @@ abstract class ProductEditor
 			$downloadFile = \Dbafs::addResource(urldecode($path));
 		}
 		
-		ProductEditor::saveCopyrightForFile($downloadFile, $product);
+		$this->saveCopyrightForFile($downloadFile, $product);
 		
 		// create Isotope download
 		$objDownload            = new Download();
 		
 		if('pdf' == $file->extension)
 		{
-			$objDownload->download_thumbnail = serialize([$this->getPDFDownloadThumbnail($file)]);
+			$objDownload->download_thumbnail = serialize([$this->getPDFThumbnail($file,$uploadFolder)]);
 		}
 		else {
 			$objDownload->download_thumbnail = serialize([$file->uuid]);
-		}
-		
-		if('' == $size['name'])
-		{
-			$size['name'] = str_replace(['_', '-','.'.$file->extension], [' ',' ',''], $file->name);
 		}
 		
 		$objDownload->pid       = $product->id;
@@ -384,9 +392,13 @@ abstract class ProductEditor
 		$objDownload->save();
 	}
 	
-	protected function getPDFThumbnail($file)
+	protected function getPDFThumbnail($file,$uploadFolder = null)
 	{
-		$uploadFolder = $this->getUploadFolder($this->dc);
+		if(null === $uploadFolder)
+		{
+			$uploadFolder = $this->getUploadFolder($this->dc);
+		}
+		
 		$completePath = $uploadFolder . '/' . $this->getPreviewFromPdf($file, $uploadFolder);
 		if (file_exists($completePath)) {
 			$completePath = \Dbafs::addResource(urldecode($completePath));
@@ -420,8 +432,9 @@ abstract class ProductEditor
 			
 			$this->moveFile($file, $this->getUploadFolder($this->dc));
 			
-			
-			$size = ['name' => $GLOBALS['TL_LANG']['MSC']['downloadItem']];
+			$size = ['name' => sprintf($GLOBALS['TL_LANG']['MSC']['downloadItem'],str_replace(['_', '-','.'.$file->extension], [' ',' ',''], $file->name))];
+
+//			$size = ['name' => $GLOBALS['TL_LANG']['MSC']['downloadItem']];
 			$this->createDownloadItem($product, $file, $size);
 		}
 	}
@@ -436,7 +449,7 @@ abstract class ProductEditor
 	{
 		$file->licence   = $product->licence;
 		$file->addedBy   = $product->addedBy;
-		$file->copyright = serialize($product->copyright);
+		$file->copyright = $product->copyright;
 		
 		$file->save();
 	}
@@ -508,12 +521,16 @@ abstract class ProductEditor
 		
 		// ghostscript
 		$transcoder = Transcoder::create();
-		$transcoder->toImage($file->path, $uploadFolder . '/' . $destinationFileName);
+		
+		$transcoder->toImage(TL_ROOT . DIRECTORY_SEPARATOR . $file->path,
+							 TL_ROOT . DIRECTORY_SEPARATOR . $uploadFolder . '/' . $destinationFileName
+		);
 		
 		$search = str_replace('.' . static::$convertFileType, '', $destinationFileName);
-		$files  = preg_grep('~^' . $search . '.*\.' . static::$convertFileType . '$~', scandir($uploadFolder));
+		$files  = preg_grep('~^' . $search . '.*\.' . static::$convertFileType . '$~', scandir(TL_ROOT . DIRECTORY_SEPARATOR .$uploadFolder));
 		
 		return reset($files);
+		
 	}
 	
 	abstract protected function createImageProduct();

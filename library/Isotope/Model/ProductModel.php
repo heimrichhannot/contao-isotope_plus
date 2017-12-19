@@ -12,17 +12,6 @@
 
 namespace Isotope\Model;
 
-use Contao\DC_Table;
-use Contao\FilesModel;
-use HeimrichHannot\Ajax\Response\ResponseData;
-use HeimrichHannot\Ajax\Response\ResponseSuccess;
-use HeimrichHannot\Haste\Dca\General;
-use HeimrichHannot\Haste\Util\FormSubmission;
-use Isotope\Backend;
-use Isotope\Backend\Product\Category;
-use Isotope\Backend\Product\Price;
-use HeimrichHannot\IsotopePlus\ProductHelper;
-use PHPExif\Reader\Reader;
 
 class ProductModel extends \Model
 {

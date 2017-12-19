@@ -30,3 +30,14 @@ $GLOBALS['TL_LANG']['tl_iso_product']['licence']                 = [
 	\HeimrichHannot\IsotopePlus\ProductHelper::ISO_LICENCE_LOCKED    => 'geschützt (lizenzpflichtig)',
 ];
 $arrLang['copyright']                                            = ['Copyright', 'Bitte geben Sie einen Copyright an.'];
+$arrLang['uploadedFiles'] = [
+	'Bild hochladen',
+	'Fügen Sie hier Bilder hinzu, die für den Upload genutzt werden sollen. Wenn Sie mehrere Bilder auswählen, wird für jedes Bild ein eigener Artikel erstellt. Die Artikel besitzen die gleichen Attribute.',
+	'Datei(en) auswählen'
+];
+
+$arrLang['uploadedDownloadFiles'] = [
+	'Downloadelemente hochladen',
+	'Fügen Sie hier Dateien hinzu, die als Downloadelemente für den Artikel genutzt werden sollen.',
+	'Datei(en) auswählen'
+];

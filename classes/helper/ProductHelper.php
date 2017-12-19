@@ -13,6 +13,7 @@ namespace HeimrichHannot\IsotopePlus;
 
 use Isotope\Model\Download;
 use Isotope\Model\Product;
+use Isotope\Model\ProductModel;
 use Isotope\Model\ProductType;
 
 class ProductHelper
@@ -74,7 +75,7 @@ class ProductHelper
 	
 	public static function getFilePath($file, $name)
 	{
-		if($file->extension != 'pdf')
+		if(!in_array($file->extension, ['pdf','mp4','mp3','html','tif','eps']))
 			return str_replace($file->name, $name, $file->path);
 		
 		return $file->path;
@@ -123,30 +124,30 @@ class ProductHelper
 	
 	public static function addPdfViewerToTemplate($template, $item, $module)
 	{
-		if (!$item->raw['isPdfProduct'])
-			return;
-		
-		if(($downloads = Download::findBy('pid', $item->id)) === null)
-			return;
-			
-		
-		$downloads = $downloads->fetchAll();
-		$viewer    = [];
-		
-		foreach ($downloads as $download) {
-			$pdfViewer       = new \FrontendTemplate('iso_pdf_viewer');
-			$pdfViewer->href = \FilesModel::findByUuid($download['singleSRC'])->path;
-			$pdfViewer->id   = $download['id'];
-			
-			$viewer[] = $pdfViewer->parse();
-		}
-		
-		$pdfViewerWrapper         = new \FrontendTemplate('iso_pdf_viewer_wrapper');
-		$pdfViewerWrapper->items  = $downloads;
-		$pdfViewerWrapper->panels = $viewer;
-		
-		
-		$template->pdfViewer = $pdfViewerWrapper->parse();
+//		if (!$item->raw['isPdfProduct'])
+//			return;
+//
+//		if(($downloads = Download::findBy('pid', $item->id)) === null)
+//			return;
+//
+//
+//		$downloads = $downloads->fetchAll();
+//		$viewer    = [];
+//
+//		foreach ($downloads as $download) {
+//			$pdfViewer       = new \FrontendTemplate('iso_pdf_viewer');
+//			$pdfViewer->href = \FilesModel::findByUuid($download['singleSRC'])->path;
+//			$pdfViewer->id   = $download['id'];
+//
+//			$viewer[] = $pdfViewer->parse();
+//		}
+//
+//		$pdfViewerWrapper         = new \FrontendTemplate('iso_pdf_viewer_wrapper');
+//		$pdfViewerWrapper->items  = $downloads;
+//		$pdfViewerWrapper->panels = $viewer;
+//
+//
+//		$template->pdfViewer = $pdfViewerWrapper->parse();
 	}
 	
 	public function getLicenceTitle()
@@ -156,5 +157,51 @@ class ProductHelper
 			static::ISO_LICENCE_COPYRIGHT,
 			static::ISO_LICENCE_LOCKED,
 		];
+	}
+	
+	public static function getTags()
+	{
+		$options = [];
+		
+		if(!FE_USER_LOGGED_IN)
+		{
+			$products = ProductModel::findAll();
+		}
+		else {
+			$user = \FrontendUser::getInstance();
+			$products = \HeimrichHannot\BegIsotope\ProductModel::findByEvu($user->groups);
+		}
+		
+		if(null === $products)
+			return;
+			
+		while ($products->next()) {
+			$options = array_merge($options, deserialize($products->tag,true));
+		}
+		
+		return $options;
+	}
+	
+	public function getCopyrights()
+	{
+		$copyrights = [];
+		
+		if(!FE_USER_LOGGED_IN)
+		{
+			$products = ProductModel::findAll();
+		}
+		else {
+			$user = \FrontendUser::getInstance();
+			$products = \HeimrichHannot\BegIsotope\ProductModel::findByEvu($user->groups);
+		}
+		
+		if(null === $products)
+			return;
+		
+		while ($products->next()) {
+			$copyrights = array_merge($copyrights, deserialize($products->copyright,true));
+		}
+		
+		return $copyrights;
 	}
 }

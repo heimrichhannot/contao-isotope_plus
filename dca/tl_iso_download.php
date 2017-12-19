@@ -5,7 +5,7 @@ $arrDca = &$GLOBALS['TL_DCA']['tl_iso_download'];
 /**
  * Palettes
  */
-$arrDca['palettes']['default'] = '{title_legend},title;' . $arrDca['palettes']['default'];
+$arrDca['palettes']['default'] = '{title_legend},title,download_thumbnail;' . $arrDca['palettes']['default'];
 
 /**
  * Fields
