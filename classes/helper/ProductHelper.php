@@ -64,21 +64,14 @@ class ProductHelper
 	}
 	
 	
-	public static function getFileName($file, $size)
+	public static function getFileName($file, $size,$type)
 	{
-		if ($size && $file->extension != 'pdf') {
-			return str_replace('.' . $file->extension, ProductHelper::getFileSizeName($file, $size), ltrim($file->name, '_'));
-		}
-		
-		return $file->name;
+		return str_replace('.' . $file->extension, ProductHelper::getFileSizeName($file, $size), ltrim($file->name, '_'));
 	}
 	
-	public static function getFilePath($file, $name)
+	public static function getFilePath($file, $name,$type)
 	{
-		if(!in_array($file->extension, ['pdf','mp4','mp3','html','tif','eps']))
-			return str_replace($file->name, $name, $file->path);
-		
-		return $file->path;
+		return str_replace($file->name, $name, $file->path);
 	}
 	
 	/**
@@ -162,40 +155,19 @@ class ProductHelper
 	public static function getTags()
 	{
 		$options = [];
-		
-		if(!FE_USER_LOGGED_IN)
-		{
-			$products = ProductModel::findAll();
-		}
-		else {
-			$user = \FrontendUser::getInstance();
-			$products = \HeimrichHannot\BegIsotope\ProductModel::findByEvu($user->groups);
-		}
-		
-		if(null === $products)
+		if(null === ($products = ProductModel::findAll()))
 			return;
 			
 		while ($products->next()) {
 			$options = array_merge($options, deserialize($products->tag,true));
 		}
-		
 		return $options;
 	}
 	
 	public function getCopyrights()
 	{
 		$copyrights = [];
-		
-		if(!FE_USER_LOGGED_IN)
-		{
-			$products = ProductModel::findAll();
-		}
-		else {
-			$user = \FrontendUser::getInstance();
-			$products = \HeimrichHannot\BegIsotope\ProductModel::findByEvu($user->groups);
-		}
-		
-		if(null === $products)
+		if(null === ($products = ProductModel::findAll()))
 			return;
 		
 		while ($products->next()) {
@@ -203,5 +175,33 @@ class ProductHelper
 		}
 		
 		return $copyrights;
+	}
+	
+	public static function getFileNameFromFile($file)
+	{
+		if('mp3' == $file->extension)
+		{
+			$title = str_replace(['_','.'],[' ',' '],$file->name);
+		}
+		else {
+			$title = str_replace(['_','.'.$file->extension],[' ',''],$file->name);
+		}
+		
+		$title = ProductHelper::ucfirstOnSign('-',$title);
+		$title = ProductHelper::ucfirstOnSign(' ',$title);
+
+		return $title;
+	}
+	
+	protected static function ucfirstOnSign($sign,$value)
+	{
+		$split = explode($sign,$value);
+		$result = [];
+		foreach($split as $part)
+		{
+			$result[] = ucfirst($part);
+		}
+		
+		return implode($sign,$result);
 	}
 }

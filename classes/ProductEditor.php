@@ -120,13 +120,11 @@ abstract class ProductEditor
 	 */
 	protected function prepareDataFromModule()
 	{
-		$pages = deserialize($this->module->orderPages,true);
+		$pages = deserialize($this->module->orderPages, true);
 		
 		
-		if(null !== $this->submission->orderPages)
-		{
-			foreach(deserialize($this->submission->orderPages, true) as $page)
-			{
+		if (null !== $this->submission->orderPages) {
+			foreach (deserialize($this->submission->orderPages, true) as $page) {
 				$pages[] = $page;
 			}
 		}
@@ -217,8 +215,9 @@ abstract class ProductEditor
 //				$data[$tagValueField] = ProductType::findByPk($this->submission->type)->name;
 //			}
 			
-			if('' == $data[$tagValueField])
+			if ('' == $data[$tagValueField]) {
 				continue;
+			}
 			
 			$tags[] = FormSubmission::prepareSpecialValueForPrint(
 				$data[$tagValueField],
@@ -256,7 +255,9 @@ abstract class ProductEditor
 		if (isset($GLOBALS['TL_HOOKS']['editProduct_modifyData']) && is_array($GLOBALS['TL_HOOKS']['editProduct_modifyData'])) {
 			foreach ($GLOBALS['TL_HOOKS']['editProduct_modifyData'] as $arrCallback) {
 				$objClass = \Controller::importStatic($arrCallback[0]);
-				list($this->module,$this->productData,$this->submission) = $objClass->{$arrCallback[1]}($this->module, $this->productData, $this->submission);
+				list(
+					$this->module, $this->productData, $this->submission
+					) = $objClass->{$arrCallback[1]}($this->module, $this->productData, $this->submission);
 			}
 		}
 	}
@@ -355,13 +356,16 @@ abstract class ProductEditor
 	 * @param $file object
 	 * @param $size array
 	 */
-	public function createDownloadItem($product, $file, $size,$uploadFolder = null)
+	public function createDownloadItem($product, $file, $size, $uploadFolder = null)
 	{
-		$name = ProductHelper::getFileName($file, $size);
-		$path = ProductHelper::getFilePath($file, $name);
+		if (!empty($size['size'])) {
+			$name = ProductHelper::getFileName($file, $size, $product->type);
+			$path = ProductHelper::getFilePath($file, $name, $product->type);
+		} else {
+			$path = $file->path;
+		}
 		
-		
-		if (!file_exists($path) && in_array($file->extension,['mp4','mp3','html','tif','eps'])) {
+		if (!file_exists($path) && !empty($size['size'])) {
 			$path = \Image::get($file->path, $size['size'][0], $size['size'][1], $size['size'][2], $path);
 		}
 		
@@ -372,13 +376,11 @@ abstract class ProductEditor
 		$this->saveCopyrightForFile($downloadFile, $product);
 		
 		// create Isotope download
-		$objDownload            = new Download();
+		$objDownload = new Download();
 		
-		if('pdf' == $file->extension)
-		{
-			$objDownload->download_thumbnail = serialize([$this->getPDFThumbnail($file,$uploadFolder)]);
-		}
-		else {
+		if ('pdf' == $file->extension) {
+			$objDownload->download_thumbnail = serialize([$this->getPDFThumbnail($file, $uploadFolder)]);
+		} else if(strpos(\Config::get('validImageTypes'),$file->extension)){
 			$objDownload->download_thumbnail = serialize([$file->uuid]);
 		}
 		
@@ -392,10 +394,9 @@ abstract class ProductEditor
 		$objDownload->save();
 	}
 	
-	protected function getPDFThumbnail($file,$uploadFolder = null)
+	protected function getPDFThumbnail($file, $uploadFolder = null)
 	{
-		if(null === $uploadFolder)
-		{
+		if (null === $uploadFolder) {
 			$uploadFolder = $this->getUploadFolder($this->dc);
 		}
 		
@@ -405,12 +406,9 @@ abstract class ProductEditor
 		}
 		
 		
-		if($completePath->uuid)
-		{
+		if ($completePath->uuid) {
 			return $completePath->uuid;
-		}
-		
-		else {
+		} else {
 			return \FilesModel::findByPath($completePath)->uuid;
 		}
 	}
@@ -421,18 +419,20 @@ abstract class ProductEditor
 	 */
 	protected function createDownloadItemsFromUploadedDownloadFiles($product)
 	{
-		$downloadUploads = deserialize($product->uploadedDownloadFiles,true);
+		$downloadUploads = deserialize($product->uploadedDownloadFiles, true);
 		
-		if(empty($downloadUploads))
+		if (empty($downloadUploads)) {
 			return;
+		}
 		
-		foreach($downloadUploads as $downloadUpload)
-		{
+		foreach ($downloadUploads as $downloadUpload) {
 			$file = \FilesModel::findByUuid($downloadUpload);
 			
 			$this->moveFile($file, $this->getUploadFolder($this->dc));
 			
-			$size = ['name' => sprintf($GLOBALS['TL_LANG']['MSC']['downloadItem'],str_replace(['_', '-','.'.$file->extension], [' ',' ',''], $file->name))];
+			$size = [
+				'name' => sprintf($GLOBALS['TL_LANG']['MSC']['downloadItem'],ProductHelper::getFileNameFromFile($file))
+			];
 
 //			$size = ['name' => $GLOBALS['TL_LANG']['MSC']['downloadItem']];
 			$this->createDownloadItem($product, $file, $size);
@@ -522,12 +522,13 @@ abstract class ProductEditor
 		// ghostscript
 		$transcoder = Transcoder::create();
 		
-		$transcoder->toImage(TL_ROOT . DIRECTORY_SEPARATOR . $file->path,
-							 TL_ROOT . DIRECTORY_SEPARATOR . $uploadFolder . '/' . $destinationFileName
+		$transcoder->toImage(
+			TL_ROOT . DIRECTORY_SEPARATOR . $file->path,
+			TL_ROOT . DIRECTORY_SEPARATOR . $uploadFolder . '/' . $destinationFileName
 		);
 		
 		$search = str_replace('.' . static::$convertFileType, '', $destinationFileName);
-		$files  = preg_grep('~^' . $search . '.*\.' . static::$convertFileType . '$~', scandir(TL_ROOT . DIRECTORY_SEPARATOR .$uploadFolder));
+		$files  = preg_grep('~^' . $search . '.*\.' . static::$convertFileType . '$~', scandir(TL_ROOT . DIRECTORY_SEPARATOR . $uploadFolder));
 		
 		return reset($files);
 		

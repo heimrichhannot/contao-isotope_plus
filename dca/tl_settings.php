@@ -10,12 +10,17 @@ $arrDca = &$GLOBALS['TL_DCA']['tl_settings'];
 
 
 $arrDca['fields']['iso_creatorFallbackMember'] = [
-	'label'            => &$GLOBALS['TL_LANG']['tl_settings']['iso_creatorFallbackMember'],
-	'exclude'          => true,
-	'inputType'        => 'select',
-	'foreignKey' 	   => 'tl_member.username',
-	'eval'             => ['tl_class' => 'clr', 'mandatory' => true, 'includeBlankOption' => true],
-	'sql'              => "int(4) unsigned NOT NULL default '0'",
+	'label'      => &$GLOBALS['TL_LANG']['tl_settings']['iso_creatorFallbackMember'],
+	'exclude'    => true,
+	'inputType'  => 'select',
+	'foreignKey' => 'tl_member.username',
+	'eval'       => ['tl_class' => 'clr', 'mandatory' => true, 'includeBlankOption' => true],
 ];
 
-$arrDca['palettes']['default'] = str_replace('shareExpirationInterval;', 'shareExpirationInterval;{iso_product_editor_legend},iso_creatorFallbackMember;', $arrDca['palettes']['default']);
+
+$arrDca['palettes']['default'] = str_replace(
+	'shareExpirationInterval;',
+	'shareExpirationInterval;{iso_product_editor_legend},iso_creatorFallbackMember;',
+	$arrDca['palettes']['default']
+);
+

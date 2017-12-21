@@ -52,4 +52,4 @@ $GLOBALS['TL_LANG']['MSC']['downloadSize'] = '%s';
 $GLOBALS['TL_LANG']['MSC']['downloadSizePdf'] = '%s (%s)';
 
 $GLOBALS['TL_LANG']['MSC']['downloadPdfItem'] = 'PDF herunterladen';
-$GLOBALS['TL_LANG']['MSC']['downloadItem'] = 'herunterladen';
+$GLOBALS['TL_LANG']['MSC']['downloadItem'] = '%s herunterladen';

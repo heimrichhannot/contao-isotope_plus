@@ -1,6 +1,14 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.8.2] 2017-12-21
+
+### Fixed
+- fixed creation of download items if no size attribute is set
+
+### Changed
+- generate `downloadTitle` from filename
+
 ## [1.8.1] 2017-12-19
 
 ### Changed

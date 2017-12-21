@@ -73,6 +73,15 @@ class DownloadHelper extends \Isotope\Isotope
 				$objDownload->path = $objFile->dirname;
 				$objDownload->class = 'isotope-download isotope-download-file';
 				
+				// add thumbnail
+				$thumbnails = [];
+				foreach(deserialize($arrFiles->download_thumbnail,true) as $thumbnail)
+				{
+					$thumbnails[] = \FilesModel::findByUuid($thumbnail);
+				}
+				$objDownload->thumbnail = $thumbnails;
+				
+				
 				// get width and height of download
 				if(in_array($objFile->extension, ['jpg', 'jpeg', 'tiff', 'png']))
 				{
