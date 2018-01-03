@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.8.3] 2018-01-03
+
+### Fixed
+- fixed error with editable field `copyright` (when editable, `uploadedFiles` was empty)
+
 ## [1.8.2] 2017-12-21
 
 ### Fixed

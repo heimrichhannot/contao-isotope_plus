@@ -166,15 +166,7 @@ class ProductHelper
 	
 	public function getCopyrights()
 	{
-		$copyrights = [];
-		if(null === ($products = ProductModel::findAll()))
-			return;
-		
-		while ($products->next()) {
-			$copyrights = array_merge($copyrights, deserialize($products->copyright,true));
-		}
-		
-		return $copyrights;
+		return ProductModel::getCopyrights();
 	}
 	
 	public static function getFileNameFromFile($file)

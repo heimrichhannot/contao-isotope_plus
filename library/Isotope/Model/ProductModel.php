@@ -16,4 +16,14 @@ namespace Isotope\Model;
 class ProductModel extends \Model
 {
 	protected static $strTable = 'tl_iso_product';
+	
+	public static function getCopyrights()
+	{
+		if(null !== ($copyrights = \Database::getInstance()->prepare("SELECT * FROM tl_iso_product WHERE copyright IS NOT NULL AND copyright != ''")->execute()))
+		{
+			return array_unique($copyrights->fetchEach('copyright'));
+		}
+		
+		return [];
+	}
 }
