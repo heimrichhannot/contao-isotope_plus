@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] - 2018-02-06
+
+### Changed
+- `heimrichhannot/contao-formhybrid` 3.x dependency
+- licence `LGPL-3.0+`to `LGPL-3.0-or-later`
+
 ## [1.8.3] 2018-01-03
 
 ### Fixed
