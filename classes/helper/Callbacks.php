@@ -66,6 +66,11 @@ class Callbacks
 	public function getUploadFolder(\DataContainer $dc)
 	{
 		$uploadFolder = \FilesModel::findByUuid($dc->objModule->iso_uploadFolder)->path;
+
+		if('' == $uploadFolder)
+		{
+			return 'files/media/mediathek';
+		}
 		
 		if (FE_USER_LOGGED_IN)
 		{

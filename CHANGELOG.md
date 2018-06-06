@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [2.0.1] - 2018-05-06
+
+### Fixed
+- `Callbacks:getUploadFolder` returned no path when in back end edit mode
+
 ## [2.0.0] - 2018-02-06
 
 ### Changed
