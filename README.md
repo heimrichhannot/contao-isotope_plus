@@ -1,3 +1,5 @@
+> This bundle abandoned. Please use [heimrichhannot/contao-isotope-extension-bundle](https://github.com/heimrichhannot/contao-isotope-extension-bundle) instead. 
+
 # Contao Isotope Plus
 
 A module that brings some new features to the isotope shopsystem
